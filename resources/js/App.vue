@@ -42,9 +42,8 @@ body {
   background-color: var(--clr-bg-dark);
   color: var(--clr-text);
   line-height: 1.5;
-  font-family: sans-serif;
+  /* font-family: sans-serif; */
 }
-
 
 input[type="text"],
 input[type="number"],

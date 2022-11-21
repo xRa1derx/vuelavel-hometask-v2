@@ -6,7 +6,8 @@
         <a href="#" class="nav_link">Home</a>
         <a href="#" class="nav_link">Blog</a>
         <a href="#" class="nav_link">Materials</a>
-        <a href="#" class="nav_link">Messanger</a>
+              <router-link :to="{ name: 'admin' }" class="login-btn"
+        >Messanger</router-link>
       </nav>
     </header>
     <main>
@@ -17,7 +18,7 @@
         </div>
         <img
           class="primary-image"
-          src="../assets/images/main-image.jpg"
+          src="../../assets/images/main-image.jpg"
           alt=""
         />
         <p class="greetings">
@@ -27,8 +28,9 @@
         </p>
         <button class="btn">Contact</button>
         <div class="social-link">
-          <a href=""><img src="../assets/images/vk.png" alt="" /></a>
+          <a href=""><img src="../../assets/images/vk.png" alt="" /></a>
         </div>
+        <img class="book" src="../../assets/images/book.svg" alt="" />
       </section>
       <section class="next">
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci earum
@@ -48,8 +50,10 @@ export default {
 };
 </script>
 
-
 <style scoped>
+.main-page {
+  margin: 1rem;
+}
 .next {
   width: 100%;
   height: 100%;
@@ -126,6 +130,7 @@ header > h1 {
   color: var(--clr-text);
   text-transform: capitalize;
   text-decoration: none;
+  align-self: center;
 }
 
 .nav_link:hover,
@@ -137,18 +142,13 @@ header > h1 {
   opacity: 0.5;
 }
 
-/* @media (min-width: 930px) {
-  .fullscreen::before {
-    content: url("../assets/images/book.svg");
-    position: absolute;
-    opacity: 0.9;
-    z-index: -100;
-    left: 0;
-    top: 0;
-    grid-column: 1 / 3;
-    grid-row: 1 / 3;
-  }
-} */
+.book {
+  display: none;
+}
+
+.login-btn{
+    color: inherit;
+}
 
 @media (min-width: 800px) {
   .personal {
@@ -187,6 +187,7 @@ header > h1 {
 
   .nav {
     grid-column: 2 / 4;
+    grid-row: 1;
   }
 
   main {
@@ -213,15 +214,15 @@ header > h1 {
     padding-bottom: 15vh;
   }
 
-  @media (min-width: 930px) {
-    .fullscreen::before {
-      content: url("../assets/images/book.svg");
-      position: absolute;
-      opacity: 0.4;
-      z-index: -10;
-      left: 0;
-      top: 0;
-    }
+  .book {
+    display: block;
+    position: absolute;
+    left: 10%;
+    grid-column: 1 / 3;
+    grid-row: 1 / 4;
+    align-self: end;
+    z-index: -10;
+    opacity: 0.4;
   }
 
   main::after {
@@ -274,10 +275,10 @@ header > h1 {
     position: absolute;
     bottom: 10vh;
     left: 0;
-    width: 110%;
+    width: 100%;
     height: 1px;
     background-color: var(--clr-accent);
-    grid-column: 1 / 5;
+    grid-column: 1 / 6;
     z-index: -2;
   }
 
@@ -306,6 +307,7 @@ header > h1 {
   }
 
   header {
+    grid-column: 2 / 5;
     grid-template-columns: repeat(3, 1fr);
   }
 
@@ -321,13 +323,13 @@ header > h1 {
   }
 
   .fullscreen::after {
-    grid-column: 1 / 4;
+    grid-column: 1 / 6;
   }
 
   .fullscreen::before {
-      grid-row: 1 / 3;
-      grid-column: 1 / 3;
-    }
+    grid-row: 1 / 3;
+    grid-column: 1 / 3;
+  }
 
   @media (max-height: 850px) {
     .primary-image {

@@ -229,18 +229,18 @@
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/posts"
+              <router-link class="nav-link" to="/admin/posts"
                 ><i class="nav-icon fa fa-solid fa-blog"></i>Posts</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/categories"
+              <router-link class="nav-link" to="/admin/categories"
                 ><i class="nav-icon fas fa-solid fa-list"></i
                 >Categories</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/comments"
+              <router-link class="nav-link" to="/admin/comments"
                 ><i class="nav-icon far fa-solid fa-envelope-open"></i
                 >Comments<span class="badge badge-info right"
                   >2</span
@@ -248,19 +248,19 @@
               >
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/tags"
+              <router-link class="nav-link" to="/admin/tags"
                 ><i class="nav-icon fas fa-regular fa-tag"></i>Tags</router-link
               >
             </li>
             <li class="nav-header"><strong>CHAT SECTION</strong></li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/users"
+              <router-link class="nav-link" to="/admin/users"
                 ><i class="nav-icon fas fa-regular fa-user"></i
                 >Students</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/comments"
+              <router-link class="nav-link" to="/messages"
                 ><i class="nav-icon fas fa-thin fa-comment-dots"></i
                 >Messages<span class="badge badge-info right"
                   >5</span
@@ -292,7 +292,13 @@
       <section class="content">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-12"></div>
+            <div class="col-12">
+              <router-view v-slot="slotProps">
+                <transition name="route" mode="out-in">
+                  <component :is="slotProps.Component"></component>
+                </transition>
+              </router-view>
+            </div>
           </div>
         </div>
       </section>
@@ -300,8 +306,7 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <footer class="main-footer">
-    </footer>
+    <footer class="main-footer"></footer>
 
     <aside class="control-sidebar control-sidebar-dark"></aside>
   </div>
@@ -312,6 +317,9 @@ export default {};
 </script>
 
 <style scoped>
+.wrapper {
+  overflow: hidden;
+}
 .main-sidebar,
 .main-footer,
 .main-header {
@@ -337,5 +345,27 @@ export default {};
 .btn,
 .white {
   color: #fff;
+}
+
+.router-link-active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff !important;
+}
+
+/* animations */
+
+.route-enter-from {
+  opacity: 0.1;
+  transform: translateY(-15px);
+}
+.route-enter-active {
+  transition: all 0.5s ease-out;
+}
+.route-leave-active {
+  transition: all 0.1s ease-in;
+}
+.route-leave-to {
+  opacity: 0;
+  transform: translateY(15px);
 }
 </style> 

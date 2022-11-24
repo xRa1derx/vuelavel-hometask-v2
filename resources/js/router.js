@@ -2,7 +2,10 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
-import CategoryComponent from "./components/CategoryComponent";
+
+import CategoryComponent from "./components/Category/CategoryComponent";
+import CreateCategoryComponent from "./components/Category/CreateCategoryComponent";
+
 import TagComponent from "./components/TagComponent";
 import CommentComponent from "./components/CommentComponent";
 import PostComponent from "./components/PostComponent";
@@ -19,6 +22,10 @@ const router = createRouter({
             name: "admin",
             children: [
                 { path: "categories", component: CategoryComponent },
+                {
+                    path: "/admin/categories/create",
+                    component: CreateCategoryComponent,
+                },
                 { path: "tags", component: TagComponent },
                 { path: "users", component: UserComponent },
                 { path: "comments", component: CommentComponent },

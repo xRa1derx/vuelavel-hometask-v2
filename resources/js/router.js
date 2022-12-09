@@ -4,12 +4,13 @@ import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 
 import CategoryComponent from "./components/Category/CategoryComponent";
-import CreateCategoryComponent from "./components/Category/CreateCategoryComponent";
+import TagComponent from "./components/Tag/TagComponent";
 
-import TagComponent from "./components/TagComponent";
+import UserComponent from "./components/User/UserComponent";
+import CreateUserComponent from "./components/User/CreateUserComponent";
+
 import CommentComponent from "./components/CommentComponent";
 import PostComponent from "./components/PostComponent";
-import UserComponent from "./components/UserComponent";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -21,13 +22,18 @@ const router = createRouter({
             component: AdminPage,
             name: "admin",
             children: [
-                { path: "categories", component: CategoryComponent },
                 {
-                    path: "/admin/categories/create",
-                    component: CreateCategoryComponent,
+                    path: "categories",
+                    component: CategoryComponent,
+                    name: "categories",
                 },
                 { path: "tags", component: TagComponent },
-                { path: "users", component: UserComponent },
+                { path: "users", component: UserComponent, name: "users" },
+                {
+                    path: "users/create",
+                    component: CreateUserComponent,
+                    name: "users.create",
+                },
                 { path: "comments", component: CommentComponent },
                 { path: "posts", component: PostComponent },
             ],

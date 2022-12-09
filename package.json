@@ -24,6 +24,9 @@
         "vue-template-compiler": "^2.7.14"
     },
     "dependencies": {
+        "cropperjs": "^1.5.13",
+        "jquery": "^3.6.1",
+        "jquery-ui-dist": "^1.13.2",
         "vue-router": "^4.1.6",
         "vuex": "^4.1.0"
     }

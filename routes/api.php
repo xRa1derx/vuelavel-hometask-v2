@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\Category\IndexController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,4 +20,28 @@ use App\Http\Controllers\Admin\Category\IndexController;
 
 
 // Route::get('/admin',  IndexController::class);
-Route::get('/admin/categories', IndexController::class);
+Route::group(['namespace' => 'Admin\Category', 'prefix' => 'admin'], function () {
+    Route::get('/categories', 'IndexController');
+    Route::post('/categories/create', 'StoreController');
+    Route::patch('/categories/{category}', 'UpdateController');
+    Route::delete('/categories/{category}', 'DeleteController');
+});
+
+Route::group(['namespace' => 'Admin\Tag', 'prefix' => 'admin'], function () {
+    Route::get('/tags', 'IndexController');
+    Route::post('/tags/create', 'StoreController');
+    Route::patch('/tags/{tag}', 'UpdateController');
+    Route::delete('/tags/{tag}', 'DeleteController');
+});
+
+Route::group(['namespace' => 'Admin\User', 'prefix' => 'admin'], function () {
+    Route::get('/users', 'IndexController');
+    Route::post('/users/create', 'StoreController');
+    Route::post('/users/{user}', 'UpdateController');
+    Route::delete('/users/{user}', 'DeleteController');
+});
+
+
+
+
+// Route::get('/admin/posts', 'App\Http\Controllers\Admin\Post\IndexController');

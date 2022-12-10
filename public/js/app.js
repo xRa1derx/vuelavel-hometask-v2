@@ -23522,12 +23522,11 @@ __webpack_require__.r(__webpack_exports__);
         });
       });
     },
-    clearAvatar: function clearAvatar(values) {
-      this.avatar = values.avatar;
-      this.selectToCrop = values.selectToCrop;
+    clearAvatar: function clearAvatar(avatar) {
+      this.avatar = avatar;
     },
-    selectedToCropEmitter: function selectedToCropEmitter(value) {
-      this.selectToCrop = value.selectToCrop;
+    isSelectToCrop: function isSelectToCrop(value) {
+      this.selectToCrop = value;
     },
     toBlob: function toBlob(blob) {
       this.avatar = blob;
@@ -23554,9 +23553,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["selectedToCropEmitter", "toBlob", "isCropped", "clearCroppedAvatar"],
+  props: ["savedAvatar"],
+  emits: ["toBlob", "isSelectToCrop", "clearAvatar"],
   data: function data() {
     return {
+      avatar: "",
       selectedFile: null,
       imageSrc: null,
       cropper: null,
@@ -23565,14 +23566,14 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    clearCroppedAvatar: function clearCroppedAvatar() {
+    clearAvatar: function clearAvatar() {
       this.cropper.destroy();
       this.avatar = "";
       this.imageSrc = null;
       this.selectToCrop = false;
       this.selectedFile = null;
       this.cropper = null;
-      this.$emit("clearCroppedAvatar", this.avatar);
+      this.$emit("clearAvatar", this.avatar);
     },
     handleImageCropped: function handleImageCropped() {
       var _this = this;
@@ -23584,7 +23585,7 @@ __webpack_require__.r(__webpack_exports__);
         _this.$emit("toBlob", blob);
       }, "image/jpeg");
       this.cropped = true;
-      this.$emit("isCropped", true);
+      this.$emit("isSelectToCrop", false);
     },
     onChangeFileUpload: function onChangeFileUpload(e) {
       var _this2 = this;
@@ -23594,9 +23595,7 @@ __webpack_require__.r(__webpack_exports__);
         this.avatar = files[0];
         this.imageSrc = URL.createObjectURL(this.avatar);
         this.selectToCrop = true;
-        this.$emit("selectedToCropEmitter", {
-          selectToCrop: this.selectToCrop
-        });
+        this.$emit("isSelectToCrop", true);
         setTimeout(function () {
           _this2.cropper = new (cropperjs__WEBPACK_IMPORTED_MODULE_0___default())(_this2.$refs.img, {
             aspectRatio: 1,
@@ -23618,10 +23617,6 @@ __webpack_require__.r(__webpack_exports__);
       setTimeout(function () {
         _this3.imageSrc = URL.createObjectURL(_this3.avatar);
         _this3.selectToCrop = false;
-        _this3.$emit("selectedToCropEmitter", {
-          selectToCrop: _this3.selectToCrop
-        });
-        _this3.cropped = false;
         _this3.cropper.destroy();
       }, 500);
     }
@@ -23644,6 +23639,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _CropAvatarComponent_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CropAvatarComponent.vue */ "./resources/js/components/User/CropAvatarComponent.vue");
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -23654,35 +23652,83 @@ __webpack_require__.r(__webpack_exports__);
   emits: ["updateUser"],
   data: function data() {
     return {
-      avatar: "",
+      avatar: null,
       name: "",
       email: "",
-      selectToCrop: false,
       isChanged: false,
-      cropped: false,
-      clearClick: true
+      clearAvatarBtn: true
     };
   },
+  mounted: function mounted() {
+    var _this = this;
+    this.observer = new MutationObserver(function (mutations) {
+      var _iterator = _createForOfIteratorHelper(mutations),
+        _step;
+      try {
+        var _loop = function _loop() {
+          var m = _step.value;
+          var newValue = m.target.getAttribute(m.attributeName);
+          _this.$nextTick(function () {
+            _this.onClassChange(newValue, m.oldValue);
+          });
+        };
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          _loop();
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+    });
+    this.observer.observe(this.$refs.closeEdit, {
+      attributes: true,
+      attributeOldValue: true,
+      attributeFilter: ["class"]
+    });
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.observer.disconnect();
+  },
   methods: {
-    callMethodInChildComponent: function callMethodInChildComponent() {
-      this.$refs.childComponent.clearCroppedAvatar();
+    clearAvatarFromCropComponent: function clearAvatarFromCropComponent() {
+      this.$refs.cropAvatarClear.clearAvatar();
+    },
+    onClassChange: function onClassChange(classAttrValue) {
+      var classList = classAttrValue.split(" ");
+      if (!classList.includes("show")) {
+        console.log("has fully-in-viewport");
+      }
     },
     updateUser: function updateUser() {
-      var _this = this;
-      this.isChanged = false;
-      if (this.avatar === null || this.avatar == "") {
+      var _this2 = this;
+      if (this.avatar === null) {
         var data = new FormData();
         data.append("avatar", "");
         data.append("name", this.name);
         data.append("email", this.email);
         axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/admin/users/".concat(this.currentUserId), data, {
           _method: "patch"
-        }).then(function (res) {
-          _this.$emit("updateUser");
+        }).then(function () {
+          _this2.$emit("updateUser");
+        });
+      } else if (typeof this.avatar == "string") {
+        fetch(this.$refs.imageSrc.src).then(function (res) {
+          return res.blob();
+        }).then(function (blob) {
+          var data = new FormData();
+          data.append("avatar", blob);
+          data.append("name", _this2.name);
+          data.append("email", _this2.email);
+          axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/admin/users/".concat(_this2.currentUserId), data, {
+            _method: "patch"
+          }).then(function (res) {
+            _this2.$emit("updateUser");
+            _this2.clearAvatarFromCropComponent();
+            _this2.clearAvatarBtn = true;
+          });
         });
       } else {
-        this.cropped = false;
-        this.clearClick = true;
         var _data = new FormData();
         _data.append("avatar", this.avatar);
         _data.append("name", this.name);
@@ -23690,43 +23736,21 @@ __webpack_require__.r(__webpack_exports__);
         axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/admin/users/".concat(this.currentUserId), _data, {
           _method: "patch"
         }).then(function (res) {
-          _this.$emit("updateUser");
-          _this.callMethodInChildComponent();
+          _this2.$emit("updateUser");
+          _this2.clearAvatarFromCropComponent();
+          _this2.$refs.imageSrc.src = "/uploads/".concat(res.data.avatar);
+          _this2.clearAvatarBtn = true;
         });
       }
-    },
-    clearAvatar: function clearAvatar() {
-      this.isChanged = true;
-      this.avatar = null;
-      this.clearClick = false;
-      this.$refs.imageSrc.src = "/uploads/no-user-image.png";
-    },
-    closeEdit: function closeEdit() {
-      var _this2 = this;
-      if (this.cropped || this.selectToCrop) {
-        this.cropped = false;
-        this.selectToCrop = false;
-        this.callMethodInChildComponent();
-      }
-      console.log(this.isChanged);
-      // this.avatar = null;
-      this.clearClick = true;
-      this.$refs.imageSrc.src = "/uploads/".concat(this.currentUserAvatar || "no-user-image.png");
-      setTimeout(function () {
-        _this2.isChanged = false;
-      }, 500);
-    },
-    selectedToCropEmitter: function selectedToCropEmitter(value) {
-      this.selectToCrop = value.selectToCrop;
+      this.isChanged = false;
     },
     toBlob: function toBlob(blob) {
       this.avatar = blob;
     },
-    isCropped: function isCropped(val) {
-      this.cropped = val;
-    },
-    clearCroppedAvatar: function clearCroppedAvatar(avatar) {
-      this.avatar = avatar;
+    clearAvatar: function clearAvatar() {
+      this.avatar = null;
+      this.clearAvatarBtn = false;
+      this.$refs.imageSrc.src = "/uploads/no-user-image.png";
     }
   },
   watch: {
@@ -23735,6 +23759,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     currentUserEmail: function currentUserEmail(val) {
       this.email = val;
+    },
+    currentUserAvatar: function currentUserAvatar(val) {
+      this.avatar = val;
     },
     name: function name() {
       if (this.name !== this.currentUserName) {
@@ -23751,8 +23778,6 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     avatar: function avatar(val, oldVal) {
-      console.log(val);
-      console.log(oldVal);
       if (this.avatar !== this.currentUserAvatar) {
         this.isChanged = true;
       } else {
@@ -24563,14 +24588,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.password, void 0, {
     trim: true
   }]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_crop_avatar_component, {
-    onSelectedToCropEmitter: $options.selectedToCropEmitter,
-    onToBlob: $options.toBlob
+    onIsSelectToCrop: $options.isSelectToCrop,
+    onToBlob: $options.toBlob,
+    onClearAvatar: $options.clearAvatar
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("*Select avatar")];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["onSelectedToCropEmitter", "onToBlob"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, 8 /* PROPS */, ["onIsSelectToCrop", "onToBlob", "onClearAvatar"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $options.addUser();
     }, ["prevent"])),
@@ -24623,7 +24649,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "avatar-image mb-3",
     src: $data.imageSrc,
     alt: "avatar-image"
-  }, null, 8 /* PROPS */, _hoisted_2)], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.imageSrc]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [!$data.selectToCrop && !$data.cropped && !$data.selectedFile ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  }, null, 8 /* PROPS */, _hoisted_2)], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.imageSrc]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [!$data.selectToCrop && !$data.selectedFile ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     "class": "btn btn-secondary px-3",
     onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -24635,11 +24661,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.handleImageCropped && $options.handleImageCropped.apply($options, arguments);
     }, ["prevent"]))
-  }, " Crop image ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.selectToCrop && !$data.cropped && $data.imageSrc ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  }, " Crop image ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.selectToCrop && $data.cropped && $data.imageSrc ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 2,
     "class": "btn btn-info",
     onClick: _cache[2] || (_cache[2] = function () {
-      return $options.clearCroppedAvatar && $options.clearCroppedAvatar.apply($options, arguments);
+      return $options.clearAvatar && $options.clearAvatar.apply($options, arguments);
     })
   }, " Clear ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedFile ? $data.selectedFile.name : "no image selected"), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     ref: "imageInput",
@@ -24674,6 +24700,7 @@ var _withScopeId = function _withScopeId(n) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-b7fe9f62"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
 };
 var _hoisted_1 = {
+  ref: "closeEdit",
   "class": "modal fade",
   id: "exampleModalCenter",
   tabindex: "-1",
@@ -24742,7 +24769,14 @@ var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_17 = {
   "class": "modal-footer"
 };
-var _hoisted_18 = ["disabled"];
+var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-secondary",
+    "data-dismiss": "modal"
+  }, " Close ", -1 /* HOISTED */);
+});
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_crop_avatar_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("crop-avatar-component");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_5, " Edit " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.currentUserName) + "'s profile ", 1 /* TEXT */), _hoisted_6]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
@@ -24767,36 +24801,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.email = $event;
     })
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.email]])]), _hoisted_16])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_crop_avatar_component, {
-    onClearCroppedAvatar: $options.clearCroppedAvatar,
-    onSelectedToCropEmitter: $options.selectedToCropEmitter,
-    onToBlob: $options.toBlob,
-    onIsCropped: $options.isCropped,
-    ref: "childComponent"
+    ref: "cropAvatarClear",
+    onToBlob: $options.toBlob
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Change avatar")];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["onClearCroppedAvatar", "onSelectedToCropEmitter", "onToBlob", "onIsCropped"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, 8 /* PROPS */, ["onToBlob"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-info",
     onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.clearAvatar && $options.clearAvatar.apply($options, arguments);
     }, ["prevent"]))
-  }, " Clear Avatar ", 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.selectToCrop && !$data.cropped && $data.clearClick && $props.currentUserAvatar]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[3] || (_cache[3] = function ($event) {
-      return $options.closeEdit();
-    }),
-    type: "button",
-    "class": "btn btn-secondary",
-    "data-dismiss": "modal"
-  }, " Close "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+  }, " Clear Avatar ", 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $props.currentUserAvatar && $data.clearAvatarBtn]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $options.updateUser();
     }, ["prevent"])),
     type: "submit",
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn", !$data.isChanged ? 'btn-secondary' : 'btn-warning']),
-    disabled: !$data.isChanged
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.isChanged ? "Save changes" : "No changes"), 11 /* TEXT, CLASS, PROPS */, _hoisted_18)])])])]);
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn", !$data.isChanged ? 'btn-secondary' : 'btn-warning'])
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.isChanged ? "Save changes" : "No changes"), 3 /* TEXT, CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Avatar: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.avatar) + " currentUserAvatar: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.currentUserAvatar), 1 /* TEXT */)])])])], 512 /* NEED_PATCH */);
 }
 
 /***/ }),
@@ -34304,7 +34327,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-header[data-v-b7fe9f62] {\r\n    border-bottom: 1px solid var(--clr-dark-grey-strip);\n}\n.modal-footer[data-v-b7fe9f62] {\r\n    border-top: 1px solid var(--clr-dark-grey-strip);\n}\n.table-wrapper[data-v-b7fe9f62] {\r\n    min-height: 50vh; /* for spinner */\r\n    height: 100%;\n}\nform[data-v-b7fe9f62] {\r\n    padding: 2rem;\n}\n.avatar[data-v-b7fe9f62] {\r\n    border-top: 1px solid var(--clr-dark-grey-strip);\r\n    border-bottom: 1px solid var(--clr-dark-grey-strip);\n}\n.avatar-label[data-v-b7fe9f62] {\r\n    width: -moz-min-content;\r\n    width: min-content;\r\n    padding-right: 1rem;\n}\n.avatar-input[data-v-b7fe9f62] {\r\n    width: -moz-min-content;\r\n    width: min-content;\n}\n.avatar-image[data-v-b7fe9f62] {\r\n    width: 100%;\r\n    border-radius: 50%;\n}\n@media (max-width: 450px) {\n.info-wrapper[data-v-b7fe9f62] {\r\n        display: block !important;\r\n        text-align: center;\n}\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-header[data-v-b7fe9f62] {\r\n    border-bottom: 1px solid var(--clr-dark-grey-strip);\n}\n.modal-footer[data-v-b7fe9f62] {\r\n    border-top: 1px solid var(--clr-dark-grey-strip);\n}\n.table-wrapper[data-v-b7fe9f62] {\r\n    min-height: 50vh; /* for spinner */\r\n    height: 100%;\n}\nform[data-v-b7fe9f62] {\r\n    padding: 2rem;\n}\r\n\r\n/* .avatar {\r\n    border-top: 1px solid var(--clr-dark-grey-strip);\r\n    border-bottom: 1px solid var(--clr-dark-grey-strip);\r\n} */\r\n\r\n/* .avatar-label {\r\n    width: min-content;\r\n    padding-right: 1rem;\r\n} */\r\n/* .avatar-input {\r\n    width: min-content;\r\n} */\r\n\r\n/* .avatar-image {\r\n    width: 100%;\r\n    border-radius: 50%;\r\n} */\n@media (max-width: 450px) {\n.info-wrapper[data-v-b7fe9f62] {\r\n        display: block !important;\r\n        text-align: center;\n}\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

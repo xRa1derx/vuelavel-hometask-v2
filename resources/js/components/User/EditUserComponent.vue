@@ -1,5 +1,6 @@
 <template>
     <div
+        ref="closeEdit"
         class="modal fade"
         id="exampleModalCenter"
         tabindex="-1"
@@ -68,11 +69,8 @@
                                 </div>
                             </div>
                             <crop-avatar-component
-                                @clearCroppedAvatar="clearCroppedAvatar"
-                                @selectedToCropEmitter="selectedToCropEmitter"
+                                ref="cropAvatarClear"
                                 @toBlob="toBlob"
-                                @isCropped="isCropped"
-                                ref="childComponent"
                             >
                                 <template v-slot:default
                                     >Change avatar</template
@@ -80,12 +78,7 @@
                             </crop-avatar-component>
 
                             <button
-                                v-show="
-                                    !selectToCrop &&
-                                    !cropped &&
-                                    clearClick &&
-                                    currentUserAvatar
-                                "
+                                v-show="currentUserAvatar && clearAvatarBtn"
                                 class="btn btn-info"
                                 @click.prevent="clearAvatar"
                             >
@@ -96,7 +89,6 @@
                 </div>
                 <div class="modal-footer">
                     <button
-                        @click="closeEdit()"
                         type="button"
                         class="btn btn-secondary"
                         data-dismiss="modal"
@@ -108,10 +100,11 @@
                         type="submit"
                         class="btn"
                         :class="!isChanged ? 'btn-secondary' : 'btn-warning'"
-                        :disabled="!isChanged"
                     >
                         {{ isChanged ? "Save changes" : "No changes" }}
                     </button>
+                    Avatar: {{ avatar }} currentUserAvatar:
+                    {{ currentUserAvatar }}
                 </div>
             </div>
         </div>
@@ -134,22 +127,44 @@ export default {
     emits: ["updateUser"],
     data() {
         return {
-            avatar: "",
+            avatar: null,
             name: "",
             email: "",
-            selectToCrop: false,
             isChanged: false,
-            cropped: false,
-            clearClick: true,
+            clearAvatarBtn: true,
         };
     },
+    mounted() {
+        this.observer = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                const newValue = m.target.getAttribute(m.attributeName);
+                this.$nextTick(() => {
+                    this.onClassChange(newValue, m.oldValue);
+                });
+            }
+        });
+
+        this.observer.observe(this.$refs.closeEdit, {
+            attributes: true,
+            attributeOldValue: true,
+            attributeFilter: ["class"],
+        });
+    },
+    beforeDestroy() {
+        this.observer.disconnect();
+    },
     methods: {
-        callMethodInChildComponent() {
-            this.$refs.childComponent.clearCroppedAvatar();
+        clearAvatarFromCropComponent() {
+            this.$refs.cropAvatarClear.clearAvatar();
+        },
+        onClassChange(classAttrValue) {
+            const classList = classAttrValue.split(" ");
+            if (!classList.includes("show")) {
+                console.log("has fully-in-viewport");
+            }
         },
         updateUser() {
-            this.isChanged = false;
-            if (this.avatar === null || this.avatar == "") {
+            if (this.avatar === null) {
                 let data = new FormData();
                 data.append("avatar", "");
                 data.append("name", this.name);
@@ -158,12 +173,32 @@ export default {
                     .post(`/api/admin/users/${this.currentUserId}`, data, {
                         _method: "patch",
                     })
-                    .then((res) => {
+                    .then(() => {
                         this.$emit("updateUser");
                     });
+            } else if (typeof this.avatar == "string") {
+                fetch(this.$refs.imageSrc.src)
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        let data = new FormData();
+                        data.append("avatar", blob);
+                        data.append("name", this.name);
+                        data.append("email", this.email);
+                        axios
+                            .post(
+                                `/api/admin/users/${this.currentUserId}`,
+                                data,
+                                {
+                                    _method: "patch",
+                                }
+                            )
+                            .then((res) => {
+                                this.$emit("updateUser");
+                                this.clearAvatarFromCropComponent();
+                                this.clearAvatarBtn = true;
+                            });
+                    });
             } else {
-                this.cropped = false;
-                this.clearClick = true;
                 let data = new FormData();
                 data.append("avatar", this.avatar);
                 data.append("name", this.name);
@@ -174,43 +209,20 @@ export default {
                     })
                     .then((res) => {
                         this.$emit("updateUser");
-                        this.callMethodInChildComponent();
+                        this.clearAvatarFromCropComponent();
+                        this.$refs.imageSrc.src = `/uploads/${res.data.avatar}`;
+                        this.clearAvatarBtn = true;
                     });
             }
-        },
-        clearAvatar() {
-            this.isChanged = true;
-            this.avatar = null;
-            this.clearClick = false;
-            this.$refs.imageSrc.src = "/uploads/no-user-image.png";
-        },
-        closeEdit() {
-            if (this.cropped || this.selectToCrop) {
-                this.cropped = false;
-                this.selectToCrop = false;
-                this.callMethodInChildComponent();
-            }
-            console.log(this.isChanged);
-            // this.avatar = null;
-            this.clearClick = true;
-            this.$refs.imageSrc.src = `/uploads/${
-                this.currentUserAvatar || "no-user-image.png"
-            }`;
-            setTimeout(() => {
-                this.isChanged = false;
-            }, 500);
-        },
-        selectedToCropEmitter(value) {
-            this.selectToCrop = value.selectToCrop;
+            this.isChanged = false;
         },
         toBlob(blob) {
             this.avatar = blob;
         },
-        isCropped(val) {
-            this.cropped = val;
-        },
-        clearCroppedAvatar(avatar) {
-            this.avatar = avatar;
+        clearAvatar() {
+            this.avatar = null;
+            this.clearAvatarBtn = false;
+            this.$refs.imageSrc.src = "/uploads/no-user-image.png";
         },
     },
     watch: {
@@ -219,6 +231,9 @@ export default {
         },
         currentUserEmail(val) {
             this.email = val;
+        },
+        currentUserAvatar(val) {
+            this.avatar = val;
         },
         name() {
             if (this.name !== this.currentUserName) {
@@ -235,8 +250,6 @@ export default {
             }
         },
         avatar(val, oldVal) {
-            console.log(val);
-            console.log(oldVal);
             if (this.avatar !== this.currentUserAvatar) {
                 this.isChanged = true;
             } else {
@@ -264,23 +277,23 @@ form {
     padding: 2rem;
 }
 
-.avatar {
+/* .avatar {
     border-top: 1px solid var(--clr-dark-grey-strip);
     border-bottom: 1px solid var(--clr-dark-grey-strip);
-}
+} */
 
-.avatar-label {
+/* .avatar-label {
     width: min-content;
     padding-right: 1rem;
-}
-.avatar-input {
+} */
+/* .avatar-input {
     width: min-content;
-}
+} */
 
-.avatar-image {
+/* .avatar-image {
     width: 100%;
     border-radius: 50%;
-}
+} */
 
 @media (max-width: 450px) {
     .info-wrapper {

@@ -17,5 +17,6 @@ class UpdateController extends Controller
         ]);
         $user->update($data);
         $user->uploadAvatar($request->file('avatar'));
+        return $user;
     }
 }

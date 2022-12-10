@@ -48,8 +48,9 @@
             </div>
 
             <crop-avatar-component
-                @selectedToCropEmitter="selectedToCropEmitter"
+                @isSelectToCrop="isSelectToCrop"
                 @toBlob="toBlob"
+                @clearAvatar="clearAvatar"
                 ><template v-slot:default
                     >*Select avatar</template
                 ></crop-avatar-component
@@ -96,12 +97,11 @@ export default {
                 .post("/api/admin/users/create", data)
                 .then((res) => this.$router.push({ name: "users" }));
         },
-        clearAvatar(values) {
-            this.avatar = values.avatar;
-            this.selectToCrop = values.selectToCrop;
+        clearAvatar(avatar) {
+            this.avatar = avatar;
         },
-        selectedToCropEmitter(value) {
-            this.selectToCrop = value.selectToCrop;
+        isSelectToCrop(value) {
+            this.selectToCrop = value;
         },
         toBlob(blob) {
             this.avatar = blob;

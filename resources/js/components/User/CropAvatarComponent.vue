@@ -13,7 +13,7 @@
                 class="avatar pt-3 pb-3 w-100 form-group d-flex flex-wrap justify-content-between"
             >
                 <button
-                    v-if="!selectToCrop && !cropped && !selectedFile"
+                    v-if="!selectToCrop && !selectedFile"
                     class="btn btn-secondary px-3"
                     @click.prevent="$refs.imageInput.click()"
                 >
@@ -27,9 +27,9 @@
                     Crop image
                 </button>
                 <button
-                    v-if="!selectToCrop && !cropped && imageSrc"
+                    v-if="!selectToCrop && cropped && imageSrc"
                     class="btn btn-info"
-                    @click="clearCroppedAvatar"
+                    @click="clearAvatar"
                 >
                     Clear
                 </button>
@@ -56,14 +56,11 @@
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 export default {
-    emits: [
-        "selectedToCropEmitter",
-        "toBlob",
-        "isCropped",
-        "clearCroppedAvatar",
-    ],
+    props: ["savedAvatar"],
+    emits: ["toBlob", "isSelectToCrop", "clearAvatar"],
     data() {
         return {
+            avatar: "",
             selectedFile: null,
             imageSrc: null,
             cropper: null,
@@ -72,14 +69,14 @@ export default {
         };
     },
     methods: {
-        clearCroppedAvatar() {
+        clearAvatar() {
             this.cropper.destroy();
             this.avatar = "";
             this.imageSrc = null;
             this.selectToCrop = false;
             this.selectedFile = null;
             this.cropper = null;
-            this.$emit("clearCroppedAvatar", this.avatar);
+            this.$emit("clearAvatar", this.avatar);
         },
         handleImageCropped() {
             this.cropper
@@ -92,7 +89,7 @@ export default {
                     this.$emit("toBlob", blob);
                 }, "image/jpeg");
             this.cropped = true;
-            this.$emit("isCropped", true);
+            this.$emit("isSelectToCrop", false);
         },
         onChangeFileUpload(e) {
             const files = e.target.files;
@@ -101,10 +98,7 @@ export default {
                 this.avatar = files[0];
                 this.imageSrc = URL.createObjectURL(this.avatar);
                 this.selectToCrop = true;
-                this.$emit("selectedToCropEmitter", {
-                    selectToCrop: this.selectToCrop,
-                });
-
+                this.$emit("isSelectToCrop", true);
                 setTimeout(() => {
                     this.cropper = new Cropper(this.$refs.img, {
                         aspectRatio: 1,
@@ -125,10 +119,6 @@ export default {
             setTimeout(() => {
                 this.imageSrc = URL.createObjectURL(this.avatar);
                 this.selectToCrop = false;
-                this.$emit("selectedToCropEmitter", {
-                    selectToCrop: this.selectToCrop,
-                });
-                this.cropped = false;
                 this.cropper.destroy();
             }, 500);
         },

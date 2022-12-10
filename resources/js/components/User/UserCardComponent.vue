@@ -46,7 +46,8 @@
                 :currentUserName="currentUserName"
                 :currentUserEmail="currentUserEmail"
                 :currentUserAvatar="currentUserAvatar"
-            ></edit-user-component>
+            >
+            </edit-user-component>
         </div>
     </div>
 </template>

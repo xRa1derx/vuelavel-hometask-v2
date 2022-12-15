@@ -24,6 +24,7 @@ mix.styles(
 mix.scripts(
     [
         "resources/assets/admin/plugins/jquery/jquery.min.js",
+        "resources/assets/admin/plugins/jquery-ui-dist/jquery-ui.js",
         "resources/assets/admin/plugins/bootstrap/js/bootstrap.bundle.min.js",
         "resources/assets/admin/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js",
         "resources/assets/admin/dist/js/adminlte.min.js",

@@ -25358,7 +25358,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [_hoisted_9];
     }),
     _: 1 /* STABLE */
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sidebar "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sidebar user (optional) "), _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SidebarSearch Form "), _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sidebar Menu "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("nav", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Blog Header "), _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add icons to the links using the .nav-icon class\n               with font-awesome or any other icon font library "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sidebar "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sidebar user (optional) "), _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SidebarSearch Form "), _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sidebar Menu "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("nav", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Blog Header "), _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add icons to the links using the .nav-icon class\r\n               with font-awesome or any other icon font library "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link",
     to: "/admin/posts"
   }, {
@@ -34207,7 +34207,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.table-wrapper[data-v-35244b4e] {\n    min-height: 50vh; /* for spinner */\n    height: 100%;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.table-wrapper[data-v-35244b4e] {\r\n    min-height: 50vh; /* for spinner */\r\n    height: 100%;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -34231,7 +34231,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.table-wrapper[data-v-e1279d3a] {\n    min-height: 50vh; /* for spinner */\n    height: 100%;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.table-wrapper[data-v-e1279d3a] {\r\n    min-height: 50vh; /* for spinner */\r\n    height: 100%;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -34375,7 +34375,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.wrapper[data-v-650af776] {\n    overflow: hidden;\n}\n.main-sidebar[data-v-650af776],\n.main-footer[data-v-650af776],\n.main-header[data-v-650af776] {\n    background-color: #242424;\n}\n.content-wrapper[data-v-650af776] {\n    background-color: #3b3b3b;\n}\n.main-header[data-v-650af776] {\n    border-bottom: 1px solid #ff7600;\n}\n.main-footer[data-v-650af776] {\n    border-top: 1px solid #ff7600;\n}\n.nav-icon[data-v-650af776],\n.fa-bars[data-v-650af776] {\n    color: #ff7600;\n}\n.btn[data-v-650af776],\n.white[data-v-650af776] {\n    color: #fff;\n}\n.active[data-v-650af776] {\n    background-color: #ff770024 !important;\n}\n.nav-treeview[data-v-650af776] {\n    margin-left: 15px;\n}\n.openTreeview[data-v-650af776] {\n    display: block !important;\n    animation-duration: 0.3s;\n    animation-name: slidein-650af776;\n}\n.mt-2[data-v-650af776]{\n    height: 50vh;\n}\n@keyframes slidein-650af776 {\nfrom {\n        margin-top: -20px;\n        opacity: 0;\n}\n}\n.router-link-active[data-v-650af776] {\n    background-color: rgba(255, 255, 255, 0.1);\n    color: #fff !important;\n}\n\n/* animations */\n.route-enter-from[data-v-650af776] {\n    opacity: 0.1;\n    transform: translateY(-15px);\n}\n.route-enter-active[data-v-650af776] {\n    transition: all 0.5s ease-out;\n}\n.route-leave-active[data-v-650af776] {\n    transition: all 0.1s ease-in;\n}\n.route-leave-to[data-v-650af776] {\n    opacity: 0;\n    transform: translateY(15px);\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.wrapper[data-v-650af776] {\r\n    overflow: hidden;\n}\n.main-sidebar[data-v-650af776],\r\n.main-footer[data-v-650af776],\r\n.main-header[data-v-650af776] {\r\n    background-color: #242424;\n}\n.content-wrapper[data-v-650af776] {\r\n    background-color: #3b3b3b;\n}\n.main-header[data-v-650af776] {\r\n    border-bottom: 1px solid #ff7600;\n}\n.main-footer[data-v-650af776] {\r\n    border-top: 1px solid #ff7600;\n}\n.nav-icon[data-v-650af776],\r\n.fa-bars[data-v-650af776] {\r\n    color: #ff7600;\n}\n.btn[data-v-650af776],\r\n.white[data-v-650af776] {\r\n    color: #fff;\n}\n.active[data-v-650af776] {\r\n    background-color: #ff770024 !important;\n}\n.nav-treeview[data-v-650af776] {\r\n    margin-left: 15px;\n}\n.openTreeview[data-v-650af776] {\r\n    display: block !important;\r\n    animation-duration: 0.3s;\r\n    animation-name: slidein-650af776;\n}\n.mt-2[data-v-650af776]{\r\n    height: 50vh;\n}\n@keyframes slidein-650af776 {\nfrom {\r\n        margin-top: -20px;\r\n        opacity: 0;\n}\n}\n.router-link-active[data-v-650af776] {\r\n    background-color: rgba(255, 255, 255, 0.1);\r\n    color: #fff !important;\n}\r\n\r\n/* animations */\n.route-enter-from[data-v-650af776] {\r\n    opacity: 0.1;\r\n    transform: translateY(-15px);\n}\n.route-enter-active[data-v-650af776] {\r\n    transition: all 0.5s ease-out;\n}\n.route-leave-active[data-v-650af776] {\r\n    transition: all 0.1s ease-in;\n}\n.route-leave-to[data-v-650af776] {\r\n    opacity: 0;\r\n    transform: translateY(15px);\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

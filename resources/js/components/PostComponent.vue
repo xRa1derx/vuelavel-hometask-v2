@@ -26,13 +26,9 @@
 import axios from "axios";
 export default {
     created() {
-        this.test();
-        console.log('test');
     },
     methods: {
-        test() {
-            axios.get("/api/admin").then((res) => console.log(res));
-        },
+
     },
 };
 </script>

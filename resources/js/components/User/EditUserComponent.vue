@@ -2,16 +2,19 @@
     <div
         ref="closeEdit"
         class="modal fade"
-        id="exampleModalCenter"
+        id="exampleModalLong"
         tabindex="-1"
         role="dialog"
-        aria-labelledby="exampleModalCenterTitle"
+        aria-labelledby="exampleModalLongTitle"
         aria-hidden="true"
     >
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div
+            class="modal-dialog modal-dialog-centered modal-lg"
+            role="document"
+        >
             <div class="modal-content bg-dark-blue">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
                         Edit {{ currentUserName }}'s profile
                     </h5>
                     <button
@@ -26,7 +29,7 @@
                 <div class="modal-body">
                     <div class="table-wrapper">
                         <form enctype="multipart/form-data">
-                            <div class="row mb-3">
+                            <div v-if="!cropper" class="row mb-3">
                                 <div class="info-wrapper d-flex">
                                     <img
                                         ref="imageSrc"
@@ -38,7 +41,7 @@
                                         alt="Card image cap"
                                     />
                                     <div
-                                        class="d-flex flex-column justify-content-center"
+                                        class="d-flex flex-column justify-content-center mx-auto"
                                     >
                                         <div class="name form-group">
                                             <input
@@ -63,6 +66,7 @@
                                                 class="form-control"
                                                 name="password"
                                                 id="password"
+                                                v-model="password"
                                             />
                                         </div>
                                     </div>
@@ -71,14 +75,18 @@
                             <crop-avatar-component
                                 ref="cropAvatarClear"
                                 @toBlob="toBlob"
+                                @clearCroppedAvatar="clearCroppedAvatar"
+                                @isCropped="isCropped"
+                                @isSelectToCrop="isSelectToCrop"
+                                @isCropping="isCropping"
+                                :currentUserAvatar="currentUserAvatar"
                             >
                                 <template v-slot:default
                                     >Change avatar</template
                                 >
                             </crop-avatar-component>
-
                             <button
-                                v-show="currentUserAvatar && clearAvatarBtn"
+                                v-show="avatar && clearAvatarBtn"
                                 class="btn btn-info"
                                 @click.prevent="clearAvatar"
                             >
@@ -96,16 +104,28 @@
                         Close
                     </button>
                     <button
-                        @click.prevent="updateUser()"
-                        type="submit"
+                        data-toggle="modal"
+                        data-target="#confirmToEdit"
+                        type="button"
                         class="btn"
+                        :disabled="!isChanged"
                         :class="!isChanged ? 'btn-secondary' : 'btn-warning'"
                     >
                         {{ isChanged ? "Save changes" : "No changes" }}
                     </button>
-                    Avatar: {{ avatar }} currentUserAvatar:
-                    {{ currentUserAvatar }}
                 </div>
+                <save-edit-component>
+                    <template v-slot:default>
+                        <button
+                            @click.prevent="updateUser()"
+                            type="submit"
+                            class="btn btn-warning px-5"
+                            data-dismiss="modal"
+                        >
+                            Yes
+                        </button>
+                    </template>
+                </save-edit-component>
             </div>
         </div>
     </div>
@@ -114,9 +134,11 @@
 <script>
 import axios from "axios";
 import CropAvatarComponent from "./CropAvatarComponent.vue";
+import SaveEditComponent from "../UI/SaveEditComponent.vue";
 export default {
     components: {
         CropAvatarComponent,
+        SaveEditComponent,
     },
     props: [
         "currentUserId",
@@ -130,8 +152,12 @@ export default {
             avatar: null,
             name: "",
             email: "",
+            password: null,
             isChanged: false,
             clearAvatarBtn: true,
+            cropped: false,
+            selectToCrop: false,
+            cropper: null,
         };
     },
     mounted() {
@@ -155,28 +181,61 @@ export default {
     },
     methods: {
         clearAvatarFromCropComponent() {
-            this.$refs.cropAvatarClear.clearAvatar();
+            this.$refs.cropAvatarClear.clearCroppedAvatar();
+        },
+        clearIncorrectFileTypeMessage(){
+            this.$refs.cropAvatarClear.clearIncorrectFileTypeMessage();
+        },
+        clearCroppedAvatar(avatar, cropper) {
+            this.avatar = avatar;
+            this.cropper = cropper;
+            this.clearAvatarBtn = true;
+            if (this.avatar == this.currentUserAvatar) {
+                this.isChanged = false;
+            }
         },
         onClassChange(classAttrValue) {
             const classList = classAttrValue.split(" ");
             if (!classList.includes("show")) {
-                console.log("has fully-in-viewport");
+                this.clearIncorrectFileTypeMessage();
+                this.isChanged = false;
+                this.clearAvatarBtn = true;
+                this.avatar = this.currentUserAvatar;
+                if (this.$refs.imageSrc) {
+                    this.$refs.imageSrc.src = `/uploads/${
+                        this.currentUserAvatar || "no-user-image.png"
+                    }`;
+                }
+                if (this.selectToCrop === true) {
+                    this.clearAvatarFromCropComponent();
+                    this.selectToCrop = false;
+                }
+                if (this.cropped === true && this.cropper != null) {
+                    this.clearAvatarFromCropComponent();
+                    this.cropped = false;
+                }
             }
         },
         updateUser() {
             if (this.avatar === null) {
+                console.log("null");
                 let data = new FormData();
-                data.append("avatar", "");
                 data.append("name", this.name);
                 data.append("email", this.email);
+                data.append("password", this.password);
                 axios
                     .post(`/api/admin/users/${this.currentUserId}`, data, {
                         _method: "patch",
                     })
-                    .then(() => {
-                        this.$emit("updateUser");
-                    });
+                    .then((res) => {
+                        {
+                            this.$emit("updateUser");
+                            this.$refs.imageSrc.src = `/uploads/no-user-image.png`;
+                        }
+                    })
+                    .finally(() => (this.isLoading = false));
             } else if (typeof this.avatar == "string") {
+                console.log("string");
                 fetch(this.$refs.imageSrc.src)
                     .then((res) => res.blob())
                     .then((blob) => {
@@ -184,6 +243,7 @@ export default {
                         data.append("avatar", blob);
                         data.append("name", this.name);
                         data.append("email", this.email);
+                        data.append("password", this.password);
                         axios
                             .post(
                                 `/api/admin/users/${this.currentUserId}`,
@@ -194,15 +254,16 @@ export default {
                             )
                             .then((res) => {
                                 this.$emit("updateUser");
-                                this.clearAvatarFromCropComponent();
-                                this.clearAvatarBtn = true;
+                                // this.clearAvatarFromCropComponent();
                             });
                     });
             } else {
+                console.log("else");
                 let data = new FormData();
                 data.append("avatar", this.avatar);
                 data.append("name", this.name);
                 data.append("email", this.email);
+                data.append("password", this.password);
                 axios
                     .post(`/api/admin/users/${this.currentUserId}`, data, {
                         _method: "patch",
@@ -210,17 +271,31 @@ export default {
                     .then((res) => {
                         this.$emit("updateUser");
                         this.clearAvatarFromCropComponent();
-                        this.$refs.imageSrc.src = `/uploads/${res.data.avatar}`;
-                        this.clearAvatarBtn = true;
                     });
             }
+            this.clearAvatarBtn = true;
+            this.cropped = false;
             this.isChanged = false;
+        },
+        isSelectToCrop() {
+            this.selectToCrop = true;
+            this.clearAvatarBtn = false;
+        },
+        isCropped(val, cropper) {
+            this.isChanged = val;
+            this.cropped = true;
+            this.cropper = cropper;
+            this.selectToCrop = !val;
+        },
+        isCropping(cropper) {
+            this.cropper = cropper;
         },
         toBlob(blob) {
             this.avatar = blob;
         },
         clearAvatar() {
             this.avatar = null;
+            this.isChanged = true;
             this.clearAvatarBtn = false;
             this.$refs.imageSrc.src = "/uploads/no-user-image.png";
         },
@@ -249,8 +324,8 @@ export default {
                 this.isChanged = false;
             }
         },
-        avatar(val, oldVal) {
-            if (this.avatar !== this.currentUserAvatar) {
+        password() {
+            if (this.password) {
                 this.isChanged = true;
             } else {
                 this.isChanged = false;
@@ -269,31 +344,12 @@ export default {
 }
 
 .table-wrapper {
-    min-height: 50vh; /* for spinner */
     height: 100%;
 }
 
 form {
     padding: 2rem;
 }
-
-/* .avatar {
-    border-top: 1px solid var(--clr-dark-grey-strip);
-    border-bottom: 1px solid var(--clr-dark-grey-strip);
-} */
-
-/* .avatar-label {
-    width: min-content;
-    padding-right: 1rem;
-} */
-/* .avatar-input {
-    width: min-content;
-} */
-
-/* .avatar-image {
-    width: 100%;
-    border-radius: 50%;
-} */
 
 @media (max-width: 450px) {
     .info-wrapper {

@@ -8,37 +8,45 @@
                 alt="avatar-image"
             />
         </div>
-        <div class="row">
+        <div class="row mx-0">
             <div
                 class="avatar pt-3 pb-3 w-100 form-group d-flex flex-wrap justify-content-between"
             >
                 <button
                     v-if="!selectToCrop && !selectedFile"
-                    class="btn btn-secondary px-3"
+                    class="btn btn-secondary mr-3"
                     @click.prevent="$refs.imageInput.click()"
                 >
                     <slot></slot>
                 </button>
-                <button
-                    v-else-if="selectToCrop"
-                    class="btn btn-warning px-3"
-                    @click.prevent="handleImageCropped"
-                >
-                    Crop image
-                </button>
-                <button
-                    v-if="!selectToCrop && cropped && imageSrc"
-                    class="btn btn-info"
-                    @click="clearAvatar"
-                >
-                    Clear
-                </button>
-                <span class="align-self-center"
-                    ><span class="text-muted">Selected file:</span>
-                    {{
-                        selectedFile ? selectedFile.name : "no image selected"
-                    }}</span
-                >
+                <div class="selectFile d-flex justify-content-between">
+                    <button
+                        v-if="selectToCrop"
+                        class="btn btn-warning mr-3"
+                        @click.prevent="handleImageCropped"
+                    >
+                        Crop image
+                    </button>
+                    <button
+                        v-if="!selectToCrop && cropped && imageSrc"
+                        class="btn btn-info mr-3"
+                        @click="clearCroppedAvatar"
+                    >
+                        Clear
+                    </button>
+                    <span class="text-break text-right"
+                        ><span class="text-muted">Selected file: </span>
+                        <span :class="{ 'text-danger': incorrectFileType }">
+                            {{
+                                selectedFile
+                                    ? selectedFile.name
+                                    : incorrectFileType
+                                    ? "incorrect file type"
+                                    : "no image selected"
+                            }}</span
+                        ></span
+                    >
+                </div>
                 <input
                     ref="imageInput"
                     class="avatar-input"
@@ -56,27 +64,35 @@
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 export default {
-    props: ["savedAvatar"],
-    emits: ["toBlob", "isSelectToCrop", "clearAvatar"],
+    props: ["currentUserAvatar"],
+    emits: [
+        "toBlob",
+        "isSelectToCrop",
+        "clearCroppedAvatar",
+        "isCropping",
+        "isCropped",
+        "cropper",
+    ],
     data() {
         return {
-            avatar: "",
+            avatar: null,
             selectedFile: null,
             imageSrc: null,
             cropper: null,
             selectToCrop: false,
             cropped: false,
+            incorrectFileType: false,
         };
     },
     methods: {
-        clearAvatar() {
+        clearCroppedAvatar() {
             this.cropper.destroy();
-            this.avatar = "";
+            this.avatar = this.currentUserAvatar;
             this.imageSrc = null;
             this.selectToCrop = false;
             this.selectedFile = null;
-            this.cropper = null;
-            this.$emit("clearAvatar", this.avatar);
+            this.cropper = null; // ???
+            this.$emit("clearCroppedAvatar", this.avatar, this.cropper);
         },
         handleImageCropped() {
             this.cropper
@@ -88,12 +104,27 @@ export default {
                     this.avatar = blob;
                     this.$emit("toBlob", blob);
                 }, "image/jpeg");
-            this.cropped = true;
-            this.$emit("isSelectToCrop", false);
+            // this.cropped = true;
+            setTimeout(() => {
+                this.imageSrc = URL.createObjectURL(this.avatar);
+                this.selectToCrop = false;
+                this.cropped = true;
+                this.cropper.destroy();
+                this.$emit("isCropped", true, this.cropper);
+            }, 100);
         },
         onChangeFileUpload(e) {
             const files = e.target.files;
+            this.incorrectFileType = false;
             if (files.length) {
+                if (
+                    !["image/png", "image/jpeg", "image/svg"].includes(
+                        files[0]["type"]
+                    )
+                ) {
+                    this.incorrectFileType = true;
+                    return;
+                }
                 this.selectedFile = files[0];
                 this.avatar = files[0];
                 this.imageSrc = URL.createObjectURL(this.avatar);
@@ -110,17 +141,12 @@ export default {
                         // cropBoxMovable: false,
                         // cropBoxResizable: false,
                     });
+                    this.$emit("isCropping", this.cropper);
                 }, 0);
             }
         },
-    },
-    watch: {
-        cropped() {
-            setTimeout(() => {
-                this.imageSrc = URL.createObjectURL(this.avatar);
-                this.selectToCrop = false;
-                this.cropper.destroy();
-            }, 500);
+        clearIncorrectFileTypeMessage() {
+            this.incorrectFileType = false;
         },
     },
 };
@@ -143,5 +169,10 @@ export default {
 .avatar-image {
     width: 100%;
     border-radius: 50%;
+}
+
+.btn {
+    height: max-content;
+    align-self: center;
 }
 </style>

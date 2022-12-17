@@ -41,6 +41,13 @@ Route::group(['namespace' => 'Admin\User', 'prefix' => 'admin'], function () {
     Route::delete('/users/{user}', 'DeleteController');
 });
 
+Route::group(['namespace' => 'Admin\Post', 'prefix' => 'admin'], function () {
+    Route::get('/posts', 'IndexController');
+    Route::post('/posts/create', 'StoreController');
+    // Route::post('/users/{user}', 'UpdateController');
+    // Route::delete('/users/{user}', 'DeleteController');
+});
+
 
 
 

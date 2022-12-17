@@ -10,7 +10,7 @@ import UserComponent from "./components/User/UserComponent";
 import CreateUserComponent from "./components/User/CreateUserComponent";
 
 import CommentComponent from "./components/CommentComponent";
-import PostComponent from "./components/PostComponent";
+import CreatePostComponent from "./components/Post/CreatePostComponent";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -35,7 +35,7 @@ const router = createRouter({
                     name: "users.create",
                 },
                 { path: "comments", component: CommentComponent },
-                { path: "posts", component: PostComponent },
+                { path: 'posts/create', component: CreatePostComponent, name: "posts.create" },
             ],
         },
         // {

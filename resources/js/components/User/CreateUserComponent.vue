@@ -49,8 +49,9 @@
 
             <crop-avatar-component
                 @isSelectToCrop="isSelectToCrop"
+                @isCropped="isCropped"
                 @toBlob="toBlob"
-                @clearAvatar="clearAvatar"
+                @clearCroppedAvatar="clearCroppedAvatar"
                 ><template v-slot:default
                     >*Select avatar</template
                 ></crop-avatar-component
@@ -61,7 +62,7 @@
                     @click.prevent="addUser()"
                     type="submit"
                     class="btn btn-warning"
-                    :disabled="selectToCrop"
+                    :disabled="!selectToCrop"
                 >
                     <i class="nav-icon fas fa-solid fa-plus"></i>
                 </button>
@@ -82,8 +83,8 @@ export default {
             avatar: "",
             name: "",
             email: "",
-            password: "",
-            selectToCrop: false,
+            password: null,
+            selectToCrop: true,
         };
     },
     methods: {
@@ -97,10 +98,13 @@ export default {
                 .post("/api/admin/users/create", data)
                 .then((res) => this.$router.push({ name: "users" }));
         },
-        clearAvatar(avatar) {
-            this.avatar = avatar;
+        clearCroppedAvatar() {
+            this.avatar = "";
         },
         isSelectToCrop(value) {
+            this.selectToCrop = !value;
+        },
+        isCropped(value) {
             this.selectToCrop = value;
         },
         toBlob(blob) {
@@ -120,5 +124,9 @@ form {
     background-color: #212529;
     padding: 2rem;
     border: 1px solid #383f45;
+}
+
+.cropper-view-box {
+    border-radius: 50%;
 }
 </style>

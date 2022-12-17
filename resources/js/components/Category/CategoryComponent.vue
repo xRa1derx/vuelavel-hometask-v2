@@ -1,9 +1,9 @@
 <template>
-    <div class="table-wrapper">
+    <div class="table-wrapper mx-auto">
         <div v-if="isLoading">
             <base-spinner></base-spinner>
         </div>
-        <table v-else class="table table-bordered table-dark col-9 mx-auto p-0">
+        <table v-else class="table table-bordered table-dark col-12">
             <tbody>
                 <create-category-component
                     @createCategory="createCategory"
@@ -73,7 +73,7 @@
 <script>
 import axios from "axios";
 import CreateCategoryComponent from "./CreateCategoryComponent.vue";
-import DeleteComponent from "../DeleteComponent.vue";
+import DeleteComponent from '../UI/DeleteComponent.vue';
 export default {
     components: { DeleteComponent, CreateCategoryComponent },
     data() {
@@ -144,6 +144,7 @@ export default {
 
 <style scoped>
 .table-wrapper {
+    max-width: 800px;
     min-height: 50vh; /* for spinner */
     height: 100%;
 }

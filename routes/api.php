@@ -37,7 +37,7 @@ Route::group(['namespace' => 'Admin\Tag', 'prefix' => 'admin'], function () {
 Route::group(['namespace' => 'Admin\User', 'prefix' => 'admin'], function () {
     Route::get('/users', 'IndexController');
     Route::post('/users/create', 'StoreController');
-    Route::post('/users/{user}', 'UpdateController');
+    Route::patch('/users/{user}', 'UpdateController');
     Route::delete('/users/{user}', 'DeleteController');
 });
 

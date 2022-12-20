@@ -3,11 +3,11 @@
     <div class="card h-100">
       <img
         @click="userAction(user)"
-        class="card-img-top rounded-circle p-3"
+        class="avatar card-img-top rounded-circle p-3"
         style="cursor: pointer"
         data-toggle="modal"
         data-target="#exampleModalLong"
-        :src="`/uploads/${user.avatar || 'no-user-image.png'}`"
+        :src="`/uploads/avatars/${user.avatar || 'no-user-image.png'}`"
         alt="Card image cap"
       />
       <div class="card-body">
@@ -111,6 +111,10 @@ export default {
 .edit-user:hover > .nav-icon,
 .delete-user:hover > .nav-icon {
   color: #ff7600;
+}
+
+.avatar{
+  object-fit: cover;
 }
 
 img:hover {

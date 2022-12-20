@@ -79,11 +79,11 @@ class User extends Authenticatable
         }
 
         if ($this->avatar != null) {
-            Storage::delete('uploads/' . $this->avatar);
+            Storage::delete('uploads/avatars/' . $this->avatar);
         }
 
         $fileName = Str::random(10) . '.' . $image->extension();
-        $image->storeAs('uploads', $fileName);
+        $image->storeAs('uploads/avatars', $fileName);
         $this->avatar = $fileName;
         $this->save();
     }
@@ -93,7 +93,7 @@ class User extends Authenticatable
     {
       
         if ($image == null) {
-            Storage::delete('uploads/' . $this->avatar);
+            Storage::delete('uploads/avatars/' . $this->avatar);
             $fileName = null;
             $this->avatar = $fileName;
             $this->save();
@@ -101,20 +101,20 @@ class User extends Authenticatable
         }
 
         if ($this->avatar != null) {
-            Storage::delete('uploads/' . $this->avatar);
+            Storage::delete('uploads/avatars/' . $this->avatar);
         }
 
         $fileName = Str::random(10) . '.' . $image->extension();
-        $image->storeAs('uploads', $fileName);
+        $image->storeAs('uploads/avatars', $fileName);
         $this->avatar = $fileName;
         $this->save();
     }
 
-    public function getImage()
-    {
-        if ($this->avatar == null) {
-            return '/uploads/no-user-image.png';
-        }
-        return '/uploads/' . $this->avatar;
-    }
+    // public function getImage()
+    // {
+    //     if ($this->avatar == null) {
+    //         return '/uploads/no-user-image.png';
+    //     }
+    //     return '/uploads/' . $this->avatar;
+    // }
 }

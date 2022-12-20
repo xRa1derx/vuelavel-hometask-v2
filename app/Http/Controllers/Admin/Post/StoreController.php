@@ -12,6 +12,7 @@ class StoreController extends Controller
 {
     public function __invoke(Request $request)
     {
+
         $this->validate($request, [
             'title' => 'required',
             'content' => 'required',

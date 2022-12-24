@@ -296,7 +296,7 @@ header > h1 {
   }
 
   .blog {
-    grid-column: 3 / 4;
+    grid-column: 3 / 5;
   }
 
   .fullscreen {

@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <td colspan="1" class="text-center align-middle">#</td>
+        <td class="text-center align-middle">#</td>
         <td colspan="2">
             <form class="d-flex flex-column">
                 <p

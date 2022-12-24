@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -27,6 +28,11 @@ class Post extends Model
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'post_tags', 'post_id', 'tag_id');;
+    }
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
     }
 
     public function sluggable(): array
@@ -60,16 +66,20 @@ class Post extends Model
 
     public function uploadImage($image)
     {
+        // dd($image);
         if ($image == null) {
             return;
         }
 
-        Storage::delete('uploads/' . $this->image);
-        $image->storeAs();
-        $fileName = Str::random(10) . '.' . $image->extension();
-        $image->storeAs('uploads', $fileName);
-        $this->$image = $fileName;
-        $this->save();
+        // Storage::delete('uploads/' . $this->image);
+        // $image->storeAs();
+        $fileName = md5(Carbon::now() . '_' . $image->getClientOriginalName()) . '.' . $image->getClientOriginalExtension();
+        // $fileName = Str::random(10) . '.' . $image->extension();
+        $image->storeAs('images/posts/' . $this->title . '/', $fileName);
+        Image::create([
+            'name' => $fileName,
+            'post_id' => $this->id
+        ]);
     }
 
     public function getImage()

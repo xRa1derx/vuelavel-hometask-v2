@@ -9,7 +9,7 @@
                     @createCategory="createCategory"
                 ></create-category-component>
                 <tr v-for="(category, index) in categories" :key="category.id">
-                    <td scope="row" class="col-1 text-center align-middle">
+                    <td class="text-center align-middle bg-warning">
                         {{ index + 1 }}
                     </td>
                     <td
@@ -28,7 +28,7 @@
                     <td v-else class="col-md-9 align-middle">
                         {{ category.title }}
                     </td>
-                    <td class="col-1 text-center" colspan="2">
+                    <td class="text-center" colspan="2">
                         <div class="d-flex justify-content-between">
                             <button
                                 v-if="
@@ -73,7 +73,7 @@
 <script>
 import axios from "axios";
 import CreateCategoryComponent from "./CreateCategoryComponent.vue";
-import DeleteComponent from '../UI/DeleteComponent.vue';
+import DeleteComponent from "../UI/DeleteComponent.vue";
 export default {
     components: { DeleteComponent, CreateCategoryComponent },
     data() {

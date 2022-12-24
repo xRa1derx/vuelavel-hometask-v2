@@ -8,7 +8,7 @@
                     @createTag="createTag"
                 ></create-tag-component>
                 <tr v-for="(tag, index) in tags" :key="tag.id">
-                    <td scope="row" class="col-1 text-center align-middle">
+                    <td class="text-center align-middle">
                         {{ index + 1 }}
                     </td>
                     <td
@@ -24,7 +24,7 @@
                     <td v-else class="col-md-9 align-middle">
                         {{ tag.title }}
                     </td>
-                    <td class="col-1 text-center" colspan="2">
+                    <td class="text-center" colspan="2">
                         <div class="d-flex justify-content-between">
                             <button
                                 v-if="isTagShowEdit && currentTagId === tag.id"

@@ -59,7 +59,7 @@ export default {
   height: 250px;
   cursor: pointer;
 }
-.three-images > .post-image:nth-child(3) {
+.one-image > .post-image:last-child {
   grid-column: 1 / 3;
 }
 </style>

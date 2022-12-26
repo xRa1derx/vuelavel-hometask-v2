@@ -29,7 +29,7 @@
                         {{ category.title }}
                     </td>
                     <td class="text-center" colspan="2">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-center">
                             <button
                                 v-if="
                                     isCategoryShowEdit &&

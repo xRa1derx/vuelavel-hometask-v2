@@ -177,7 +177,7 @@
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed">
+    <aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed ">
       <!-- Brand Logo -->
       <!-- <a href="../../index3.html" class="brand-link text-center"> </a> -->
       <router-link

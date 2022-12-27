@@ -82,19 +82,20 @@ export default {
 
 <style scoped>
 .post-wrapper {
-  margin: 0 0 3rem 0;
+  margin: 0 0 5rem 0;
   position: relative;
-  padding: 10px;
+  padding: 1rem 3rem;
   margin-right: 3px;
+  border-bottom: 1px solid rgb(108, 108, 108);
   /* border-top: solid 1px var(--clr-accent);
     border-left: solid 1px #ff7700a9;
     border-bottom: solid 1px #ff77005e;
     border-radius: 1rem 0 0 1rem; */
 
-  border-top: solid 1px rgba(255, 255, 255, 0.166);
+  /* border-top: solid 1px rgba(255, 255, 255, 0.166);
   border-left: solid 1px rgba(255, 255, 255, 0.166);
   border-bottom: solid 1px rgba(255, 255, 255, 0.166);
-  border-radius: 1rem 0 0 1rem;
+  border-radius: 1rem 0 0 1rem; */
 }
 
 .tags-wrap {

@@ -226,6 +226,7 @@ header > h1 {
     border: 1px solid rgb(108, 108, 108);
     border-radius: 10px;
     box-shadow: 0 0 20px 1px rgb(108 108 108);
+    z-index: 0;
 }
 
 .nav_link:hover {

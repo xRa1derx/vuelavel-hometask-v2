@@ -298,7 +298,7 @@
     </aside>
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
+    <div class="content-wrapper admin-content">
       <!-- Content Header (Page header) -->
       <section v-if="this.$route.name == 'admin'" class="content-header">
         <div class="container-fluid">
@@ -365,10 +365,23 @@ export default {
   background-color: #242424;
 }
 .content-wrapper {
+  position: relative;
   background-color: #3b3b3b;
 }
 
+.admin-content{
+  margin-top: 55px;
+}
+
+.content{
+  margin-top: 55px;
+}
+
 .main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   border-bottom: 1px solid #ff7600;
 }
 

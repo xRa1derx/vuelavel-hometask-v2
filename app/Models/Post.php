@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image as ImageIntervention;
 
 class Post extends Model
 {
@@ -66,20 +67,22 @@ class Post extends Model
 
     public function uploadImage($image)
     {
-        // dd($image);
         if ($image == null) {
             return;
         }
 
-        // Storage::delete('uploads/' . $this->image);
-        // $image->storeAs();
         $fileName = md5(Carbon::now() . '_' . $image->getClientOriginalName()) . '.' . $image->getClientOriginalExtension();
-        // $fileName = Str::random(10) . '.' . $image->extension();
+        $prev_name = 'prev_' . $fileName;
         $image->storeAs('images/posts/' . $this->title . '/', $fileName);
         Image::create([
             'name' => $fileName,
+            'preview' => $prev_name,
             'post_id' => $this->id
         ]);
+
+        $path = public_path('images/posts/' . $this->title . '/' . $prev_name);
+
+        ImageIntervention::make($image)->fit(100, 100)->save($path);
     }
 
     public function getImage()

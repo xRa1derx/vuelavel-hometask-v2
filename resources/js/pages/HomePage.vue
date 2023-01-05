@@ -49,9 +49,10 @@
                 </div>
                 <img class="book" src="../../assets/images/book.svg" alt="" />
             </section>
-            <transition appear name="slide">
+            <transition name="slide">
                 <section v-if="!show" class="blog">
-                    <post-component></post-component>
+                    <base-spinner v-if="isLoading"></base-spinner>
+                    <post-component @loading="loading"></post-component>
                 </section>
             </transition>
             <section class="second-page">
@@ -72,6 +73,7 @@ export default {
         return {
             show: true,
             isActive: null,
+            isLoading: false,
         };
     },
     mounted() {
@@ -103,6 +105,10 @@ export default {
                 this.$refs.image.classList.remove("resize");
                 this.$refs.image.classList.add("close");
             }
+        },
+        loading(val) {
+            this.isLoading = val;
+            console.log(val);
         },
     },
     computed: {
@@ -216,13 +222,16 @@ header > h1 {
 }
 
 .blog {
-    margin: 0 1rem;
+    width: 95%;
+    margin: 0 auto;
     height: 90vh;
     overflow: auto;
     background-color: #242424;
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     border: 1px solid rgb(108, 108, 108);
     border-radius: 10px;
     box-shadow: 0 0 20px 1px rgb(108 108 108);
@@ -319,9 +328,10 @@ header > h1 {
     }
 
     .blog {
+        width: 100%;
         margin: 0;
         position: relative;
-        grid-column: 3 / 5;
+        grid-column: 3 / 6;
         grid-row: 1;
         overflow: auto;
         height: 79.9vh;
@@ -334,7 +344,7 @@ header > h1 {
     }
 
     .blog::-webkit-scrollbar {
-        width: 12px;
+        width: 0.8rem;
         background-color: #282828;
     }
     .blog::-webkit-scrollbar:horizontal {

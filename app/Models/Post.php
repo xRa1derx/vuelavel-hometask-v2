@@ -82,7 +82,9 @@ class Post extends Model
 
         $path = public_path('images/posts/' . $this->title . '/' . $prev_name);
 
-        ImageIntervention::make($image)->fit(100, 100)->save($path);
+        ImageIntervention::make($image)->heighten(500., function ($image) {
+            $image->upsize();
+        })->save($path);
     }
 
     public function getImage()

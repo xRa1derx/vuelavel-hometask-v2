@@ -11,6 +11,11 @@ const app = createApp(App);
 app.use(router);
 app.use(store);
 app.use(VueLazyload, {
+    observer: true,
+    observerOptions: {
+        rootMargin: "0px",
+        threshold: 0.1,
+    },
     lazyComponent: true,
 });
 

@@ -1,110 +1,114 @@
 <template>
-    <lazy-component
-        v-for="(image, index) in images"
-        :key="image.id"
-        :class="{
-            'last-image': index === images.length - 1 && images.length % 2 != 0,
-        }"
-    >
-        <img v-if="!isLoaded" lazy="loading" />
-        <img
-            lazy="loaded"
-            class="post-image"
-            alt=""
-            :src="`/images/posts/${title}/${image.preview}`"
-            @click="showMultiple(index)"
-            @load="onImgLoad($event)"
-        />
-    </lazy-component>
-    <teleport to="body">
-        <vue-easy-lightbox
-            scrollDisabled
-            escDisabled
-            moveDisabled
-            :visible="visible"
-            :imgs="imgs"
-            :index="index"
-            @hide="handleHide"
-        ></vue-easy-lightbox>
-    </teleport>
+  <lazy-component
+    v-for="(image, index) in images"
+    :key="image.id"
+    :class="{
+      'last-image': index === images.length - 1 && images.length % 2 != 0,
+    }"
+  >
+    <img v-if="!isLoaded" lazy="loading" />
+    <img
+      lazy="loaded"
+      class="post-image"
+      alt=""
+      :src="`/images/posts/${title}/${image.preview}`"
+      @click="showMultiple(index)"
+      @load="onImgLoad($event)"
+    />
+  </lazy-component>
+  <teleport to="body">
+    <vue-easy-lightbox
+      scrollDisabled
+      escDisabled
+      moveDisabled
+      :visible="visible"
+      :imgs="imgs"
+      :index="index"
+      @hide="handleHide"
+    ></vue-easy-lightbox>
+  </teleport>
 </template>
 
 <script>
 import VueEasyLightbox from "vue-easy-lightbox";
 export default {
-    components: {
-        VueEasyLightbox,
+  components: {
+    VueEasyLightbox,
+  },
+  props: ["images", "title"],
+  data() {
+    return {
+      imgs: "",
+      visible: false,
+      index: 0,
+      isLoaded: false,
+    };
+  },
+  methods: {
+    showMultiple(index) {
+      this.imgs = this.images.reduce((acc, image) => {
+        acc.push(`/images/posts/${this.title}/${image.name}`);
+        return acc;
+      }, []);
+      this.index = index;
+      this.show();
     },
-    props: ["images", "title"],
-    data() {
-        return {
-            imgs: "",
-            visible: false,
-            index: 0,
-            isLoaded: false,
-        };
+    show() {
+      this.visible = true;
     },
-    methods: {
-        showMultiple(index) {
-            this.imgs = this.images.reduce((acc, image) => {
-                acc.push(`/images/posts/${this.title}/${image.name}`);
-                return acc;
-            }, []);
-            this.index = index;
-            this.show();
-        },
-        show() {
-            this.visible = true;
-        },
-        handleHide() {
-            this.visible = false;
-        },
-        onImgLoad(e) {
-            if (
-                (e.target.attributes.lazy.value =
-                    "loaded" && e.target.src[0] != "d")
-            ) {
-                e.target.style.visibility = "visible";
-                // e.target.style.background = "none";
-                this.isLoaded = true;
-            }
-        },
+    handleHide() {
+      this.visible = false;
     },
+    onImgLoad(e) {
+      const res = e.target.attributes.lazy.value;
+      const src = e.target.src[0];
+      const target = e.target;
+      setTimeout(() => {
+        if (res == "loaded" && src != "d") {
+          target.style.visibility = "visible";
+          target.style.display = "block";
+          this.isLoaded = true;
+        }
+      }, 700);
+    },
+  },
 };
 </script>
 
 <style scoped>
 .last-image {
-    grid-column: 1 / 3;
+  grid-column: 1 / 3;
 }
 
 img[lazy="loading"] {
-    background-color: #eee;
-    height: 250px;
-    width: 100%;
-    animation: fade 1s ease-in-out infinite alternate;
+  background-color: #eee;
+  height: 250px;
+  width: 100%;
+  border-radius: 20px;
+  animation: fade 1s ease-in-out infinite alternate;
 }
 
 img[lazy="loaded"] {
-    display: none;
+  display: none;
+  border-radius: 20px;
 }
 
 .post-image {
-    object-fit: cover;
-    width: 100%;
-    height: 250px;
-    cursor: pointer;
-    position: relative;
-    animation: fade 1s linear;
-    visibility: hidden;
+  object-fit: cover;
+  width: 100%;
+  height: 250px;
+  cursor: pointer;
+  position: relative;
+  animation: fade 1s linear;
+  visibility: hidden;
 }
 
 @keyframes fade {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>

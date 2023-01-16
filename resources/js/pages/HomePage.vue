@@ -129,9 +129,8 @@ nav > a {
 }
 
 .main-page {
-    overflow-x: hidden;
-    /* margin: 1rem; */
-    margin: 1rem 0;
+    /* overflow-x: hidden; */
+    /* margin: 1rem 0; */
 }
 
 img {
@@ -193,6 +192,7 @@ header {
     display: flex;
     align-items: center;
     margin: 0 1rem;
+    padding-top: 1rem;
 }
 
 header > h1 {

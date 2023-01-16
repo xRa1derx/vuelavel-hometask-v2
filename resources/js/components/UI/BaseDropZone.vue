@@ -78,7 +78,6 @@ export default {
 
 .dz-preview {
   display: flex;
-  /* flex-wrap: wrap; */
   justify-content: space-between;
   padding: 2rem;
   border-bottom: 1px solid var(--clr-dark-grey-strip);

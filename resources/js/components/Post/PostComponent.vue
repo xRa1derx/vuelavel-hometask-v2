@@ -55,7 +55,7 @@ export default {
     this.getPosts();
   },
   methods: {
-    async getPosts() {
+    getPosts() {
       this.$emit("loading", true);
       axios
         .get("/api/admin/posts")
@@ -63,17 +63,19 @@ export default {
           this.posts = res.data;
         })
         .then(() => {
-          this.$refs.imageContainer.forEach((element) => {
-            const countImages = element.childElementCount;
-            if (countImages >= 3) {
-              [...element.children].forEach((child) => {
-                child.style.zIndex = -1;
-              });
-            }
-            if (element.nextElementSibling.firstChild.scrollHeight >= 300) {
-              element.nextElementSibling.classList.add("post-content-hidden");
-            }
-          });
+          setTimeout(() => {
+            this.$refs.imageContainer.forEach((element) => {
+              const countImages = element.childElementCount;
+              if (countImages >= 3) {
+                [...element.children].forEach((child) => {
+                  child.style.zIndex = -1;
+                });
+              }
+              if (element.nextElementSibling.firstChild.scrollHeight >= 300) {
+                element.nextElementSibling.classList.add("post-content-hidden");
+              }
+            });
+          }, 100);
         })
         .finally(() => {
           this.$emit("loading", false);
@@ -93,7 +95,8 @@ export default {
       const target = event.target;
       if (target.classList.contains("post-image-container")) {
         const images = document.getElementById(`${post.title}`);
-        images.style.maxHeight = event.target.scrollHeight + "px";
+        images.style.maxHeight =
+          Math.ceil(target.childElementCount / 2) * 265 + "px";
         images.classList.remove("images-hidden");
         images.classList.add("images-show");
         [...images.children].forEach((child) => {
@@ -195,7 +198,7 @@ export default {
 }
 
 .images-hidden {
-  min-height: 300px;
+  /* min-height: 300px; */
   overflow: hidden;
   background-image: linear-gradient(
     to bottom,

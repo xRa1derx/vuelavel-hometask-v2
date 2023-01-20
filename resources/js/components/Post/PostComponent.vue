@@ -21,6 +21,7 @@
     </div>
     <div class="post-content">
       <p class="ql-editor" v-html="post.content"></p>
+      <button class="show-more" @click="showMoreText($event)">show more</button>
     </div>
     <div class="post-footer d-flex justify-content-between">
       <div class="tags-wrap m-0 d-flex">
@@ -63,7 +64,6 @@ export default {
           this.posts = res.data;
         })
         .then(() => {
-          setTimeout(() => {
             this.$refs.imageContainer.forEach((element) => {
               const countImages = element.childElementCount;
               if (countImages >= 3) {
@@ -73,9 +73,9 @@ export default {
               }
               if (element.nextElementSibling.firstChild.scrollHeight >= 300) {
                 element.nextElementSibling.classList.add("post-content-hidden");
+                element.nextElementSibling.lastChild.style.display = "block";
               }
             });
-          }, 100);
         })
         .finally(() => {
           this.$emit("loading", false);
@@ -102,6 +102,12 @@ export default {
         [...images.children].forEach((child) => {
           child.style.zIndex = 0;
         });
+      }
+    },
+    showMoreText(event) {
+      if (event.target) {
+        event.target.offsetParent.classList.remove("post-content-hidden");
+        event.target.style.display = "none";
       }
     },
   },
@@ -141,21 +147,20 @@ export default {
 }
 
 .post-content-hidden {
-  min-height: 250px;
-  max-height: 300px;
+  max-height: 285px;
   position: relative;
   overflow: hidden;
   margin-bottom: 1rem;
-  background-image: linear-gradient(
-    to bottom,
-    #24242400,
-    #24242418,
-    #24242444,
-    #242424b7,
-    #242424e3
-  );
-  background-size: cover;
-  cursor: pointer;
+}
+
+.show-more {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: var(--clr-accent);
+  padding: 0 10px;
+  border: none;
+  display: none;
 }
 
 .post-wrapper:nth-child(odd) .post-content {

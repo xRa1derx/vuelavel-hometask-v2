@@ -163,9 +163,9 @@ export default {
   display: none;
 }
 
-.post-wrapper:nth-child(odd) .post-content {
+/* .post-wrapper:nth-child(odd) .post-content {
   background-color: #282828d0;
-}
+} */
 
 .post-title > h1 {
   margin-bottom: 0;

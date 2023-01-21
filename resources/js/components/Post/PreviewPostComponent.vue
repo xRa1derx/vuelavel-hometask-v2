@@ -175,6 +175,7 @@ export default {
   gap: 0.8rem;
   grid-template-columns: repeat(2, 1fr);
   margin-bottom: 1rem;
+  padding: 0.8rem;
 }
 
 .post-image {
@@ -182,6 +183,7 @@ export default {
   width: 100%;
   height: 250px;
   position: relative;
+  border-radius: 10px;
 }
 
 .post-submit {

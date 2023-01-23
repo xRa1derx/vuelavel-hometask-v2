@@ -65,7 +65,6 @@ export default {
       this.$refs.imageContainer.classList.add("last-image");
     }
   },
-  methods: {},
 };
 </script>
 

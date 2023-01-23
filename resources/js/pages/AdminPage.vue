@@ -177,7 +177,7 @@
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed ">
+    <aside class="main-sidebar sidebar-dark-primary elevation-4 position-fixed">
       <!-- Brand Logo -->
       <!-- <a href="../../index3.html" class="brand-link text-center"> </a> -->
       <router-link
@@ -236,9 +236,18 @@
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
             <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'posts.create'}"
-                ><i class="nav-icon fa fa-solid fa-blog"></i>Posts</router-link
-              >
+              <router-link class="nav-link" :to="{ name: 'posts' }"
+                ><i class="nav-icon fa fa-solid fa-blog"></i>Posts
+                <i class="right fas fa-angle-left"></i
+              ></router-link>
+              <ul class="nav nav-treeview" :class="{ openTreeview: isActive }">
+                <li class="nav-item">
+                  <router-link class="nav-link" :to="{ name: 'posts.create' }">
+                    <i class="nav-icon fas fa-solid fa-user-plus"></i>
+                    Add new
+                  </router-link>
+                </li>
+              </ul>
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/admin/categories"
@@ -369,11 +378,11 @@ export default {
   background-color: #3b3b3b;
 }
 
-.admin-content{
+.admin-content {
   margin-top: 55px;
 }
 
-.content{
+.content {
   margin-top: 55px;
 }
 

@@ -1,38 +1,48 @@
 <template>
-  <div class="post-wrapper" v-for="post in posts" :key="post.id">
-    <div class="title-wrap d-flex">
-      <div class="post-title">
-        <h1>{{ post.title }}</h1>
+  <div class="posts-container mx-auto">
+    <div class="post-wrapper" v-for="post in posts" :key="post.id">
+      <div class="title-wrap d-flex">
+        <div class="post-title">
+          <h1>{{ post.title }}</h1>
+          <router-link :to="{ name: 'posts.edit.id', params: { id: post.id } }"
+            ><i class="post-edit nav-icon fas fa-pen-square text-info"></i
+          ></router-link>
+        </div>
+        <div class="date">
+          <button class="button">{{ getFullDate(post) }}</button>
+        </div>
       </div>
-      <div class="date">
-        <button class="button">{{ getFullDate(post) }}</button>
+      <div
+        class="post-image-container"
+        ref="imageContainer"
+        :class="{
+          'images-hidden': post.images.length >= 3,
+        }"
+        @click.self="moreImages(post, $event)"
+        :id="post.title"
+      >
+        <base-lightbox
+          :images="post.images"
+          :title="post.title"
+        ></base-lightbox>
       </div>
-    </div>
-    <div
-      class="post-image-container"
-      ref="imageContainer"
-      :class="{
-        'images-hidden': post.images.length >= 3,
-      }"
-      @click.self="moreImages(post, $event)"
-      :id="post.title"
-    >
-      <base-lightbox :images="post.images" :title="post.title"></base-lightbox>
-    </div>
-    <div class="post-content">
-      <p class="ql-editor" v-html="post.content"></p>
-      <button class="show-more" @click="showMoreText($event)">show more</button>
-    </div>
-    <div class="post-footer d-flex justify-content-between">
-      <div class="tags-wrap m-0 d-flex">
-        <span class="text-muted align-self-center mr-1">Tags: </span>
-        <span class="tags" v-for="tag in post.tags" :key="tag.id">
-          {{ tag.title }}
-        </span>
+      <div class="post-content">
+        <p class="ql-editor" v-html="post.content"></p>
+        <button class="show-more" @click="showMoreText($event)">
+          show more
+        </button>
       </div>
-      <div class="category d-flex flex-nowrap">
-        <span class="text-muted mr-1">Category: </span>
-        <span> {{ post.category.title }}</span>
+      <div class="post-footer d-flex justify-content-between">
+        <div class="tags-wrap m-0 d-flex">
+          <span class="text-muted align-self-center mr-1">Tags: </span>
+          <span class="tags" v-for="tag in post.tags" :key="tag.id">
+            {{ tag.title }}
+          </span>
+        </div>
+        <div class="category d-flex flex-nowrap">
+          <span class="text-muted mr-1">Category: </span>
+          <span> {{ post.category.title }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -64,18 +74,18 @@ export default {
           this.posts = res.data;
         })
         .then(() => {
-            this.$refs.imageContainer.forEach((element) => {
-              const countImages = element.childElementCount;
-              if (countImages >= 3) {
-                [...element.children].forEach((child) => {
-                  child.style.zIndex = -1;
-                });
-              }
-              if (element.nextElementSibling.firstChild.scrollHeight >= 300) {
-                element.nextElementSibling.classList.add("post-content-hidden");
-                element.nextElementSibling.lastChild.style.display = "block";
-              }
-            });
+          this.$refs.imageContainer.forEach((element) => {
+            const countImages = element.childElementCount;
+            if (countImages >= 3) {
+              [...element.children].forEach((child) => {
+                child.style.zIndex = -1;
+              });
+            }
+            if (element.nextElementSibling.firstChild.scrollHeight >= 300) {
+              element.nextElementSibling.classList.add("post-content-hidden");
+              element.nextElementSibling.lastChild.style.display = "block";
+            }
+          });
         })
         .finally(() => {
           this.$emit("loading", false);
@@ -115,11 +125,19 @@ export default {
 </script>
 
 <style scoped>
+.posts-container {
+  max-width: 800px;
+  background-color: #242424f6;
+}
+
 .post-wrapper {
   position: relative;
   padding: 3rem 0;
   z-index: 1;
-  border-radius: 10px;
+}
+
+.post-edit {
+  margin-left: 0.8rem;
 }
 
 .title-wrap {
@@ -133,7 +151,8 @@ export default {
 
 @media (min-width: 800px) {
   .post-wrapper {
-    margin: 0 0 0 0.8rem;
+    margin: 0 0.8rem;
+    border-radius: 10px;
   }
 }
 
@@ -168,6 +187,7 @@ export default {
 } */
 
 .post-title > h1 {
+  display: inline;
   margin-bottom: 0;
 }
 
@@ -203,6 +223,7 @@ export default {
 }
 
 .images-hidden {
+  /* min-height: 300px; */
   overflow: hidden;
   background-image: linear-gradient(
     to bottom,

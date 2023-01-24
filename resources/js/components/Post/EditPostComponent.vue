@@ -1,90 +1,91 @@
 <template>
-  <form class="mx-auto table-dark">
-    <div class="form-group">
-      <label for="title">Title</label>
-      <input
-        type="title"
-        class="form-control"
-        id="title"
-        placeholder="Enter title"
-        aria-describedby="titleHelp"
-        v-model="title"
-      />
-      <small id="titleHelp" class="form-text text-muted"
-        >Give a title to your new post</small
-      >
-    </div>
-    <div class="form-group">
-      <div class="form-row align-items-start justify-content-between">
-        <div class="col-auto my-1 w-50 category">
-          <label class="mr-sm-2" for="category">Category</label>
-          <select
-            class="custom-select mr-sm-2"
-            id="category"
-            aria-describedby="categoryHelp"
-          >
-            <option>{{ currentCategory }}</option>
-            <option
-              v-for="category in categories"
-              :key="category.id"
-              :value="category.id"
-            >
-              {{ category.title }}
-            </option>
-          </select>
-          <small id="categoryHelp" class="form-text text-muted"
-            >Choose a category</small
-          >
-        </div>
-        <div class="tagSelect col-auto my-1 w-50">
-          <label for="tags">Tags</label>
-          <select
-            multiple
-            class="form-control mb-2"
-            id="tags"
-            aria-describedby="tagHelp"
-            v-model="selectedTags"
-          >
-            <option
-              ref="selecting"
-              v-for="tag in data.tags"
-              :key="tag.id"
-              :value="tag"
-            >
-              {{ tag.title }}
-            </option>
-          </select>
-          <div
-            v-if="selectedTags.length"
-            v-html="selectedTagsArr"
-            class="d-flex flex-wrap"
-          ></div>
-          <small id="tagHelp" class="form-text text-muted">
-            Use
-            <span class="text-warning">'CTRL' + 'left mouse click'</span>
-            to select multiple tags</small
-          >
-        </div>
-        <div
-          class="edit-image-container"
-          ref="imageContainer"
-          :class="{
-            'images-hidden': images.length >= 3,
-          }"
-          @click.self="moreImages(data.post, $event)"
-          :id="title"
-        >
-          <base-lightbox :images="images" :title="title"></base-lightbox>
-        </div>
-        <QuillEditor
-          v-model:content="content"
-          contentType="html"
-          :options="options"
-          v-model="content"
+    <form class="mx-auto table-dark">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input
+          type="title"
+          class="form-control"
+          id="title"
+          placeholder="Enter title"
+          aria-describedby="titleHelp"
+          v-model="title"
         />
+        <small id="titleHelp" class="form-text text-muted"
+          >Give a title to your new post</small
+        >
       </div>
-    </div>
-  </form>
+      <div class="form-group">
+        <div class="form-row align-items-start justify-content-between">
+          <div class="col-auto my-1 w-50 category">
+            <label class="mr-sm-2" for="category">Category</label>
+            <select
+              class="custom-select mr-sm-2"
+              id="category"
+              aria-describedby="categoryHelp"
+            >
+              <option>{{ currentCategory }}</option>
+              <option
+                v-for="category in categories"
+                :key="category.id"
+                :value="category.id"
+              >
+                {{ category.title }}
+              </option>
+            </select>
+            <small id="categoryHelp" class="form-text text-muted"
+              >Choose a category</small
+            >
+          </div>
+          <div class="tagSelect col-auto my-1 w-50">
+            <label for="tags">Tags</label>
+            <select
+              multiple
+              class="form-control mb-2"
+              id="tags"
+              aria-describedby="tagHelp"
+            >
+              <option
+                ref="selecting"
+                v-for="tag in data.tags"
+                :key="tag.id"
+                :value="tag"
+                :selected="
+                  selectedTagsIds.some((selectedTag) => selectedTag == tag.id)
+                "
+              >
+                {{ tag.title }}
+              </option>
+            </select>
+            <div
+              v-if="selectedTags.length"
+              v-html="selectedTagsArr"
+              class="d-flex flex-wrap"
+            ></div>
+            <small id="tagHelp" class="form-text text-muted">
+              Use
+              <span class="text-warning">'CTRL' + 'left mouse click'</span>
+              to select multiple tags</small
+            >
+          </div>
+          <div
+            class="edit-image-container"
+            ref="imageContainer"
+            :class="{
+              'images-hidden': images.length >= 3,
+            }"
+            @click.self="moreImages(data.post, $event)"
+            :id="title"
+          >
+            <base-lightbox :images="images" :title="title"></base-lightbox>
+          </div>
+          <QuillEditor
+            v-model:content="content"
+            contentType="html"
+            :options="options"
+          />
+        </div>
+      </div>
+    </form>
 </template>
 
 <script>
@@ -129,39 +130,31 @@ export default {
       },
     };
   },
-  created() {
+  mounted() {
     this.getPost();
   },
   methods: {
     getPost() {
-      axios
-        .get(`/api/admin/post/${this.$route.params.id}`)
-        .then((res) => {
-          this.data = res.data;
-          this.title = res.data.post.title;
-          this.images = res.data.post.images;
-          this.currentCategory = res.data.post.category.title;
-          this.categories = res.data.categories.filter(
-            (category) => category.title != this.currentCategory
-          );
-          this.selectedTags = res.data.post.tags;
-          this.content = res.data.post.content;
-          this.$nextTick(() => {
-            const countImages = this.$refs.imageContainer.childElementCount;
-            if (countImages >= 3) {
-              [...this.$refs.imageContainer.children].forEach((element) => {
-                element.style.zIndex = -1;
-              });
-            }
-          });
-        })
-        .then(() => {
-          this.$refs.selecting
-            .filter((tag) =>
-              this.selectedTags.some((item) => tag._value.id == item.id)
-            )
-            .map((tag) => (tag.selected = true));
+      this.isLoading = true;
+      axios.get(`/api/admin/post/${this.$route.params.id}`).then((res) => {
+        this.data = res.data;
+        this.title = res.data.post.title;
+        this.images = res.data.post.images;
+        this.currentCategory = res.data.post.category.title;
+        this.categories = res.data.categories.filter(
+          (category) => category.title != this.currentCategory
+        );
+        this.selectedTags = res.data.post.tags;
+        this.content = res.data.post.content;
+        this.$nextTick(() => {
+          const countImages = this.$refs.imageContainer.childElementCount;
+          if (countImages >= 3) {
+            [...this.$refs.imageContainer.children].forEach((element) => {
+              element.style.zIndex = -1;
+            });
+          }
         });
+      });
     },
     moreImages(post, event) {
       const target = event.target;
@@ -250,5 +243,19 @@ form {
 .images-show {
   transition: max-height 0.25s ease-in;
   overflow: hidden;
+}
+
+.category {
+  align-self: flex-start;
+}
+
+@media (max-width: 505px) {
+  .tagSelect {
+    width: 100% !important;
+  }
+
+  .category {
+    width: 100% !important;
+  }
 }
 </style>

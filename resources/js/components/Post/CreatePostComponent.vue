@@ -267,6 +267,10 @@ form {
   transition: height 0.4s ease-out;
 }
 
+.category {
+  align-self: flex-start;
+}
+
 @keyframes show {
   0% {
     opacity: 0;

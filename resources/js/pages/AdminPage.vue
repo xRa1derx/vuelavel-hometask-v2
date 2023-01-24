@@ -282,7 +282,7 @@
                 Students
                 <i class="right fas fa-angle-left"></i>
               </router-link>
-              <ul class="nav nav-treeview" :class="{ openTreeview: isActive }">
+              <ul class="nav nav-treeview"  :class="{ openTreeview: isActive }">
                 <li class="nav-item">
                   <router-link class="nav-link" :to="{ name: 'users.create' }">
                     <i class="nav-icon fas fa-solid fa-user-plus"></i>

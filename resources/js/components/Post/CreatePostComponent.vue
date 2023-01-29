@@ -98,22 +98,8 @@
           :options="options"
           v-model="content"
         />
-
-        <!-- <textarea
-                    class="form-control"
-                    id="text"
-                    rows="3"
-                    v-model="content"
-                ></textarea> -->
       </div>
       <div class="d-flex w-100 justify-content-end">
-        <!-- <button
-                    @click.prevent="createPost"
-                    type="submit"
-                    class="btn btn-warning"
-                >
-                    <i class="nav-icon fas fa-solid fa-plus"></i>
-                </button> -->
         <button
           id="show-modal"
           class="btn btn-warning"
@@ -279,6 +265,10 @@ form {
   animation: hide 0.4s ease-out;
   height: 0px;
   transition: height 0.4s ease-out;
+}
+
+.category {
+  align-self: flex-start;
 }
 
 @keyframes show {

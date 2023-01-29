@@ -1,9 +1,12 @@
 window._ = require("lodash");
 
 try {
-    require("bootstrap");
-} catch (e) {}
+    window.$ = window.jQuery = require("jquery");
 
+    require("bootstrap");
+} catch (e) {
+    console.log(e);
+}
 
 window.axios = require("axios");
 

@@ -10,7 +10,10 @@ import UserComponent from "./components/User/UserComponent";
 import CreateUserComponent from "./components/User/CreateUserComponent";
 
 import CommentComponent from "./components/CommentComponent";
+
+import ShowPostComponent from "./components/Post/ShowPostComponent";
 import CreatePostComponent from "./components/Post/CreatePostComponent";
+import EditPostComponent from "./components/Post/EditPostComponent";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -35,7 +38,17 @@ const router = createRouter({
                     name: "users.create",
                 },
                 { path: "comments", component: CommentComponent },
-                { path: 'posts/create', component: CreatePostComponent, name: "posts.create" },
+                { path: "posts", component: ShowPostComponent, name: "posts" },
+                {
+                    path: "posts/create",
+                    component: CreatePostComponent,
+                    name: "posts.create",
+                },
+                {
+                    path: "posts/edit/:id",
+                    component: EditPostComponent,
+                    name: "posts.edit.id",
+                },
             ],
         },
         // {

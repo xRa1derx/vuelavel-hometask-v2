@@ -168,9 +168,9 @@ export default {
   display: none;
 }
 
-.post-wrapper:nth-child(odd) .post-content {
-    background-color: #282828d0;
-}
+/* .post-wrapper:nth-child(odd) .post-content {
+  background-color: #282828d0;
+} */
 
 .post-title > h1 {
     margin-bottom: 0;
@@ -208,7 +208,6 @@ export default {
 }
 
 .images-hidden {
-  /* min-height: 300px; */
   overflow: hidden;
   background-image: linear-gradient(
     to bottom,

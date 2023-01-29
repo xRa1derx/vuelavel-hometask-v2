@@ -78,6 +78,7 @@ export default {
     },
     mounted() {
         console.log("Home Component mounted.");
+        // $('[data-widget = "treeview"]').Treeview("init");
     },
     methods: {
         blogOpen(navSection) {
@@ -261,7 +262,7 @@ header > h1 {
 
 .blog::-webkit-scrollbar {
     width: 0.8rem;
-    background-color: #282828;
+    background-color: #242424f6;
 }
 .blog::-webkit-scrollbar:horizontal {
     height: 12px;
@@ -360,7 +361,7 @@ header > h1 {
         overflow: auto;
         height: 79.9vh;
         z-index: 5;
-        background-color: #242424d5;
+        background-color: #242424f6;
         border-radius: 10px;
         -webkit-box-shadow: 0 0 15px 3px rgb(108, 108, 108);
         -moz-box-shadow: 0 0 15px 3px rgb(108, 108, 108);

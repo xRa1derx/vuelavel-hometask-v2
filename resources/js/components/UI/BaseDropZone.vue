@@ -62,6 +62,7 @@ export default {
 
 <style>
 .dropzone {
+  width: 100%;
   word-break: break-word;
 }
 

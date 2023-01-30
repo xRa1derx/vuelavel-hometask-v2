@@ -192,7 +192,7 @@ export default {
       this.selectedTagsIds = [];
       this.selectedTagsNames = [];
       axios
-        .post("/api/admin/posts/create", data)
+        .post("/api/admin/post/create", data)
         .then((res) => console.log(res));
       this.showModal = false;
       this.isCreated = true;

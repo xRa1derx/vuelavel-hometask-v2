@@ -1,100 +1,112 @@
 <template>
-    <form class="mx-auto table-dark">
-      <div class="form-group">
-        <label for="title">Title</label>
-        <input
-          type="title"
-          class="form-control"
-          id="title"
-          placeholder="Enter title"
-          aria-describedby="titleHelp"
-          v-model="title"
-        />
-        <small id="titleHelp" class="form-text text-muted"
-          >Give a title to your new post</small
-        >
-      </div>
-      <div class="form-group">
-        <div class="form-row align-items-start justify-content-between">
-          <div class="col-auto my-1 w-50 category">
-            <label class="mr-sm-2" for="category">Category</label>
-            <select
-              class="custom-select mr-sm-2"
-              id="category"
-              aria-describedby="categoryHelp"
-            >
-              <option>{{ currentCategory }}</option>
-              <option
-                v-for="category in categories"
-                :key="category.id"
-                :value="category.id"
-              >
-                {{ category.title }}
-              </option>
-            </select>
-            <small id="categoryHelp" class="form-text text-muted"
-              >Choose a category</small
-            >
-          </div>
-          <div class="tagSelect col-auto my-1 w-50">
-            <label for="tags">Tags</label>
-            <select
-              multiple
-              class="form-control mb-2"
-              id="tags"
-              aria-describedby="tagHelp"
-            >
-              <option
-                ref="selecting"
-                v-for="tag in data.tags"
-                :key="tag.id"
-                :value="tag"
-                :selected="
-                  selectedTagsIds.some((selectedTag) => selectedTag == tag.id)
-                "
-              >
-                {{ tag.title }}
-              </option>
-            </select>
-            <div
-              v-if="selectedTags.length"
-              v-html="selectedTagsArr"
-              class="d-flex flex-wrap"
-            ></div>
-            <small id="tagHelp" class="form-text text-muted">
-              Use
-              <span class="text-warning">'CTRL' + 'left mouse click'</span>
-              to select multiple tags</small
-            >
-          </div>
-          <div
-            class="edit-image-container"
-            ref="imageContainer"
-            :class="{
-              'images-hidden': images.length >= 3,
-            }"
-            @click.self="moreImages(data.post, $event)"
-            :id="title"
+  <form class="mx-auto table-dark">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input
+        type="title"
+        class="form-control"
+        id="title"
+        placeholder="Enter title"
+        aria-describedby="titleHelp"
+        v-model="title"
+      />
+      <small id="titleHelp" class="form-text text-muted"
+        >Give a title to your new post</small
+      >
+    </div>
+    <div class="form-group">
+      <div class="form-row align-items-start justify-content-between">
+        <div class="col-auto my-1 w-50 category">
+          <label class="mr-sm-2" for="category">Category</label>
+          <select
+            class="custom-select mr-sm-2"
+            id="category"
+            aria-describedby="categoryHelp"
           >
-            <base-lightbox :images="images" :title="title"></base-lightbox>
-          </div>
-          <QuillEditor
-            v-model:content="content"
-            contentType="html"
-            :options="options"
-          />
+            <option>{{ currentCategory }}</option>
+            <option
+              v-for="category in categories"
+              :key="category.id"
+              :value="category.id"
+            >
+              {{ category.title }}
+            </option>
+          </select>
+          <small id="categoryHelp" class="form-text text-muted"
+            >Choose a category</small
+          >
         </div>
+        <div class="tagSelect col-auto my-1 w-50">
+          <label for="tags">Tags</label>
+          <select
+            multiple
+            class="form-control mb-2"
+            id="tags"
+            aria-describedby="tagHelp"
+          >
+            <option
+              ref="selecting"
+              v-for="tag in data.tags"
+              :key="tag.id"
+              :value="tag"
+              :selected="
+                selectedTagsIds.some((selectedTag) => selectedTag == tag.id)
+              "
+            >
+              {{ tag.title }}
+            </option>
+          </select>
+          <div
+            v-if="selectedTags.length"
+            v-html="selectedTagsArr"
+            class="d-flex flex-wrap"
+          ></div>
+          <small id="tagHelp" class="form-text text-muted">
+            Use
+            <span class="text-warning">'CTRL' + 'left mouse click'</span>
+            to select multiple tags</small
+          >
+        </div>
+        <div
+          class="edit-image-container"
+          ref="imageContainer"
+          :class="{
+            'images-hidden': images.length >= 3,
+          }"
+          @click.self="moreImages(data.post, $event)"
+          :id="title"
+        >
+          <base-lightbox :images="images" :title="title"></base-lightbox>
+        </div>
+        <base-drop-zone @dropzone="dropzone"></base-drop-zone>
+        <QuillEditor
+          class="mb-2"
+          v-model:content="content"
+          contentType="html"
+          :options="options"
+        />
       </div>
-    </form>
+      <div class="form-group">
+        <button
+          type="submit"
+          class="btn btn-warning float-right"
+          @click.prevent="saveChanges()"
+        >
+          Save changes
+        </button>
+      </div>
+    </div>
+  </form>
 </template>
 
 <script>
 import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
+import BaseDropZone from "../UI/BaseDropZone.vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 export default {
-  components: { BaseLightbox, QuillEditor },
+  components: { BaseLightbox, QuillEditor, BaseDropZone },
   emits: ["cancel, 'createPost"],
   data() {
     return {
@@ -106,6 +118,7 @@ export default {
       categories: [],
       content: "",
       currentCategory: "",
+      selectedCategoryId: "",
       selectedTags: [],
       selectedTagsIds: [],
       selectedTagsNames: [],
@@ -134,6 +147,30 @@ export default {
     this.getPost();
   },
   methods: {
+    saveChanges() {
+      const data = new FormData();
+      data.append("title", this.title);
+      data.append("category_id", this.selectedCategoryId);
+      this.selectedTagsIds.forEach((tag) => {
+        data.append("tags[]", tag);
+      });
+      data.append("content", this.content);
+      const images = this.images.getAcceptedFiles();
+      images.forEach((image) => {
+        data.append("images[]", image);
+        this.images.removeFile(image);
+      });
+      data.append("_method", "patch");
+      this.title = "";
+      this.content = "";
+      this.selectedCategoryId = "";
+      this.selectedTags = [];
+      this.selectedTagsIds = [];
+      this.selectedTagsNames = [];
+      axios
+        .post(`/api/admin/post/${this.$route.params.id}`, data)
+        .then((res) => console.log(res));
+    },
     getPost() {
       this.isLoading = true;
       axios.get(`/api/admin/post/${this.$route.params.id}`).then((res) => {
@@ -141,6 +178,7 @@ export default {
         this.title = res.data.post.title;
         this.images = res.data.post.images;
         this.currentCategory = res.data.post.category.title;
+        this.selectedCategoryId = res.data.post.category_id;
         this.categories = res.data.categories.filter(
           (category) => category.title != this.currentCategory
         );
@@ -154,6 +192,7 @@ export default {
             });
           }
         });
+        console.log(this.data);
       });
     },
     moreImages(post, event) {
@@ -168,6 +207,9 @@ export default {
           child.style.zIndex = 0;
         });
       }
+    },
+    dropzone(val) {
+      this.images = val;
     },
   },
   computed: {

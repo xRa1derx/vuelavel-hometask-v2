@@ -25617,7 +25617,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     innerHTML: $options.selectedTagsArr,
     "class": "d-flex flex-wrap"
   }, null, 8 /* PROPS */, _hoisted_16)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_17]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["edit-image-container", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["edit-image-container mb-2", {
       'images-hidden': $data.images.length >= 3
     }]),
     ref: "imageContainer",
@@ -25629,6 +25629,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     images: $data.images,
     title: $data.title
   }, null, 8 /* PROPS */, ["images", "title"])], 10 /* CLASS, PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_QuillEditor, {
+    "class": "mb-2",
     content: $data.content,
     "onUpdate:content": _cache[2] || (_cache[2] = function ($event) {
       return $data.content = $event;
@@ -38372,7 +38373,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nform[data-v-7a9c74af] {\r\n  position: relative;\r\n  max-width: 800px;\r\n  padding: 2rem;\r\n  opacity: 1;\r\n  animation: show 0.4s ease-in;\r\n  z-index: 0;\n}\n.edit-image-container[data-v-7a9c74af] {\r\n  width: 100%;\r\n  min-height: 250px;\r\n  max-height: 300px;\r\n  position: relative;\r\n  display: grid;\r\n  gap: 0.8rem;\r\n  grid-template-columns: repeat(2, 1fr);\r\n  margin-bottom: 1rem;\n}\n.images-hidden[data-v-7a9c74af] {\r\n  overflow: hidden;\r\n  background-image: linear-gradient(\r\n    to bottom,\r\n    #24242400,\r\n    #24242418,\r\n    #24242444,\r\n    #242424b7,\r\n    #242424e3\r\n  );\r\n  background-size: cover;\r\n  position: relative;\r\n  cursor: pointer;\n}\n.images-hidden[data-v-7a9c74af]::before {\r\n  content: \"\";\r\n  display: block;\r\n  opacity: 0;\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\r\n  width: 100%;\r\n  height: 100%;\r\n  background-color: #9090901f;\r\n  transition: opacity 0.3s ease-in-out;\n}\n.images-hidden[data-v-7a9c74af]:hover::before {\r\n  opacity: 1;\n}\n.images-show[data-v-7a9c74af] {\r\n  transition: max-height 0.25s ease-in;\r\n  overflow: hidden;\n}\n.category[data-v-7a9c74af] {\r\n  align-self: flex-start;\n}\n@media (max-width: 505px) {\n.tagSelect[data-v-7a9c74af] {\r\n    width: 100% !important;\n}\n.category[data-v-7a9c74af] {\r\n    width: 100% !important;\n}\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nform[data-v-7a9c74af] {\r\n    position: relative;\r\n    max-width: 800px;\r\n    padding: 2rem;\r\n    opacity: 1;\r\n    animation: show 0.4s ease-in;\r\n    z-index: 0;\n}\n.edit-image-container[data-v-7a9c74af] {\r\n    width: 100%;\r\n    min-height: 250px;\r\n    max-height: 300px;\r\n    position: relative;\r\n    display: grid;\r\n    gap: 0.8rem;\r\n    grid-template-columns: repeat(2, 1fr);\n}\n.images-hidden[data-v-7a9c74af] {\r\n    overflow: hidden;\r\n    background-image: linear-gradient(\r\n        to bottom,\r\n        #24242400,\r\n        #24242418,\r\n        #24242444,\r\n        #242424b7,\r\n        #242424e3\r\n    );\r\n    background-size: cover;\r\n    position: relative;\r\n    cursor: pointer;\n}\n.images-hidden[data-v-7a9c74af]::before {\r\n    content: \"\";\r\n    display: block;\r\n    opacity: 0;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    height: 100%;\r\n    background-color: #9090901f;\r\n    transition: opacity 0.3s ease-in-out;\n}\n.images-hidden[data-v-7a9c74af]:hover::before {\r\n    opacity: 1;\n}\n.images-show[data-v-7a9c74af] {\r\n    transition: max-height 0.25s ease-in;\r\n    overflow: hidden;\n}\n.category[data-v-7a9c74af] {\r\n    align-self: flex-start;\n}\n@media (max-width: 505px) {\n.tagSelect[data-v-7a9c74af] {\r\n        width: 100% !important;\n}\n.category[data-v-7a9c74af] {\r\n        width: 100% !important;\n}\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

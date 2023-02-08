@@ -1,69 +1,93 @@
 <template>
-    
-    <div class="posts-container mx-auto">
-      <base-spinner v-if="isLoading"></base-spinner>
-      <div class="post-wrapper" v-for="post in posts" :key="post.id">
-        <div class="title-wrap d-flex">
-          <div class="post-title">
-            <h1>{{ post.title }}</h1>
-            <router-link
-              :to="{ name: 'posts.edit.id', params: { id: post.id } }"
-              ><i class="post-edit nav-icon fas fa-pen-square text-info"></i
-            ></router-link>
-          </div>
-          <div class="date">
-            <button class="button">{{ getFullDate(post) }}</button>
-          </div>
+  <div class="posts-container mx-auto pb-3">
+    <transition name="modal">
+      <div v-if="isCreated" class="post-created">
+        <base-check-mark></base-check-mark>
+      </div>
+    </transition>
+    <base-spinner v-if="isLoading"></base-spinner>
+    <div class="post-wrapper" v-for="post in posts" :key="post.id">
+      <button
+        :title="`Delete '${post.title}' post`"
+        type="button"
+        class="btn post-delete"
+        data-toggle="modal"
+        data-target="#deleteModal"
+        @click="deletePost(post)"
+      >
+        <i :class="['nav-icon fas fa-minus-circle']"></i>
+      </button>
+      <div class="title-wrap d-flex">
+        <div class="post-title">
+          <h1>{{ post.title }}</h1>
+          <router-link
+            class="post-edit"
+            :title="`Edit '${post.title}' post`"
+            :to="{ name: 'posts.edit.id', params: { id: post.id } }"
+            ><i class="nav-icon fas fa-pen-square"></i
+          ></router-link>
         </div>
-        <div
-          class="post-image-container"
-          ref="imageContainer"
-          :class="{
-            'images-hidden': post.images.length >= 3,
-          }"
-          @click.self="moreImages(post, $event)"
-          :id="post.title"
-        >
-          <base-lightbox
-            :images="post.images"
-            :title="post.title"
-          ></base-lightbox>
+        <div class="date">
+          <button class="button">{{ getFullDate(post) }}</button>
         </div>
-        <div class="post-content">
-          <p class="ql-editor" v-html="post.content"></p>
-          <button class="show-more" @click="showMoreText($event)">
-            show more
-          </button>
+      </div>
+      <div
+        class="post-image-container"
+        ref="imageContainer"
+        :class="{
+          'images-hidden': post.images.length >= 3,
+        }"
+        @click.self="moreImages(post, $event)"
+        :id="post.title"
+      >
+        <base-lightbox :images="post.images"></base-lightbox>
+      </div>
+      <div class="post-content">
+        <p class="ql-editor" v-html="post.content"></p>
+        <button class="show-more" @click="showMoreText($event)">
+          show more
+        </button>
+      </div>
+      <div class="post-footer d-flex justify-content-between">
+        <div class="tags-wrap m-0 d-flex">
+          <span class="text-muted align-self-center mr-1">Tags: </span>
+          <span class="tags" v-for="tag in post.tags" :key="tag.id">
+            {{ tag.title }}
+          </span>
         </div>
-        <div class="post-footer d-flex justify-content-between">
-          <div class="tags-wrap m-0 d-flex">
-            <span class="text-muted align-self-center mr-1">Tags: </span>
-            <span class="tags" v-for="tag in post.tags" :key="tag.id">
-              {{ tag.title }}
-            </span>
-          </div>
-          <div class="category d-flex flex-nowrap">
-            <span class="text-muted mr-1">Category: </span>
-            <span> {{ post.category.title }}</span>
-          </div>
+        <div class="category d-flex flex-nowrap">
+          <span class="text-muted mr-1">Category: </span>
+          <span> {{ post.category.title }}</span>
         </div>
       </div>
     </div>
+    <delete-component @deleteConfirm="deleteConfirm">
+      <template v-slot:default>{{ postTitleToDelete }}</template>
+      <template v-slot:type>post</template>
+    </delete-component>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
+import BaseCheckMark from "../UI/BaseCheckMark.vue";
+import DeleteComponent from "../UI/DeleteComponent.vue";
 export default {
   components: {
     BaseLightbox,
+    BaseCheckMark,
+    DeleteComponent,
   },
   emits: ["loading"],
   data() {
     return {
       posts: [],
+      postIdToDelete: null,
+      postTitleToDelete: null,
       isLoading: false,
       isLoaded: false,
+      isCreated: false,
     };
   },
   mounted() {
@@ -79,6 +103,10 @@ export default {
           this.posts = res.data;
         })
         .then(() => {
+          if (!this.$refs.imageContainer) {
+            this.$router.push({ name: "posts.create" });
+            return;
+          }
           this.$refs.imageContainer.forEach((element) => {
             const countImages = element.childElementCount;
             if (countImages >= 3) {
@@ -112,7 +140,7 @@ export default {
       if (target.classList.contains("post-image-container")) {
         const images = document.getElementById(`${post.title}`);
         images.style.maxHeight =
-          Math.ceil(target.childElementCount / 2) * 265 + "px";
+          Math.ceil(target.childElementCount / 2) * 275 + "px";
         images.classList.remove("images-hidden");
         images.classList.add("images-show");
         [...images.children].forEach((child) => {
@@ -125,6 +153,15 @@ export default {
         event.target.offsetParent.classList.remove("post-content-hidden");
         event.target.style.display = "none";
       }
+    },
+    deletePost(post) {
+      this.postIdToDelete = post.id;
+      this.postTitleToDelete = post.title;
+    },
+    deleteConfirm() {
+      axios
+        .delete(`/api/admin/post/${this.postIdToDelete}`)
+        .then(() => this.getPosts());
     },
   },
 };
@@ -143,8 +180,9 @@ export default {
   z-index: 1;
 }
 
-.post-edit {
+.post-edit > .nav-icon {
   margin-left: 0.8rem;
+  color: #17a2b8;
 }
 
 .title-wrap {
@@ -154,6 +192,7 @@ export default {
 .date {
   align-self: flex-end;
   margin-bottom: 2px;
+  margin-right: 1rem;
 }
 
 @media (min-width: 800px) {
@@ -165,6 +204,7 @@ export default {
 
 .post-wrapper:nth-child(even) {
   background-color: var(--clr-bg-light);
+  /* border: 2px solid var(--clr-bg-light); */
 }
 
 .post-title,
@@ -265,6 +305,7 @@ export default {
 .images-show {
   transition: max-height 0.25s ease-in;
   overflow: hidden;
+  background-color: #242424d5;
 }
 
 .button {
@@ -296,5 +337,44 @@ export default {
 .button:hover::after,
 .button:focus::after {
   transform: scale(1.35, 1.85);
+}
+
+.post-created {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.post-delete {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  padding: 0;
+}
+
+.nav-icon {
+  color: #6c757d;
+}
+
+.post-edit:hover > .nav-icon,
+.post-delete:hover > .nav-icon {
+  color: #ff7600;
+}
+
+.modal-enter-from {
+  transform: rotateX(45deg);
+  opacity: 0;
+}
+
+.modal-enter-active {
+  transition: all 0.4s ease-in;
+}
+.modal-leave-active {
+  transition: all 0.4s ease-out;
+}
+
+.modal-leave-to {
+  opacity: 0;
+  transform: rotateX(45deg);
 }
 </style>

@@ -19,6 +19,7 @@
                 <div class="col-auto my-1 w-50 category">
                     <label class="mr-sm-2" for="category">Category</label>
                     <select
+                        @change="onChangeCategories($event)"
                         class="custom-select mr-sm-2"
                         id="category"
                         aria-describedby="categoryHelp"
@@ -43,12 +44,13 @@
                         class="form-control mb-2"
                         id="tags"
                         aria-describedby="tagHelp"
+                        @change="onChangeTags($event)"
                     >
                         <option
                             ref="selecting"
-                            v-for="tag in data.tags"
+                            v-for="tag in data.all_tags"
                             :key="tag.id"
-                            :value="tag"
+                            :value="tag.id"
                             :selected="
                                 selectedTagsIds.some(
                                     (selectedTag) => selectedTag == tag.id
@@ -71,20 +73,10 @@
                         to select multiple tags</small
                     >
                 </div>
-                <div
-                    class="edit-image-container mb-2"
-                    ref="imageContainer"
-                    :class="{
-                        'images-hidden': images.length >= 3,
-                    }"
-                    @click.self="moreImages(data.post, $event)"
-                    :id="title"
-                >
-                    <base-lightbox
-                        :images="images"
-                        :title="title"
-                    ></base-lightbox>
-                </div>
+                <base-drop-zone
+                    @dropzone="dropzone"
+                    @removeImage="removeImage"
+                ></base-drop-zone>
                 <QuillEditor
                     class="mb-2"
                     v-model:content="content"
@@ -92,18 +84,26 @@
                     :options="options"
                 />
             </div>
+            <div class="form-group">
+                <button
+                    type="submit"
+                    class="btn btn-warning float-right"
+                    @click.prevent="saveChanges()"
+                >
+                    Save changes
+                </button>
+            </div>
         </div>
     </form>
 </template>
 
 <script>
 import axios from "axios";
-import BaseLightbox from "../UI/BaseLightBox.vue";
+import BaseDropZone from "../UI/BaseDropZone.vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 export default {
-    components: { BaseLightbox, QuillEditor },
-    emits: ["cancel, 'createPost"],
+    components: { QuillEditor, BaseDropZone },
     data() {
         return {
             selectedTagsStyle:
@@ -114,9 +114,11 @@ export default {
             categories: [],
             content: "",
             currentCategory: "",
+            selectedCategoryId: "",
             selectedTags: [],
             selectedTagsIds: [],
             selectedTagsNames: [],
+            imageIdsForDelete: [],
             options: {
                 modules: {
                     toolbar: [
@@ -142,55 +144,84 @@ export default {
         this.getPost();
     },
     methods: {
+        onChangeCategories(event) {
+            this.selectedCategoryId = event.target.value;
+        },
+        onChangeTags(event) {
+            this.selectedTags = [];
+            [...event.target].forEach((tag) =>
+                tag.selected == true
+                    ? this.selectedTags.push(this.findSelectedTag(+tag.value))
+                    : ""
+            );
+        },
+        findSelectedTag(tagId) {
+            return this.data.all_tags.filter((item) => item.id == tagId)[0];
+        },
+        saveChanges() {
+            const data = new FormData();
+            data.append("title", this.title);
+            data.append("category_id", this.selectedCategoryId);
+            this.selectedTagsIds.forEach((tag) => {
+                data.append("tags[]", tag);
+            });
+            data.append("content", this.content);
+            const images = this.images.getAcceptedFiles();
+            images.forEach((image) => {
+                data.append("images[]", image);
+                this.images.removeFile(image);
+            });
+            this.imageIdsForDelete.forEach((idForDelete) => {
+                data.append("image_ids_for_delete[]", idForDelete);
+            });
+            data.append("_method", "patch");
+            this.title = "";
+            this.content = "";
+            this.selectedCategoryId = "";
+            this.selectedTags = [];
+            this.selectedTagsIds = [];
+            this.selectedTagsNames = [];
+            axios
+                .post(`/api/admin/post/${this.$route.params.id}`, data)
+                .then(() => this.$router.push({ name: "posts" }));
+        },
         getPost() {
             this.isLoading = true;
             axios
                 .get(`/api/admin/post/${this.$route.params.id}`)
                 .then((res) => {
-                    this.data = res.data;
-                    this.title = res.data.post.title;
-                    this.images = res.data.post.images;
-                    this.currentCategory = res.data.post.category.title;
-                    this.categories = res.data.categories.filter(
+                    this.data = res.data.data;
+                    this.title = res.data.data.title;
+                    res.data.data.images.forEach((image) => {
+                        let file = {
+                            id: image.id,
+                            name: image.name,
+                            size: image.size,
+                        };
+                        this.images.displayExistingFile(
+                            file,
+                            "/" + image.path
+                            // `/images/posts/${this.title}/${image.preview}`
+                        );
+                    });
+                    this.currentCategory = res.data.data.category.title;
+                    this.selectedCategoryId = res.data.data.category.id;
+                    this.categories = res.data.data.all_categories.filter(
                         (category) => category.title != this.currentCategory
                     );
-                    this.selectedTags = res.data.post.tags;
-                    this.content = res.data.post.content;
-                    this.$nextTick(() => {
-                        const countImages =
-                            this.$refs.imageContainer.childElementCount;
-                        if (countImages >= 3) {
-                            [...this.$refs.imageContainer.children].forEach(
-                                (element) => {
-                                    element.style.zIndex = -1;
-                                }
-                            );
-                        }
-                    });
+                    this.selectedTags = res.data.data.tags;
+                    this.content = res.data.data.content;
                 });
         },
-        moreImages(post, event) {
-            const target = event.target;
-            if (target.classList.contains("edit-image-container")) {
-                const images = document.getElementById(`${post.title}`);
-                images.style.maxHeight =
-                    Math.ceil(target.childElementCount / 2) * 265 + "px";
-                images.classList.remove("images-hidden");
-                images.classList.add("images-show");
-                [...images.children].forEach((child) => {
-                    child.style.zIndex = 0;
-                });
-            }
+        dropzone(val) {
+            this.images = val;
+        },
+        removeImage(val) {
+            this.imageIdsForDelete.push(val.id);
         },
     },
     computed: {
         selectedTagsArr() {
-            // this.selectedTags.reduce((acc, tag) => {
-            //   tag.title = tag["title"];
-            //   tag.id = tag["id"];
-            //   acc.push(tag);
-            //   return acc;
-            // }, []);
             this.selectedTagsIds = this.selectedTags.map((tag) => tag.id);
             return `<div style="${
                 this.selectedTagsStyle
@@ -219,8 +250,8 @@ form {
     display: grid;
     gap: 0.8rem;
     grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 1rem;
 }
-
 .images-hidden {
     overflow: hidden;
     background-image: linear-gradient(
@@ -235,7 +266,6 @@ form {
     position: relative;
     cursor: pointer;
 }
-
 .images-hidden::before {
     content: "";
     display: block;
@@ -248,25 +278,20 @@ form {
     background-color: #9090901f;
     transition: opacity 0.3s ease-in-out;
 }
-
 .images-hidden:hover::before {
     opacity: 1;
 }
-
 .images-show {
     transition: max-height 0.25s ease-in;
     overflow: hidden;
 }
-
 .category {
     align-self: flex-start;
 }
-
 @media (max-width: 505px) {
     .tagSelect {
         width: 100% !important;
     }
-
     .category {
         width: 100% !important;
     }

@@ -11,7 +11,7 @@
             lazy="loaded"
             class="post-image"
             alt=""
-            :src="`/images/posts/${title}/${image.preview}`"
+            :src="`/images/posts/${image.preview}`"
             @click="showMultiple(index)"
             @load="onImgLoad($event)"
         />
@@ -35,7 +35,7 @@ export default {
     components: {
         VueEasyLightbox,
     },
-    props: ["images", "title"],
+    props: ["images"],
     data() {
         return {
             imgs: "",
@@ -47,7 +47,7 @@ export default {
     methods: {
         showMultiple(index) {
             this.imgs = this.images.reduce((acc, image) => {
-                acc.push(`/images/posts/${this.title}/${image.name}`);
+                acc.push(`/images/posts/${image.name}`);
                 return acc;
             }, []);
             this.index = index;
@@ -63,13 +63,11 @@ export default {
             const res = e.target.attributes.lazy.value;
             const src = e.target.src[0];
             const target = e.target;
-            // setTimeout(() => {
             if (res == "loaded" && src != "d") {
                 target.style.visibility = "visible";
                 target.style.display = "block";
                 this.isLoaded = true;
             }
-            // }, 700);
         },
     },
 };
@@ -78,6 +76,8 @@ export default {
 <style scoped>
 .last-image {
     grid-column: 1 / 3;
+    width: 70%;
+    margin: auto;
 }
 
 img[lazy="loading"] {

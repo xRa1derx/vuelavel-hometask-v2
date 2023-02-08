@@ -95,6 +95,10 @@ export default {
     /* font-size: clamp(0.6rem, 1.3vw, 5rem); */
 }
 
+.col{
+    min-width: 150px;
+}
+
 .delete-user {
     position: absolute;
     right: 0;

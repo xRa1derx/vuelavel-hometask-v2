@@ -33,7 +33,7 @@
                         Close
                     </button>
                     <button
-                        @click="$emit('deleteConfirm')"
+                        @click="$emit('deleteConfirm', '123')"
                         data-dismiss="modal"
                         type="button"
                         class="btn btn-primary"

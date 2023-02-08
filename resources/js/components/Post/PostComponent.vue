@@ -19,7 +19,6 @@
         >
             <base-lightbox
                 :images="post.images"
-                :title="post.title"
             ></base-lightbox>
         </div>
         <div class="post-content">
@@ -101,7 +100,7 @@ export default {
       if (target.classList.contains("post-image-container")) {
         const images = document.getElementById(`${post.title}`);
         images.style.maxHeight =
-          Math.ceil(target.childElementCount / 2) * 265 + "px";
+          Math.ceil(target.childElementCount / 2) * 275 + "px";
         images.classList.remove("images-hidden");
         images.classList.add("images-show");
         [...images.children].forEach((child) => {
@@ -144,6 +143,7 @@ export default {
 
 .post-wrapper:nth-child(even) {
     background-color: var(--clr-bg-light);
+    /* border: 2px solid var(--clr-bg-light); */
 }
 
 .post-title,
@@ -242,6 +242,7 @@ export default {
 .images-show {
     transition: max-height 0.25s ease-in;
     overflow: hidden;
+    background-color: #242424d5;
 }
 
 .button {

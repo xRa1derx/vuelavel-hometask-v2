@@ -18,6 +18,7 @@ class CreateImagesTable extends Migration
             $table->integer('post_id');
             $table->string('name');
             $table->string('preview');
+            $table->string('path');
             $table->timestamps();
         });
     }

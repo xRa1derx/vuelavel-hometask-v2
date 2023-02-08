@@ -73,15 +73,15 @@ class Post extends Model
 
         $fileName = md5(Carbon::now() . '_' . $image->getClientOriginalName()) . '.' . $image->getClientOriginalExtension();
         $prev_name = 'prev_' . $fileName;
-        $image->storeAs('images/posts/' . $this->title . '/', $fileName);
+        $image->storeAs('images/posts/', $fileName);
+        $path = public_path('images/posts/' . $prev_name);
+        $filePath = 'images/posts/' . $fileName;
         Image::create([
             'name' => $fileName,
             'preview' => $prev_name,
-            'post_id' => $this->id
+            'post_id' => $this->id,
+            'path' => $filePath
         ]);
-
-        $path = public_path('images/posts/' . $this->title . '/' . $prev_name);
-
         ImageIntervention::make($image)->heighten(500., function ($image) {
             $image->upsize();
         })->save($path);

@@ -17,9 +17,7 @@
             @click.self="moreImages(post, $event)"
             :id="post.title"
         >
-            <base-lightbox
-                :images="post.images"
-            ></base-lightbox>
+            <base-lightbox :images="post.images"></base-lightbox>
         </div>
         <div class="post-content">
             <p class="ql-editor" ref="post" v-html="post.content"></p>
@@ -39,82 +37,117 @@
                 <span> {{ post.category.title }}</span>
             </div>
         </div>
+        <div class="post-comments-section">
+            <div v-for="comment in comments" :key="comment.id">
+                <p>{{ comment.user }}</p>
+                <p>{{ comment.comment }}</p>
+                <p>{{ comment.date }}</p>
+            </div>
+            <comment-textarea
+                @addComment="addComment($event, post.id)"
+            ></comment-textarea>
+        </div>
     </div>
 </template>
 
 <script>
 import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
+import CommentTextarea from "../Post/CommentTextarea.vue";
 export default {
-  components: {
-    BaseLightbox,
-  },
-  emits: ["loading"],
-  data() {
-    return {
-      posts: [],
-      isLoaded: false,
-    };
-  },
-  mounted() {
-    this.getPosts();
-  },
-  methods: {
-    getPosts() {
-      this.$emit("loading", true);
-      axios
-        .get("/api/admin/posts")
-        .then((res) => {
-          this.posts = res.data;
-        })
-        .then(() => {
-            this.$refs.imageContainer.forEach((element) => {
-              const countImages = element.childElementCount;
-              if (countImages >= 3) {
-                [...element.children].forEach((child) => {
-                  child.style.zIndex = -1;
+    components: {
+        BaseLightbox,
+        CommentTextarea,
+    },
+    emits: ["loading"],
+    data() {
+        return {
+            posts: [],
+            isLoaded: false,
+            comments: [
+                {
+                    id: 1,
+                    user: "John",
+                    date: "Feb 9, 2023",
+                    comment: "new comment",
+                },
+            ],
+        };
+    },
+    mounted() {
+        this.getPosts();
+    },
+    methods: {
+        getPosts() {
+            this.$emit("loading", true);
+            axios
+                .get("/api/admin/posts")
+                .then((res) => {
+                    this.posts = res.data;
+                })
+                .then(() => {
+                    this.$refs.imageContainer.forEach((element) => {
+                        const countImages = element.childElementCount;
+                        if (countImages >= 3) {
+                            [...element.children].forEach((child) => {
+                                child.style.zIndex = -1;
+                            });
+                        }
+                        if (
+                            element.nextElementSibling.firstChild
+                                .scrollHeight >= 300
+                        ) {
+                            element.nextElementSibling.classList.add(
+                                "post-content-hidden"
+                            );
+                            element.nextElementSibling.lastChild.style.display =
+                                "block";
+                        }
+                    });
+                })
+                .finally(() => {
+                    this.$emit("loading", false);
                 });
-              }
-              if (element.nextElementSibling.firstChild.scrollHeight >= 300) {
-                element.nextElementSibling.classList.add("post-content-hidden");
-                element.nextElementSibling.lastChild.style.display = "block";
-              }
+        },
+        getFullDate(post) {
+            let date = post.created_at.slice(0, 16).replace("T", " ");
+            let t = date.split(/[- :]/);
+            let time = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4]));
+            return time.toLocaleString("en-US", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
             });
-        })
-        .finally(() => {
-          this.$emit("loading", false);
-        });
+        },
+        moreImages(post, event) {
+            const target = event.target;
+            if (target.classList.contains("post-image-container")) {
+                const images = document.getElementById(`${post.title}`);
+                images.style.maxHeight =
+                    Math.ceil(target.childElementCount / 2) * 275 + "px";
+                images.classList.remove("images-hidden");
+                images.classList.add("images-show");
+                [...images.children].forEach((child) => {
+                    child.style.zIndex = 0;
+                });
+            }
+        },
+        showMoreText(event) {
+            if (event.target) {
+                event.target.offsetParent.classList.remove(
+                    "post-content-hidden"
+                );
+                event.target.style.display = "none";
+            }
+        },
+        addComment(text, post_id) {
+            let user_id = 1;
+            const data = { text, post_id, user_id };
+            axios
+                .post("/api/admin/comment/create", data)
+                .then((res) => console.log(res));
+        },
     },
-    getFullDate(post) {
-      let date = post.created_at.slice(0, 16).replace("T", " ");
-      let t = date.split(/[- :]/);
-      let time = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4]));
-      return time.toLocaleString("en-US", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
-    },
-    moreImages(post, event) {
-      const target = event.target;
-      if (target.classList.contains("post-image-container")) {
-        const images = document.getElementById(`${post.title}`);
-        images.style.maxHeight =
-          Math.ceil(target.childElementCount / 2) * 275 + "px";
-        images.classList.remove("images-hidden");
-        images.classList.add("images-show");
-        [...images.children].forEach((child) => {
-          child.style.zIndex = 0;
-        });
-      }
-    },
-    showMoreText(event) {
-      if (event.target) {
-        event.target.offsetParent.classList.remove("post-content-hidden");
-        event.target.style.display = "none";
-      }
-    },
-  },
 };
 </script>
 
@@ -124,6 +157,7 @@ export default {
     padding: 3rem 0;
     z-index: 1;
     border-radius: 10px;
+    margin: 0 0 0 0.8rem;
 }
 
 .title-wrap {
@@ -133,12 +167,6 @@ export default {
 .date {
     align-self: flex-end;
     margin-bottom: 2px;
-}
-
-@media (min-width: 800px) {
-    .post-wrapper {
-        margin: 0 0 0 0.8rem;
-    }
 }
 
 .post-wrapper:nth-child(even) {
@@ -152,20 +180,20 @@ export default {
 }
 
 .post-content-hidden {
-  max-height: 285px;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 1rem;
+    max-height: 285px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
 }
 
 .show-more {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background-color: var(--clr-accent);
-  padding: 0 10px;
-  border: none;
-  display: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--clr-accent);
+    padding: 0 10px;
+    border: none;
+    display: none;
 }
 
 /* .post-wrapper:nth-child(odd) .post-content {
@@ -208,18 +236,18 @@ export default {
 }
 
 .images-hidden {
-  overflow: hidden;
-  background-image: linear-gradient(
-    to bottom,
-    #24242400,
-    #24242418,
-    #24242444,
-    #242424b7,
-    #242424e3
-  );
-  background-size: cover;
-  position: relative;
-  cursor: pointer;
+    overflow: hidden;
+    background-image: linear-gradient(
+        to bottom,
+        #24242400,
+        #24242418,
+        #24242444,
+        #242424b7,
+        #242424e3
+    );
+    background-size: cover;
+    position: relative;
+    cursor: pointer;
 }
 
 .images-hidden::before {
@@ -274,5 +302,16 @@ export default {
 .button:hover::after,
 .button:focus::after {
     transform: scale(1.35, 1.85);
+}
+
+.post-comments-section {
+    margin: 0.8rem;
+    background-color: #fff;
+    color: #000;
+    border-radius: 10px;
+}
+
+.ql-editor {
+    padding: 0;
 }
 </style>

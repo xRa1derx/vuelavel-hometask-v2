@@ -19,7 +19,9 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
-// Route::get('/admin',  IndexController::class);
+Route::get('/',  'IndexController');
+
+Route::post('/login', 'AuthController');
 Route::group(['namespace' => 'Admin\Category', 'prefix' => 'admin'], function () {
     Route::get('/categories', 'IndexController');
     Route::post('/categories/create', 'StoreController');
@@ -47,6 +49,14 @@ Route::group(['namespace' => 'Admin\Post', 'prefix' => 'admin'], function () {
     Route::post('/post/create', 'StoreController');
     Route::patch('/post/{id}', 'UpdateController');
     Route::delete('/post/{id}', 'DeleteController');
+});
+
+Route::group(['namespace' => 'Admin\Comment', 'prefix' => 'admin'], function () {
+    // Route::get('/posts', 'IndexController');
+    // Route::get('/post/{id}', 'ShowController');
+    Route::post('/comment/create', 'StoreController');
+    // Route::patch('/post/{id}', 'UpdateController');
+    // Route::delete('/post/{id}', 'DeleteController');
 });
 
 

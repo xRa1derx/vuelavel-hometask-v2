@@ -27,6 +27,7 @@ export default {
   --clr-bg-dark: #242424;
   --clr-bg-light: #3b3b3b;
   --clr-accent: #ff7600;
+  --clr-touch: #cc5f00;
   --clr-dark-blue: #212529;
   --clr-dark-grey-strip: #383f45;
 }

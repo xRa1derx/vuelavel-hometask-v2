@@ -17,10 +17,16 @@
                     :class="{ active: navActive == 'materials' }"
                     >Materials</a
                 >
-                <router-link :to="{ name: 'admin' }" class="login-btn"
+                <router-link :to="{ name: 'admin' }" class="nav_link messanger"
                     >Messanger</router-link
                 >
             </nav>
+            <div class="user-login">
+                <button
+                    class="user-login-btn nav-icon fas fa-door-open"
+                    @click="loginOpen()"
+                ></button>
+            </div>
         </header>
         <main>
             <section class="fullscreen">
@@ -61,26 +67,41 @@
                 deleniti laboriosam a nihil molestiae, atque voluptate quis
                 excepturi magnam laudantium libero reiciendis.
             </section>
+            <transition name="modal">
+                <login-component
+                    v-if="isLoginOpen"
+                    @close="isLoginOpen = false"
+                ></login-component>
+            </transition>
         </main>
     </div>
 </template>
 
 <script>
 import PostComponent from "../components/Post/PostComponent.vue";
+import LoginComponent from "../components/LoginComponent.vue";
+import axios from "axios";
 export default {
-    components: { PostComponent },
+    components: { PostComponent, LoginComponent },
     data() {
         return {
             show: true,
             isActive: null,
             isLoading: false,
+            isLoginOpen: false,
         };
     },
     mounted() {
         console.log("Home Component mounted.");
-        // $('[data-widget = "treeview"]').Treeview("init");
+        this.isAuth();
     },
     methods: {
+        isAuth() {
+            axios.get("/api").then((res) => console.log(res));
+        },
+        loginOpen() {
+            this.isLoginOpen = !this.isLoginOpen;
+        },
         blogOpen(navSection) {
             this.navSelectStatus(navSection);
             this.show = !this.show;
@@ -121,12 +142,29 @@ export default {
 
 <style scoped>
 .active {
-    color: var(--clr-accent);
-    border-bottom: 1px solid var(--clr-accent);
+    /* color: var(--clr-accent); */
+    /* padding: 10px 20px; */
+    border-radius: 10px;
+    background-color: var(--clr-accent);
+    transition: all 0.2s linear;
+    /* border-bottom: 1px solid var(--clr-accent); */
 }
 
 nav > a {
+    padding: 1px 15px;
     color: #fff;
+    transition: all 0.3s linear;
+}
+
+.user-login-btn {
+    font-size: 2.5rem;
+    border: none;
+    background-color: inherit;
+    color: var(--clr-accent);
+}
+
+.user-login-btn:hover {
+    color: var(--clr-touch);
 }
 
 .main-page {
@@ -200,6 +238,7 @@ header > h1 {
     font-family: "Arizonia", cursive;
     color: var(--clr-accent);
     line-height: 1;
+    margin: 0;
 }
 
 .title-wrap {
@@ -232,14 +271,14 @@ header > h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    border: 1px solid rgb(108, 108, 108);
+    border: 1px solid rgb(73, 73, 73);
     border-radius: 10px;
-    box-shadow: 0 0 20px 1px rgb(108 108 108);
+    /* box-shadow: 0 0 20px 1px rgb(108 108 108); */
     z-index: 0;
 }
 
 .nav_link:hover {
-    color: var(--clr-accent);
+    background-color: var(--clr-touch);
 }
 .social-link:hover,
 .social-link:focus {
@@ -250,7 +289,7 @@ header > h1 {
     display: none;
 }
 
-.login-btn {
+.messanger {
     color: inherit;
 }
 
@@ -286,6 +325,18 @@ header > h1 {
     .personal {
         margin: 0;
     }
+    header > h1 {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .user-login {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: end;
+        padding-right: 1rem;
+    }
+
     .main-page {
         width: 100%;
         height: 100%;
@@ -363,9 +414,9 @@ header > h1 {
         z-index: 5;
         background-color: #242424f6;
         border-radius: 10px;
-        -webkit-box-shadow: 0 0 15px 3px rgb(108, 108, 108);
+        /* -webkit-box-shadow: 0 0 15px 3px rgb(108, 108, 108);
         -moz-box-shadow: 0 0 15px 3px rgb(108, 108, 108);
-        box-shadow: 0 0 20px 1px rgb(108, 108, 108);
+        box-shadow: 0 0 20px 1px rgb(108, 108, 108); */
     }
 
     .primary-image {
@@ -498,6 +549,12 @@ header > h1 {
         grid-row: 1;
     }
 
+    .user-login {
+        grid-column: 3;
+        justify-self: end;
+        padding-right: 0;
+    }
+
     .primary-image {
         grid-column: 3 / 5;
     }
@@ -602,5 +659,22 @@ header > h1 {
 .slide-leave-to {
     transform: translateX(250px);
     opacity: 0;
+}
+
+.modal-enter-from {
+    opacity: 0;
+    transform: scale(1.5);
+}
+
+.modal-enter-active {
+    transition: all 0.2s ease-in;
+}
+.modal-leave-active {
+    transition: all 0.5s ease-in-out;
+}
+
+.modal-leave-to {
+    opacity: 0;
+    transform: scale(0);
 }
 </style>

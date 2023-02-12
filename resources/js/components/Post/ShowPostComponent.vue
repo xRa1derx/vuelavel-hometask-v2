@@ -1,5 +1,5 @@
 <template>
-    <div class="posts-container mx-auto pb-3">
+    <div class="posts-container mx-auto">
         <transition name="modal">
             <div v-if="isCreated" class="post-created">
                 <base-check-mark></base-check-mark>
@@ -105,6 +105,10 @@ export default {
                     this.posts = res.data;
                 })
                 .then(() => {
+                    if (!this.$refs.imageContainer) {
+                        this.$router.push({ name: "posts.create" });
+                        return;
+                    }
                     this.$refs.imageContainer.forEach((element) => {
                         const countImages = element.childElementCount;
                         if (countImages >= 3) {
@@ -177,54 +181,46 @@ export default {
 .posts-container {
     min-height: 440px;
     max-width: 800px;
-    background-color: #242424f6;
+}
+
+.post-wrapper:nth-child(odd) {
+    box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.658);
 }
 
 .post-wrapper {
     position: relative;
     padding: 3rem 0;
     z-index: 1;
+    border-radius: 10px;
+    margin-bottom: 1rem;
 }
 
 .post-edit > .nav-icon {
     margin-left: 0.8rem;
     color: #17a2b8;
 }
-
 .title-wrap {
     justify-content: space-between;
 }
-
 .date {
     align-self: flex-end;
     margin-bottom: 2px;
     margin-right: 1rem;
 }
-
-@media (min-width: 800px) {
-    .post-wrapper {
-        margin: 0 0.8rem;
-        border-radius: 10px;
-    }
-}
-
 .post-wrapper:nth-child(even) {
-    background-color: var(--clr-bg-light);
+    background-color: var(--clr-bg-dark);
     /* border: 2px solid var(--clr-bg-light); */
 }
-
 .post-title,
 .post-content {
     margin: 0 0.8rem;
 }
-
 .post-content-hidden {
     max-height: 285px;
     position: relative;
     overflow: hidden;
     margin-bottom: 1rem;
 }
-
 .show-more {
     position: absolute;
     bottom: 0;
@@ -234,20 +230,16 @@ export default {
     border: none;
     display: none;
 }
-
 /* .post-wrapper:nth-child(odd) .post-content {
   background-color: #282828d0;
 } */
-
 .post-title > h1 {
     display: inline;
     margin-bottom: 0;
 }
-
 .post-footer {
     margin: 0 0.8rem 0.8rem 0.8rem;
 }
-
 .tags-wrap {
     width: 75%;
     flex-wrap: wrap;
@@ -259,11 +251,9 @@ export default {
     border-radius: 10px;
     color: black;
 }
-
 .category {
     align-self: center;
 }
-
 .post-image-container {
     min-height: 250px;
     max-height: 300px;
@@ -274,7 +264,6 @@ export default {
     margin-bottom: 1rem;
     padding: 0.8rem;
 }
-
 .images-hidden {
     /* min-height: 300px; */
     overflow: hidden;
@@ -290,7 +279,6 @@ export default {
     position: relative;
     cursor: pointer;
 }
-
 .images-hidden::before {
     content: "";
     display: block;
@@ -303,17 +291,14 @@ export default {
     background-color: #9090901f;
     transition: opacity 0.3s ease-in-out;
 }
-
 .images-hidden:hover::before {
     opacity: 1;
 }
-
 .images-show {
     transition: max-height 0.25s ease-in;
     overflow: hidden;
     background-color: #242424d5;
 }
-
 .button {
     position: relative;
     cursor: pointer;
@@ -327,7 +312,6 @@ export default {
     right: -10px;
     z-index: 1;
 }
-
 .button::after {
     content: "";
     position: absolute;
@@ -339,46 +323,43 @@ export default {
     transition: transform 175ms cubic-bezier(0.91, 0, 0.55, 1.64);
     transform-origin: top right;
 }
-
 .button:hover::after,
 .button:focus::after {
     transform: scale(1.35, 1.85);
 }
-
 .post-created {
     position: absolute;
     top: 5px;
     right: 5px;
 }
-
 .post-delete {
     position: absolute;
     right: 1rem;
     top: 1rem;
     padding: 0;
 }
-
 .nav-icon {
-    color: #6c757d;
+    color: #fff;
+}
+
+.ql-editor {
+    padding: 0;
 }
 
 .post-edit:hover > .nav-icon,
 .post-delete:hover > .nav-icon {
     color: #ff7600;
 }
-
 .modal-enter-from {
     transform: rotateX(45deg);
     opacity: 0;
 }
-
 .modal-enter-active {
     transition: all 0.4s ease-in;
 }
 .modal-leave-active {
     transition: all 0.4s ease-out;
 }
-
 .modal-leave-to {
     opacity: 0;
     transform: rotateX(45deg);

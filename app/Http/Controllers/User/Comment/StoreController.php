@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Comment;
+namespace App\Http\Controllers\User\Comment;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
@@ -13,7 +13,8 @@ class StoreController extends Controller
         $data = $this->validate($request, [
             'post_id' => 'required',
             'user_id' => 'required',
-            'text' => 'required'
+            'text' => 'required',
+            'parent_id' => 'nullable'
         ]);
         Comment::create($data);
     }

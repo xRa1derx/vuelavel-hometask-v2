@@ -1,42 +1,54 @@
-import axios from 'axios'
+import axios from "axios";
 
 export default {
     namespaced: true,
-    state:{
-        authenticated:false,
-        user:{}
+    state: {
+        authenticated: false,
+        isAdmin: false,
+        user: {},
     },
-    getters:{
-        authenticated(state){
-            return state.authenticated
+    getters: {
+        authenticated(state) {
+            return state.authenticated;
         },
-        user(state){
-            return state.user
-        }
+        user(state) {
+            return state.user;
+        },
+        isAdmin(state) {
+            return state.isAdmin;
+        },
     },
-    mutations:{
-        SET_AUTHENTICATED (state, value) {
-            state.authenticated = value
+    mutations: {
+        SET_AUTHENTICATED(state, value) {
+            state.authenticated = value;
         },
-        SET_USER (state, value) {
-            state.user = value
-        }
+        SET_USER(state, value) {
+            state.user = value;
+        },
+        SET_ADMIN(state, value) {
+            state.isAdmin = value;
+        },
     },
-    actions:{
-        login({commit}){
-            return axios.get('/api/user').then(({data})=>{
-                commit('SET_USER',data)
-                commit('SET_AUTHENTICATED',true)
-                console.log('yep!');
-            }).catch((res)=>{
-                console.log(res);
-                commit('SET_USER',{})
-                commit('SET_AUTHENTICATED',false)
-            })
+    actions: {
+        login({ commit }) {
+            return axios
+                .get("/api/user")
+                .then(({ data }) => {
+                    commit("SET_USER", data);
+                    commit("SET_AUTHENTICATED", true);
+                    if (data.is_admin === 1) {
+                        commit("SET_ADMIN", true);
+                    }
+                })
+                .catch((res) => {
+                    commit("SET_USER", {});
+                    commit("SET_AUTHENTICATED", false);
+                });
         },
-        logout({commit}){
-            commit('SET_USER',{})
-            commit('SET_AUTHENTICATED',false)
-        }
-    }
-}
+        logout({ commit }) {
+            commit("SET_USER", {});
+            commit("SET_AUTHENTICATED", false);
+            commit("SET_ADMIN", false);
+        },
+    },
+};

@@ -143,7 +143,7 @@ export default {
             selectedTagsIds: [],
             selectedCategoryId: "",
             selectedCategoryName: "",
-            content: null,
+            content: '',
             images: null,
             prevImage: null,
             showModal: false,

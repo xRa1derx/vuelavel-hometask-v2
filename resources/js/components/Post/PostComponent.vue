@@ -1,11 +1,12 @@
 <template>
-    <div class="post-wrapper" v-for="post in posts" :key="post.id">
+    <base-spinner v-if="loading"></base-spinner>
+    <div v-else class="post-wrapper" v-for="post in posts" :key="post.id">
         <div class="title-wrap d-flex">
             <div class="post-title">
-                <h1>{{ post.title }}</h1>
+                <h5>{{ post.title }}</h5>
             </div>
             <div class="date">
-                <button class="button">{{ getFullDate(post) }}</button>
+                <p>{{ getFullDate(post) }}</p>
             </div>
         </div>
         <div
@@ -26,25 +27,32 @@
             </button>
         </div>
         <div class="post-footer d-flex justify-content-between">
-            <div class="tags-wrap m-0 d-flex">
-                <span class="text-muted align-self-center mr-1">Tags: </span>
-                <span class="tags" v-for="tag in post.tags" :key="tag.id">
-                    {{ tag.title }}
-                </span>
+            <div class="tags-and-category-wrap">
+                <div class="tags-wrap m-0 d-flex">
+                    <span class="text-muted align-self-center mr-1"
+                        >Tags:
+                    </span>
+                    <span class="tags" v-for="tag in post.tags" :key="tag.id">
+                        {{ tag.title }}
+                    </span>
+                </div>
+                <div class="category d-flex flex-nowrap">
+                    <span class="text-muted mr-1">Category: </span>
+                    <span> {{ post.category.title }}</span>
+                </div>
             </div>
-            <div class="category d-flex flex-nowrap">
-                <span class="text-muted mr-1">Category: </span>
-                <span> {{ post.category.title }}</span>
+
+            <div class="comments">
+                <button @click="commentsLink(post.id)">
+                    <i class="far fa-comment"> </i>
+                    <i class="comments-quantity"> {{ post.comments.length }}</i>
+                </button>
             </div>
         </div>
         <div class="post-comments-section">
-            <div v-for="comment in comments" :key="comment.id">
-                <p>{{ comment.user }}</p>
-                <p>{{ comment.comment }}</p>
-                <p>{{ comment.date }}</p>
-            </div>
             <comment-textarea
                 @addComment="addComment($event, post.id)"
+                @loginOpen="$emit('loginOpen')"
             ></comment-textarea>
         </div>
     </div>
@@ -53,31 +61,28 @@
 <script>
 import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
-import CommentTextarea from "../Post/CommentTextarea.vue";
+import CommentTextarea from "../Comments/CommentTextarea.vue";
+import BaseSpinner from "../UI/BaseSpinner.vue";
 export default {
     components: {
         BaseLightbox,
         CommentTextarea,
+        BaseSpinner,
     },
-    emits: ["loading"],
+    emits: ["loading", "commentLink", "loginOpen"],
     data() {
         return {
             posts: [],
-            isLoaded: false,
-            comments: [
-                {
-                    id: 1,
-                    user: "John",
-                    date: "Feb 9, 2023",
-                    comment: "new comment",
-                },
-            ],
+            loading: false,
         };
     },
     mounted() {
         this.getPosts();
     },
     methods: {
+        commentsLink(id) {
+            this.$emit("commentLink", id);
+        },
         getPosts() {
             this.$emit("loading", true);
             axios
@@ -140,12 +145,14 @@ export default {
                 event.target.style.display = "none";
             }
         },
-        addComment(text, post_id) {
-            let user_id = 1;
+        async addComment(text, post_id) {
+            this.loading = true;
+            let user_id = this.$store.state.auth.user.id || 0;
             const data = { text, post_id, user_id };
-            axios
-                .post("/api/admin/comment/create", data)
-                .then((res) => console.log(res));
+            await axios
+                .post("/api/user/comment/create", data)
+                .then((res) => this.getPosts())
+                .finally(() => (this.loading = false));
         },
     },
 };
@@ -154,24 +161,39 @@ export default {
 <style scoped>
 .post-wrapper {
     position: relative;
-    padding: 3rem 0;
+    padding: 0.3rem 0;
     z-index: 1;
-    border-radius: 10px;
-    margin: 0 0 0 0.8rem;
+    margin-bottom: 0.5rem;
+    /* border-radius: 10px; */
+    /* margin: 0.8rem 0 0.8rem 0.8rem; */
 }
 
 .title-wrap {
+    margin-bottom: 0.5rem;
     justify-content: space-between;
 }
 
 .date {
-    align-self: flex-end;
-    margin-bottom: 2px;
+    font-size: 10px;
+    display: inline-flex;
+    align-self: end;
+    margin-right: 0.8rem;
+    margin-left: auto;
+    flex: 0 0 auto;
+    padding-bottom: 0.5rem;
+}
+
+.date > p {
+    margin: 0;
 }
 
 .post-wrapper:nth-child(even) {
     background-color: var(--clr-bg-light);
     /* border: 2px solid var(--clr-bg-light); */
+}
+
+.post-title {
+    flex: 0 1 auto;
 }
 
 .post-title,
@@ -200,28 +222,27 @@ export default {
   background-color: #282828d0;
 } */
 
-.post-title > h1 {
+.post-title > h5 {
     margin-bottom: 0;
+    padding: 0.5rem 0;
 }
 
 .post-footer {
-    margin: 0 0.8rem 0.8rem 0.8rem;
+    margin: 0.8rem;
 }
 
 .tags-wrap {
-    width: 75%;
-    flex-wrap: wrap;
     gap: 0.5rem;
 }
 .tags {
     background-color: #ffc107;
-    padding: 5px;
-    border-radius: 10px;
+    padding: 0 8px;
+    /* border-radius: 10px; */
     color: black;
 }
 
 .category {
-    align-self: center;
+    gap: 0.5rem;
 }
 
 .post-image-container {
@@ -229,10 +250,10 @@ export default {
     max-height: 300px;
     position: relative;
     display: grid;
-    gap: 0.8rem;
+    gap: 0.3rem;
     grid-template-columns: repeat(2, 1fr);
     margin-bottom: 1rem;
-    padding: 0.8rem;
+    /* padding: 0.8rem; */
 }
 
 .images-hidden {
@@ -273,42 +294,37 @@ export default {
     background-color: #242424d5;
 }
 
-.button {
-    position: relative;
-    cursor: pointer;
-    display: inline-block;
-    border: 0;
-    background: transparent;
-    color: var(--clr-text);
-    font-size: 1.125rem;
-    padding: 0;
-    margin-right: 0.8rem;
-    right: -10px;
-    z-index: 1;
-}
-
-.button::after {
-    content: "";
-    position: absolute;
-    background: var(--clr-accent);
-    height: 0.85em;
-    width: 75%;
-    right: 0;
-    z-index: -1;
-    transition: transform 175ms cubic-bezier(0.91, 0, 0.55, 1.64);
-    transform-origin: top right;
-}
-
-.button:hover::after,
-.button:focus::after {
-    transform: scale(1.35, 1.85);
-}
-
 .post-comments-section {
-    margin: 0.8rem;
-    background-color: #fff;
-    color: #000;
-    border-radius: 10px;
+    /* margin: 0 0.8rem; */
+    /* border-radius: 10px; */
+}
+
+.comments {
+    display: flex;
+    position: relative;
+}
+
+.comments > button {
+    font-size: 2rem;
+    display: flex;
+    border: none;
+    background: inherit;
+    align-self: end;
+}
+
+.fa-comment {
+    color: rgba(255, 255, 255, 0.055);
+}
+
+.comments-quantity {
+    font-size: 1rem;
+    font-style: inherit;
+    color: var(--clr-accent);
+    font-weight: 600;
+    align-self: end;
+    position: absolute;
+    right: 8px;
+    bottom: 0;
 }
 
 .ql-editor {

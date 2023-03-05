@@ -77,8 +77,8 @@ export default {
 };
 </script>
 
-<style>
-.modal-mask {
+<style scoped>
+/* .modal-mask {
     position: absolute;
     z-index: 9998;
     top: 0;
@@ -101,11 +101,9 @@ export default {
     max-width: 485px;
     margin: auto;
     background-color: #242424;
-    /* border: 1px solid rgb(136, 136, 136); */
     border-radius: 10px;
-    /* box-shadow: 0 0 20px 1px rgb(136, 136, 136); */
     z-index: 1;
-}
+} */
 
 .post-wrapper {
     position: relative;
@@ -197,7 +195,7 @@ export default {
     grid-column: 1 / 3;
 }
 
-.ql-align-right {
+/* .ql-align-right {
     text-align: right;
 }
 .ql-align-center {
@@ -208,10 +206,10 @@ export default {
 }
 
 .ql-toolbar {
-    background-color: inherit;
+    background-color: red;
 }
 
 .ql-container {
     border-radius: 0.25rem;
-}
+} */
 </style>

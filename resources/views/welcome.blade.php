@@ -3,12 +3,13 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="theme-color" content="#242424">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet" />
-<title>My hometask</title>
+    <title>My hometask</title>
     <link rel="stylesheet" href="font">
     {{-- <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> --}}

@@ -425,7 +425,9 @@ export default {
         this.$nextTick(() => {
             window.addEventListener("resize", this.onResize);
         });
-
+        if (document.body.classList.contains("overflow")) {
+            document.body.classList.remove("overflow");
+        }
         const sidebarButtons = document.querySelectorAll(".sidebar-btn");
         sidebarButtons.forEach((btn) =>
             btn.addEventListener("click", () => {

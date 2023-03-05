@@ -76,7 +76,7 @@ export default {
 <style scoped>
 .last-image {
     grid-column: 1 / 3;
-    width: 70%;
+    width: 100%;
     margin: auto;
 }
 
@@ -84,13 +84,13 @@ img[lazy="loading"] {
     background-color: #eee;
     height: 250px;
     width: 100%;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     animation: fade 1s ease-in-out infinite alternate;
 }
 
 img[lazy="loaded"] {
     display: none;
-    border-radius: 10px;
+    /* border-radius: 10px; */
 }
 
 .post-image {

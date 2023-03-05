@@ -22,6 +22,7 @@ class PostResource extends JsonResource
             'content' => $this->content,
             'created_at' => $this->created_at,
             'category' => $this->category,
+            'comments' => $this->comments,
             'images' => ImageResource::collection($this->images),
             'tags' => $this->tags,
             'all_tags' => Tag::all(),

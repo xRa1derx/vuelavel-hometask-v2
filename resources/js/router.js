@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
+import store from "./store";
 
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
+import DashboardPage from "./pages/DashboardPage";
 
 import CategoryComponent from "./components/Category/CategoryComponent";
 import TagComponent from "./components/Tag/TagComponent";
@@ -9,7 +11,7 @@ import TagComponent from "./components/Tag/TagComponent";
 import UserComponent from "./components/User/UserComponent";
 import CreateUserComponent from "./components/User/CreateUserComponent";
 
-import CommentComponent from "./components/CommentComponent";
+import CommentComponent from "./components/Comments/CommentComponent";
 
 import ShowPostComponent from "./components/Post/ShowPostComponent";
 import CreatePostComponent from "./components/Post/CreatePostComponent";
@@ -18,12 +20,23 @@ import EditPostComponent from "./components/Post/EditPostComponent";
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        { path: "/", component: HomePage, name: "home" },
-        // { path: "/login", component: LoginPage, name: "login" },
+        {
+            path: "/",
+            component: HomePage,
+            name: "home",
+            meta: {
+                middleware: "guest",
+                title: "Home",
+            },
+        },
         {
             path: "/admin",
             component: AdminPage,
             name: "admin",
+            meta: {
+                middleware: "admin",
+                title: "Admin",
+            },
             children: [
                 {
                     path: "categories",
@@ -50,6 +63,15 @@ const router = createRouter({
                     name: "posts.edit.id",
                 },
             ],
+        },
+        {
+            path: "/dashboard",
+            component: DashboardPage,
+            name: "dashboard",
+            meta: {
+                middleware: "auth",
+                title: "Dashboard",
+            },
         },
         // {
         //     path: "/admin/users",
@@ -79,6 +101,25 @@ const router = createRouter({
         //     name: "notfound",
         // },
     ],
+});
+
+router.beforeEach((to, from, next) => {
+    document.title = `${to.meta.title} - ${process.env.MIX_APP_NAME}`;
+    if (to.meta.middleware == "admin") {
+        if (store.state.auth.isAdmin) {
+            next();
+        } else {
+            next({ name: "home" });
+        }
+    } else if (to.meta.middleware == "auth") {
+        if (store.state.auth.authenticated && !store.state.auth.isAdmin) {
+            next();
+        } else {
+            next({ name: "home" });
+        }
+    } else {
+        next();
+    }
 });
 
 export default router;

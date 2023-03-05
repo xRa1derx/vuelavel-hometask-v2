@@ -1,10 +1,12 @@
 import axios from "axios";
 import { createStore } from "vuex";
+import createPersistedState from "vuex-persistedstate";
 import auth from "./auth";
 const store = createStore({
     modules: {
         auth,
     },
+    plugins: [createPersistedState()],
     state() {
         return {
             users: [],
@@ -23,9 +25,6 @@ const store = createStore({
         },
     },
     getters: {
-        authenticated(state) {
-            return state.authenticated;
-        },
         users(state) {
             return state.users;
         },

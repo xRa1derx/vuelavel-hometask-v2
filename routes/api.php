@@ -3,13 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
-// Route::get('/',  'IndexController');
-
-// Route::post('/login', 'AuthController');
 Route::group(['namespace' => 'Admin\Category', 'prefix' => 'admin'], function () {
     Route::get('/categories', 'IndexController');
     Route::post('/categories/create', 'StoreController');
@@ -39,6 +36,6 @@ Route::group(['namespace' => 'Admin\Post', 'prefix' => 'admin'], function () {
     Route::delete('/post/{id}', 'DeleteController');
 });
 
-Route::group(['namespace' => 'Admin\Comment', 'prefix' => 'admin'], function () {
+Route::group(['namespace' => 'User\Comment', 'prefix' => 'user'], function () {
     Route::post('/comment/create', 'StoreController');
 });

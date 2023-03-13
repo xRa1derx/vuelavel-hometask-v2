@@ -53,22 +53,12 @@
                         <span> {{ category }}</span>
                     </div>
                 </div>
-
-                <div
-                    class="parent-comment"
+                <replies-component
                     v-for="comment in comments"
                     :key="comment.id"
-                >
-                    <comment-component
-                        :comment="comment"
-                        @replyData="replyData"
-                    ></comment-component>
-                    <replies-component
-                        :comments="comment.replies"
-                        @replyData="replyData"
-                        :depth="depth + 1"
-                    ></replies-component>
-                </div>
+                    :comment="comment"
+                    @replyData="replyData"
+                ></replies-component>
                 <div class="post-comments-section">
                     <comment-textarea
                         v-if="!isLoading"
@@ -85,13 +75,11 @@
 import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
 import CommentTextarea from "../Comments/CommentTextarea.vue";
-import CommentComponent from "../Comments/CommentComponent.vue";
 import BaseSpinner from "../UI/BaseSpinner.vue";
 export default {
     components: {
         BaseLightbox,
         CommentTextarea,
-        CommentComponent,
         BaseSpinner,
     },
     props: ["postSelected"],
@@ -106,7 +94,7 @@ export default {
             time: "",
             comments: [],
             isLoading: false,
-            depth: 0,
+            depth: null,
         };
     },
     mounted() {
@@ -208,20 +196,32 @@ export default {
             this.isLoading = true;
             let replyId = this.replyId;
             let user_id = this.$store.state.auth.user.id || 0;
+            if (this.depth != null && this.depth < 5) {
+                this.depth++;
+            } else {
+                this.depth = 0;
+            }
+            let depth = this.depth;
             const data = {
                 text: text,
                 post_id,
                 user_id,
                 parent_id: replyId,
+                depth,
             };
             await axios
                 .post("/api/user/comment/create", data)
                 .finally(() => (this.isLoading = false));
             this.getPost();
+            this.depth = null;
+            this.replyId = null;
+            this.replyName = "";
         },
         replyData(val) {
+            this.$store.dispatch("getQuickTextarea", val.id);
             this.replyId = val.id;
             this.replyName = val.author.name;
+            this.depth = val.depth;
         },
         scrollDown() {
             if (this.$refs.wrapper) {
@@ -263,7 +263,7 @@ export default {
     top: 0;
     background-color: rgba(255, 255, 255, 0.938);
     color: #000;
-    z-index: 1;
+    z-index: 2;
     transition: all 0.3s linear;
     box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5);
 }
@@ -308,6 +308,10 @@ export default {
     position: relative;
     overflow: hidden;
     margin-bottom: 1rem;
+}
+
+.post-comments-section{
+    height: 56px;
 }
 
 .show-more {
@@ -401,10 +405,6 @@ nav > a {
 
 .nav_link:hover {
     background-color: var(--clr-touch);
-}
-
-.parent-comment {
-    margin: 0 0.8rem;
 }
 
 .ql-editor {

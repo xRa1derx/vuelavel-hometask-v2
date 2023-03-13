@@ -14,7 +14,8 @@ class StoreController extends Controller
             'post_id' => 'required',
             'user_id' => 'required',
             'text' => 'required',
-            'parent_id' => 'nullable'
+            'parent_id' => 'nullable',
+            'depth' => 'required|integer'
         ]);
         Comment::create($data);
     }

@@ -29,10 +29,12 @@ export default {
     methods: {
         autoGrow(element) {
             this.message = element.target.value;
-            element.target.style.height = "30px";
+            element.target.style.height = "66px";
             element.target.style.height = `${element.target.scrollHeight}px`;
             element.target.parentElement.parentElement.style.height = "56px";
-            element.target.parentElement.parentElement.style.height = `${element.target.parentElement.parentElement.scrollHeight}px`;
+            element.target.parentElement.parentElement.style.height = `${
+                element.target.parentElement.parentElement.scrollHeight + 10
+            }px`;
         },
     },
 };
@@ -41,10 +43,11 @@ export default {
 <style scoped>
 .textarea-wrap {
     display: flex;
+    max-width: 100%;
     justify-content: space-between;
     gap: 0.5rem;
     height: 30px;
-    margin: 1.6rem 0.8rem;
+    margin: 0.4rem 0.6rem;
 }
 textarea {
     max-height: 150px;
@@ -52,6 +55,7 @@ textarea {
     border: none;
     border-radius: 10px;
     resize: none;
+    
 }
 .send-comment-btn {
     color: #fff;
@@ -59,7 +63,7 @@ textarea {
     border: none;
     align-self: center;
     font-size: 20px;
-    transform: rotate(45deg);
+    /* transform: rotate(45deg); */
 }
 .name {
     /* padding: 3px; */

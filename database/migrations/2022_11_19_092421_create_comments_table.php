@@ -21,6 +21,7 @@ class CreateCommentsTable extends Migration
             $table->foreignIdFor(Post::class, 'post_id');
             $table->foreignIdFor(User::class, 'user_id');
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->unsignedBigInteger('depth')->default(0);
             $table->timestamps();
         });
     }

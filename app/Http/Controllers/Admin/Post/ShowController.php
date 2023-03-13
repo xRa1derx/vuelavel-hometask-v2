@@ -10,6 +10,6 @@ class ShowController extends Controller
 {
     public function __invoke($id)
     {
-        return new PostResource(Post::with('tags', 'images', 'category', 'comments.author', 'comments.replies.author')->findOrFail($id));
+        return new PostResource(Post::with('tags', 'images', 'category', 'comments.author', 'comments.replies.author', 'comments.parent')->findOrFail($id));
     }
 }

@@ -23802,10 +23802,10 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     autoGrow: function autoGrow(element) {
       this.message = element.target.value;
-      element.target.style.height = "30px";
+      element.target.style.height = "66px";
       element.target.style.height = "".concat(element.target.scrollHeight, "px");
       element.target.parentElement.parentElement.style.height = "56px";
-      element.target.parentElement.parentElement.style.height = "".concat(element.target.parentElement.parentElement.scrollHeight, "px");
+      element.target.parentElement.parentElement.style.height = "".concat(element.target.parentElement.parentElement.scrollHeight + 10, "px");
     }
   }
 });
@@ -23823,13 +23823,70 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _Comments_CommentTextarea_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Comments/CommentTextarea.vue */ "./resources/js/components/Comments/CommentTextarea.vue");
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ["comments", "depth"],
-  emits: ["replyData"],
+  components: {
+    CommentTextarea: _Comments_CommentTextarea_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  props: {
+    comment: {
+      type: Object,
+      required: true
+    }
+  },
   data: function data() {
-    return {};
+    return {
+      showReply: false
+    };
+  },
+  mounted: function mounted() {
+    this.$store.state.quickTextarea = null;
+  },
+  computed: {
+    setOffset: function setOffset() {
+      if (this.comment.depth === 5) {
+        return this.resetOffset;
+      } else if (this.comment.parent_id !== null) {
+        return this.offset;
+      }
+    },
+    offset: function offset() {
+      return {
+        "margin-left": "30px"
+      };
+    },
+    resetOffset: function resetOffset() {
+      return {
+        "margin-left": "-".concat(27 * (this.comment.depth - 1), "px"),
+        "box-shadow": "0px 0px 50px 1px #00000075",
+        "border-radius": "5px",
+        border: "1px solid #0000007d",
+        "padding-bottom": "0.4rem"
+      };
+    },
+    hasReply: function hasReply() {
+      var replies = this.comment.replies;
+      return replies && replies.length;
+    },
+    toggleReplyIcon: function toggleReplyIcon() {
+      return this.showReply ? "nav-icon fas fa-angle-down move-down" : "fas fa-angle-right move-right";
+    },
+    showMoreButton: function showMoreButton() {
+      var replies = this.comment.replies;
+      return replies && replies.length > 0 && this.comment.depth === 4;
+    }
   },
   methods: {
+    toggleReply: function toggleReply() {
+      var showMoreStyle = this.$refs.showmore.style;
+      if (showMoreStyle.display != "block") {
+        showMoreStyle.display = "block";
+      } else {
+        showMoreStyle.display = "none";
+      }
+      this.showReply = !this.showReply;
+    },
     getFullDate: function getFullDate(comment) {
       var date = comment.created_at.slice(0, 16).replace("T", " ");
       var t = date.split(/[- :]/);
@@ -24394,8 +24451,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _UI_BaseLightBox_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../UI/BaseLightBox.vue */ "./resources/js/components/UI/BaseLightBox.vue");
 /* harmony import */ var _Comments_CommentTextarea_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Comments/CommentTextarea.vue */ "./resources/js/components/Comments/CommentTextarea.vue");
-/* harmony import */ var _Comments_CommentComponent_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Comments/CommentComponent.vue */ "./resources/js/components/Comments/CommentComponent.vue");
-/* harmony import */ var _UI_BaseSpinner_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../UI/BaseSpinner.vue */ "./resources/js/components/UI/BaseSpinner.vue");
+/* harmony import */ var _UI_BaseSpinner_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../UI/BaseSpinner.vue */ "./resources/js/components/UI/BaseSpinner.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -24410,13 +24466,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     BaseLightbox: _UI_BaseLightBox_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
     CommentTextarea: _Comments_CommentTextarea_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    CommentComponent: _Comments_CommentComponent_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
-    BaseSpinner: _UI_BaseSpinner_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+    BaseSpinner: _UI_BaseSpinner_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   props: ["postSelected"],
   emits: ["loading", "backToBlog", "loginOpen"],
@@ -24430,7 +24484,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       time: "",
       comments: [],
       isLoading: false,
-      depth: 0
+      depth: null
     };
   },
   mounted: function mounted() {
@@ -24521,7 +24575,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     addComment: function addComment(text, post_id) {
       var _this3 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var replyId, user_id, data;
+        var replyId, user_id, depth, data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -24529,19 +24583,29 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                 _this3.isLoading = true;
                 replyId = _this3.replyId;
                 user_id = _this3.$store.state.auth.user.id || 0;
+                if (_this3.depth != null && _this3.depth < 5) {
+                  _this3.depth++;
+                } else {
+                  _this3.depth = 0;
+                }
+                depth = _this3.depth;
                 data = {
                   text: text,
                   post_id: post_id,
                   user_id: user_id,
-                  parent_id: replyId
+                  parent_id: replyId,
+                  depth: depth
                 };
-                _context.next = 6;
+                _context.next = 8;
                 return axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/user/comment/create", data)["finally"](function () {
                   return _this3.isLoading = false;
                 });
-              case 6:
+              case 8:
                 _this3.getPost();
-              case 7:
+                _this3.depth = null;
+                _this3.replyId = null;
+                _this3.replyName = "";
+              case 12:
               case "end":
                 return _context.stop();
             }
@@ -24550,8 +24614,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }))();
     },
     replyData: function replyData(val) {
+      this.$store.dispatch("getQuickTextarea", val.id);
       this.replyId = val.id;
       this.replyName = val.author.name;
+      this.depth = val.depth;
     },
     scrollDown: function scrollDown() {
       if (this.$refs.wrapper) {
@@ -26020,38 +26086,61 @@ var _hoisted_3 = {
   "class": "avatar"
 };
 var _hoisted_4 = ["src"];
-var _hoisted_5 = ["onClick"];
+var _hoisted_5 = {
+  "class": "comment-body"
+};
 var _hoisted_6 = {
-  "class": "comment"
+  "class": "comment-footer d-flex justify-content-between"
 };
 var _hoisted_7 = {
-  "class": "h-100"
-};
-var _hoisted_8 = {
   "class": "date text-muted"
 };
+var _hoisted_8 = {
+  key: 0,
+  "class": "quick-textarea"
+};
+var _hoisted_9 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "more", -1 /* HOISTED */);
+});
+var _hoisted_10 = {
+  key: 1,
+  ref: "showmore"
+};
+var _hoisted_11 = {
+  key: 2,
+  "class": "comment-collapsing-area"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_comment_textarea = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("comment-textarea");
   var _component_replies_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("replies-component", true);
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.comments, function (comment) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["comments", [{
-        offset: $props.depth % 3 === 0
-      }]]),
-      key: comment.id
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-      src: "/uploads/avatars/".concat(comment.author.avatar || 'no-user-image.png'),
-      alt: ""
-    }, null, 8 /* PROPS */, _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-      "class": "reply",
-      onClick: function onClick($event) {
-        return $options.replyData(comment);
-      }
-    }, "Reply", 8 /* PROPS */, _hoisted_5)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "depth: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.depth), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(comment.author.name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(comment.text), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getFullDate(comment)), 1 /* TEXT */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_replies_component, {
-      comments: comment.replies,
-      onReplyData: $options.replyData,
-      depth: $props.depth + 1
-    }, null, 8 /* PROPS */, ["comments", "onReplyData", "depth"])], 2 /* CLASS */);
-  }), 128 /* KEYED_FRAGMENT */);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    "class": "comments d-flex",
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($options.setOffset)
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: "/uploads/avatars/".concat($props.comment.author.avatar || 'no-user-image.png'),
+    alt: ""
+  }, null, 8 /* PROPS */, _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div>depth: {{ comment.depth }}</div>\r\n                <div>parent_id {{ comment.parent_id }}</div> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.comment.author.name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"text-muted\" :class=\"comment.parent ? 'quote' : ''\">\r\n                    <p v-if=\"comment.parent\" class=\"h-100\">\r\n                        {{ comment.parent.text }}\r\n                    </p>\r\n                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.comment.text), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": "reply",
+    onClick: _cache[0] || (_cache[0] = function ($event) {
+      return $options.replyData($props.comment);
+    })
+  }, " Reply "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getFullDate($props.comment)), 1 /* TEXT */)]), this.$store.state.quickTextarea === $props.comment.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_comment_textarea)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), $options.showMoreButton ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 0,
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["show-more", {
+      activeMore: $data.showReply
+    }]),
+    onClick: _cache[1] || (_cache[1] = function ($event) {
+      return $options.toggleReply();
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.toggleReplyIcon)
+  }, null, 2 /* CLASS */), _hoisted_9], 2 /* CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.hasReply ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.comment.replies, function (reply) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_replies_component, {
+      key: reply.id,
+      comment: reply,
+      onReplyData: $options.replyData
+    }, null, 8 /* PROPS */, ["comment", "onReplyData"]);
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.showReply && !$options.showMoreButton]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.comment.parent_id != null && $props.comment.depth != 5 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 4 /* STYLE */);
 }
 
 /***/ }),
@@ -26697,7 +26786,6 @@ var _hoisted_16 = {
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_base_spinner = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("base-spinner");
   var _component_base_lightbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("base-lightbox");
-  var _component_comment_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("comment-component");
   var _component_replies_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("replies-component");
   var _component_comment_textarea = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("comment-textarea");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [$data.isLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_base_spinner, {
@@ -26741,17 +26829,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           key: tag.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(tag.title), 1 /* TEXT */);
       }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.category), 1 /* TEXT */)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.comments, function (comment) {
-        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-          "class": "parent-comment",
-          key: comment.id
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_comment_component, {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_replies_component, {
+          key: comment.id,
           comment: comment,
           onReplyData: $options.replyData
-        }, null, 8 /* PROPS */, ["comment", "onReplyData"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_replies_component, {
-          comments: comment.replies,
-          onReplyData: $options.replyData,
-          depth: $data.depth + 1
-        }, null, 8 /* PROPS */, ["comments", "onReplyData", "depth"])]);
+        }, null, 8 /* PROPS */, ["comment", "onReplyData"]);
       }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [!$data.isLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_comment_textarea, {
         key: 0,
         onAddComment: _cache[4] || (_cache[4] = function ($event) {
@@ -29029,12 +29111,16 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_3__.createStore)({
   plugins: [(0,vuex_persistedstate__WEBPACK_IMPORTED_MODULE_1__["default"])()],
   state: function state() {
     return {
-      users: []
+      users: [],
+      quickTextarea: null
     };
   },
   mutations: {
     setUsers: function setUsers(state, users) {
       state.users = users;
+    },
+    setQuickTextarea: function setQuickTextarea(state, quickTextarea) {
+      state.quickTextarea = quickTextarea;
     }
   },
   actions: {
@@ -29043,11 +29129,17 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_3__.createStore)({
       axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/admin/users").then(function (users) {
         commit("setUsers", users.data);
       });
+    },
+    getQuickTextarea: function getQuickTextarea(context, id) {
+      context.commit("setQuickTextarea", id);
     }
   },
   getters: {
     users: function users(state) {
       return state.users;
+    },
+    currentTextarea: function currentTextarea(state) {
+      return state.quickTextarea;
     }
   }
 });
@@ -39660,7 +39752,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.textarea-wrap[data-v-355dc4e9] {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    gap: 0.5rem;\r\n    height: 30px;\r\n    margin: 1.6rem 0.8rem;\n}\ntextarea[data-v-355dc4e9] {\r\n    max-height: 150px;\r\n    width: 100%;\r\n    border: none;\r\n    border-radius: 10px;\r\n    resize: none;\n}\n.send-comment-btn[data-v-355dc4e9] {\r\n    color: #fff;\r\n    background-color: inherit;\r\n    border: none;\r\n    align-self: center;\r\n    font-size: 20px;\r\n    transform: rotate(45deg);\n}\n.name[data-v-355dc4e9] {\r\n    /* padding: 3px; */\r\n    align-self: center;\n}\n.login > button[data-v-355dc4e9] {\r\n    background-color: inherit;\r\n    border: none;\r\n    color: var(--clr-accent);\r\n    padding: 0;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.textarea-wrap[data-v-355dc4e9] {\r\n    display: flex;\r\n    max-width: 100%;\r\n    justify-content: space-between;\r\n    gap: 0.5rem;\r\n    height: 30px;\r\n    margin: 0.4rem 0.6rem;\n}\ntextarea[data-v-355dc4e9] {\r\n    max-height: 150px;\r\n    width: 100%;\r\n    border: none;\r\n    border-radius: 10px;\r\n    resize: none;\n}\n.send-comment-btn[data-v-355dc4e9] {\r\n    color: #fff;\r\n    background-color: inherit;\r\n    border: none;\r\n    align-self: center;\r\n    font-size: 20px;\r\n    /* transform: rotate(45deg); */\n}\n.name[data-v-355dc4e9] {\r\n    /* padding: 3px; */\r\n    align-self: center;\n}\n.login > button[data-v-355dc4e9] {\r\n    background-color: inherit;\r\n    border: none;\r\n    color: var(--clr-accent);\r\n    padding: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -39684,7 +39776,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.comments[data-v-4e52fbd5] {\r\n    margin-left: 50px;\n}\n.offset[data-v-4e52fbd5] {\r\n    /* margin-left: -15px; */\n}\n.hidden[data-v-4e52fbd5] {\r\n    height: 0;\r\n    visibility: hidden;\r\n    position: relative;\n}\n.wrap[data-v-4e52fbd5] {\r\n    position: relative;\r\n    gap: 0.5rem;\r\n    padding: 0.5rem 0;\r\n    /* border-bottom: 1px solid rgb(73, 73, 73); */\n}\n.comment[data-v-4e52fbd5] {\r\n    display: flex;\r\n    flex: 0 1 100%;\r\n    flex-direction: column;\n}\n.comment > p[data-v-4e52fbd5] {\r\n    /* text-align: justify; */\r\n    margin: 5px 0;\n}\n.comment > b[data-v-4e52fbd5] {\r\n    color: var(--clr-touch);\n}\n.date[data-v-4e52fbd5] {\r\n    font-size: 12px;\r\n    margin: 0;\r\n    align-self: flex-end;\n}\n.reply[data-v-4e52fbd5] {\r\n    font-size: 12px;\r\n    margin: 5px 0;\r\n    text-align: center;\r\n    color: burlywood;\r\n    border: none;\r\n    background-color: inherit;\n}\n.avatar_wrapper[data-v-4e52fbd5] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-between;\n}\n.avatar[data-v-4e52fbd5] {\r\n    flex: 0 0 auto;\r\n    width: 70px;\r\n    height: 70px;\r\n    padding: 0.5rem;\n}\n.avatar > img[data-v-4e52fbd5] {\r\n    width: 100%;\r\n    height: 100%;\r\n    -o-object-fit: cover;\r\n       object-fit: cover;\r\n    border-radius: 100%;\r\n    /* -webkit-filter: drop-shadow(0px 0px 2px #000);\r\n    filter: drop-shadow(0px 0px 2px #000); */\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.comments[data-v-4e52fbd5] {\r\n    flex-direction: column;\r\n    position: relative;\r\n    background-color: var(--clr-bg-dark);\r\n    z-index: 1;\r\n    /* gap: 0.5rem; */\r\n    /* padding: 0.5rem 0; */\n}\n.wrap[data-v-4e52fbd5] {\r\n    position: relative;\r\n    gap: 0.5rem;\r\n    padding: 0.5rem 0;\r\n    margin: 0 0.8rem;\n}\n.comment-collapsing-area[data-v-4e52fbd5] {\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    width: 1px;\r\n    height: 100%;\r\n    background-color: rgba(128, 128, 128, 0.349);\n}\n.comment-body[data-v-4e52fbd5] {\r\n    display: flex;\r\n    flex: 0 1 100%;\r\n    flex-direction: column;\n}\n.comment-body > b[data-v-4e52fbd5] {\r\n    color: var(--clr-touch);\n}\n.quick-textarea[data-v-4e52fbd5] {\r\n    box-sizing: content-box;\r\n    height: 45px;\r\n    margin-top: 0.4rem;\r\n    border-top: 1px solid rgba(128, 128, 128, 0.349);\r\n    border-bottom: 1px solid rgba(128, 128, 128, 0.349);\n}\n.quick-textarea > .textarea-wrap[data-v-4e52fbd5] {\r\n    width: 100%;\n}\n.quote[data-v-4e52fbd5] {\r\n    width: -moz-fit-content;\r\n    width: fit-content;\r\n    border: 1px solid gray;\r\n    border-radius: 10px;\r\n    font-family: cursive;\n}\n.quote > p[data-v-4e52fbd5] {\r\n    padding: 0.2rem 0.5rem;\r\n    margin: 0;\n}\n.date[data-v-4e52fbd5] {\r\n    font-size: 12px;\r\n    margin: 0;\r\n    align-self: flex-end;\n}\n.reply[data-v-4e52fbd5] {\r\n    font-size: 12px;\r\n    text-align: center;\r\n    color: burlywood;\r\n    border: none;\r\n    background-color: inherit;\r\n    padding: 0;\n}\n.show-more[data-v-4e52fbd5] {\r\n    display: flex;\r\n    justify-content: center;\r\n    width: -moz-fit-content;\r\n    width: fit-content;\r\n    margin: auto;\r\n    position: relative;\r\n    margin-bottom: 0.8rem;\r\n    gap: 0.5rem;\r\n    cursor: pointer;\r\n    color: rgba(255, 255, 255, 0.815);\r\n    box-shadow: rgba(0, 0, 0, 0.26) 0px 0px 15px 1px;\r\n    border-radius: 10px;\r\n    padding: 0 1rem;\r\n    transition: all 0.2s linear;\n}\n.show-more[data-v-4e52fbd5]:hover {\r\n    color: var(--clr-touch);\r\n    box-shadow: inset rgba(0, 0, 0, 0.205) 0px 0px 15px 1px;\n}\n.show-more[data-v-4e52fbd5]:active {\r\n    color: var(--clr-touch);\r\n    box-shadow: inset rgba(0, 0, 0, 0.63) 0px 0px 15px 1px;\n}\n.activeMore[data-v-4e52fbd5] {\r\n    color: var(--clr-touch);\r\n    box-shadow: inset rgba(0, 0, 0, 0.322) 0px 0px 15px 1px;\n}\n.move-right[data-v-4e52fbd5] {\r\n    animation: 0.5s linear infinite alternate slideRight-4e52fbd5;\n}\n.move-down[data-v-4e52fbd5] {\r\n    animation: 0.5s linear infinite alternate slideDown-4e52fbd5;\n}\n@keyframes slideRight-4e52fbd5 {\nfrom {\r\n        transform: translateX(-4px);\n}\nto {\r\n        transform: translateX(4px);\n}\n}\n@keyframes slideDown-4e52fbd5 {\nfrom {\r\n        transform: translateY(-4px);\n}\nto {\r\n        transform: translateY(4px);\n}\n}\n.show-more > span[data-v-4e52fbd5] {\r\n    align-self: center;\n}\n.avatar_wrapper[data-v-4e52fbd5] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-between;\n}\n.avatar[data-v-4e52fbd5] {\r\n    flex: 0 0 auto;\r\n    width: 35px;\r\n    height: 35px;\n}\n.avatar > img[data-v-4e52fbd5] {\r\n    width: 100%;\r\n    height: 100%;\r\n    -o-object-fit: cover;\r\n       object-fit: cover;\r\n    border-radius: 100%;\r\n    /* -webkit-filter: drop-shadow(0px 0px 2px #000);\r\n    filter: drop-shadow(0px 0px 2px #000); */\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -39804,7 +39896,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.post-wrapper[data-v-8d3c8ea2] {\r\n    /* padding: 0.3rem 0; */\r\n    position: relative;\r\n    z-index: 1;\r\n    /* margin-bottom: 0.5rem; */\r\n    /* margin: 0.8rem 0 0.8rem 0.8rem; */\r\n    /* border-radius: 10px; */\n}\n.title-wrap[data-v-8d3c8ea2] {\r\n    margin: 0.5rem 0.5rem 0.8rem 0.5rem;\n}\n.back-btn[data-v-8d3c8ea2] {\r\n    display: flex;\r\n    background-color: inherit;\r\n    border: none;\r\n    color: #fff;\r\n    align-self: center;\n}\n.back-btn > i[data-v-8d3c8ea2] {\r\n    align-self: end;\n}\n.back-sticky[data-v-8d3c8ea2] {\r\n    position: sticky;\r\n    top: 0;\r\n    background-color: rgba(255, 255, 255, 0.938);\r\n    color: #000;\r\n    z-index: 1;\r\n    transition: all 0.3s linear;\r\n    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5);\n}\n.back-sticky > button[data-v-8d3c8ea2] {\r\n    background-color: rgba(255, 255, 255, 0);\r\n    color: #000;\n}\n.back-sticky > .post-title > h5[data-v-8d3c8ea2] {\r\n    font-weight: 500;\n}\n.date[data-v-8d3c8ea2] {\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    margin-right: 0.8rem;\r\n    font-size: 10px;\r\n    padding: 0.5rem 0;\n}\n.date > p[data-v-8d3c8ea2] {\r\n    margin: 0;\n}\n.post-wrapper[data-v-8d3c8ea2]:nth-child(even) {\r\n    background-color: var(--clr-bg-light);\n}\n.post-title[data-v-8d3c8ea2] {\r\n    flex: 0 1 auto;\n}\n.post-title[data-v-8d3c8ea2],\r\n.post-content[data-v-8d3c8ea2] {\r\n    margin: 0 0.8rem;\n}\n.post-content-hidden[data-v-8d3c8ea2] {\r\n    max-height: 285px;\r\n    position: relative;\r\n    overflow: hidden;\r\n    margin-bottom: 1rem;\n}\n.show-more[data-v-8d3c8ea2] {\r\n    position: absolute;\r\n    bottom: 0;\r\n    right: 0;\r\n    background-color: var(--clr-accent);\r\n    padding: 0 10px;\r\n    border: none;\r\n    display: none;\n}\n.post-title > h5[data-v-8d3c8ea2] {\r\n    cursor: pointer;\r\n    margin-bottom: 0;\r\n    padding: 0.5rem 0;\n}\n.post-footer[data-v-8d3c8ea2] {\r\n    margin: 0 0.8rem 0.8rem 0.8rem;\n}\n.tags-wrap[data-v-8d3c8ea2] {\r\n    width: 75%;\r\n    flex-wrap: wrap;\r\n    gap: 0.5rem;\n}\n.tags[data-v-8d3c8ea2] {\r\n    background-color: #ffc107;\r\n    padding: 0 8px;\r\n    /* border-radius: 10px; */\r\n    color: black;\n}\n.category[data-v-8d3c8ea2] {\r\n    align-self: center;\n}\n.post-image-container[data-v-8d3c8ea2] {\r\n    min-height: 250px;\r\n    max-height: 300px;\r\n    position: relative;\r\n    display: grid;\r\n    gap: 0.8rem;\r\n    grid-template-columns: repeat(2, 1fr);\r\n    margin-bottom: 1rem;\n}\n.images-hidden[data-v-8d3c8ea2] {\r\n    overflow: hidden;\r\n    background-image: linear-gradient(\r\n        to bottom,\r\n        #24242400,\r\n        #24242418,\r\n        #24242444,\r\n        #242424b7,\r\n        #242424e3\r\n    );\r\n    background-size: cover;\r\n    position: relative;\r\n    cursor: pointer;\n}\n.images-hidden[data-v-8d3c8ea2]::before {\r\n    content: \"\";\r\n    display: block;\r\n    opacity: 0;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    height: 100%;\r\n    background-color: #9090901f;\r\n    transition: opacity 0.3s ease-in-out;\n}\n.images-hidden[data-v-8d3c8ea2]:hover::before {\r\n    opacity: 1;\n}\n.images-show[data-v-8d3c8ea2] {\r\n    transition: max-height 0.25s ease-in;\r\n    overflow: hidden;\r\n    background-color: #242424d5;\n}\nnav > a[data-v-8d3c8ea2] {\r\n    padding: 1px 15px;\r\n    color: #fff;\r\n    transition: all 0.3s linear;\n}\n.nav_link[data-v-8d3c8ea2]:hover {\r\n    background-color: var(--clr-touch);\n}\n.parent-comment[data-v-8d3c8ea2] {\r\n    margin: 0 0.8rem;\n}\n.ql-editor[data-v-8d3c8ea2] {\r\n    padding: 0;\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar {\r\n    width: 0.5rem;\r\n    background-color: #242424f6;\r\n    /* border-radius: 10px; */\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar:horizontal {\r\n    height: 12px;\r\n    margin-right: 20px;\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar-thumb {\r\n    background-color: #efe4e4;\r\n    border: 1px solid #000000;\r\n    /* border-radius: 16px; */\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar-thumb:hover {\r\n    background-color: #d3c9c9;\r\n    border: 1px solid #333333;\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar-thumb:active {\r\n    background-color: #9b8a8b;\r\n    border: 1px solid #333333;\n}\n.fade-enter-from[data-v-8d3c8ea2] {\r\n    opacity: 0.1;\n}\n.fade-enter-active[data-v-8d3c8ea2] {\r\n    transition: all 0.5s linear;\n}\n.fade-leave-active[data-v-8d3c8ea2] {\r\n    transition: all 0.1s ease-out;\n}\n.fade-leave-to[data-v-8d3c8ea2] {\r\n    opacity: 0;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.post-wrapper[data-v-8d3c8ea2] {\r\n    /* padding: 0.3rem 0; */\r\n    position: relative;\r\n    z-index: 1;\r\n    /* margin-bottom: 0.5rem; */\r\n    /* margin: 0.8rem 0 0.8rem 0.8rem; */\r\n    /* border-radius: 10px; */\n}\n.title-wrap[data-v-8d3c8ea2] {\r\n    margin: 0.5rem 0.5rem 0.8rem 0.5rem;\n}\n.back-btn[data-v-8d3c8ea2] {\r\n    display: flex;\r\n    background-color: inherit;\r\n    border: none;\r\n    color: #fff;\r\n    align-self: center;\n}\n.back-btn > i[data-v-8d3c8ea2] {\r\n    align-self: end;\n}\n.back-sticky[data-v-8d3c8ea2] {\r\n    position: sticky;\r\n    top: 0;\r\n    background-color: rgba(255, 255, 255, 0.938);\r\n    color: #000;\r\n    z-index: 2;\r\n    transition: all 0.3s linear;\r\n    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5);\n}\n.back-sticky > button[data-v-8d3c8ea2] {\r\n    background-color: rgba(255, 255, 255, 0);\r\n    color: #000;\n}\n.back-sticky > .post-title > h5[data-v-8d3c8ea2] {\r\n    font-weight: 500;\n}\n.date[data-v-8d3c8ea2] {\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    margin-right: 0.8rem;\r\n    font-size: 10px;\r\n    padding: 0.5rem 0;\n}\n.date > p[data-v-8d3c8ea2] {\r\n    margin: 0;\n}\n.post-wrapper[data-v-8d3c8ea2]:nth-child(even) {\r\n    background-color: var(--clr-bg-light);\n}\n.post-title[data-v-8d3c8ea2] {\r\n    flex: 0 1 auto;\n}\n.post-title[data-v-8d3c8ea2],\r\n.post-content[data-v-8d3c8ea2] {\r\n    margin: 0 0.8rem;\n}\n.post-content-hidden[data-v-8d3c8ea2] {\r\n    max-height: 285px;\r\n    position: relative;\r\n    overflow: hidden;\r\n    margin-bottom: 1rem;\n}\n.post-comments-section[data-v-8d3c8ea2]{\r\n    height: 56px;\n}\n.show-more[data-v-8d3c8ea2] {\r\n    position: absolute;\r\n    bottom: 0;\r\n    right: 0;\r\n    background-color: var(--clr-accent);\r\n    padding: 0 10px;\r\n    border: none;\r\n    display: none;\n}\n.post-title > h5[data-v-8d3c8ea2] {\r\n    cursor: pointer;\r\n    margin-bottom: 0;\r\n    padding: 0.5rem 0;\n}\n.post-footer[data-v-8d3c8ea2] {\r\n    margin: 0 0.8rem 0.8rem 0.8rem;\n}\n.tags-wrap[data-v-8d3c8ea2] {\r\n    width: 75%;\r\n    flex-wrap: wrap;\r\n    gap: 0.5rem;\n}\n.tags[data-v-8d3c8ea2] {\r\n    background-color: #ffc107;\r\n    padding: 0 8px;\r\n    /* border-radius: 10px; */\r\n    color: black;\n}\n.category[data-v-8d3c8ea2] {\r\n    align-self: center;\n}\n.post-image-container[data-v-8d3c8ea2] {\r\n    min-height: 250px;\r\n    max-height: 300px;\r\n    position: relative;\r\n    display: grid;\r\n    gap: 0.8rem;\r\n    grid-template-columns: repeat(2, 1fr);\r\n    margin-bottom: 1rem;\n}\n.images-hidden[data-v-8d3c8ea2] {\r\n    overflow: hidden;\r\n    background-image: linear-gradient(\r\n        to bottom,\r\n        #24242400,\r\n        #24242418,\r\n        #24242444,\r\n        #242424b7,\r\n        #242424e3\r\n    );\r\n    background-size: cover;\r\n    position: relative;\r\n    cursor: pointer;\n}\n.images-hidden[data-v-8d3c8ea2]::before {\r\n    content: \"\";\r\n    display: block;\r\n    opacity: 0;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    height: 100%;\r\n    background-color: #9090901f;\r\n    transition: opacity 0.3s ease-in-out;\n}\n.images-hidden[data-v-8d3c8ea2]:hover::before {\r\n    opacity: 1;\n}\n.images-show[data-v-8d3c8ea2] {\r\n    transition: max-height 0.25s ease-in;\r\n    overflow: hidden;\r\n    background-color: #242424d5;\n}\nnav > a[data-v-8d3c8ea2] {\r\n    padding: 1px 15px;\r\n    color: #fff;\r\n    transition: all 0.3s linear;\n}\n.nav_link[data-v-8d3c8ea2]:hover {\r\n    background-color: var(--clr-touch);\n}\n.ql-editor[data-v-8d3c8ea2] {\r\n    padding: 0;\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar {\r\n    width: 0.5rem;\r\n    background-color: #242424f6;\r\n    /* border-radius: 10px; */\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar:horizontal {\r\n    height: 12px;\r\n    margin-right: 20px;\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar-thumb {\r\n    background-color: #efe4e4;\r\n    border: 1px solid #000000;\r\n    /* border-radius: 16px; */\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar-thumb:hover {\r\n    background-color: #d3c9c9;\r\n    border: 1px solid #333333;\n}\n.wrapper[data-v-8d3c8ea2]::-webkit-scrollbar-thumb:active {\r\n    background-color: #9b8a8b;\r\n    border: 1px solid #333333;\n}\n.fade-enter-from[data-v-8d3c8ea2] {\r\n    opacity: 0.1;\n}\n.fade-enter-active[data-v-8d3c8ea2] {\r\n    transition: all 0.5s linear;\n}\n.fade-leave-active[data-v-8d3c8ea2] {\r\n    transition: all 0.1s ease-out;\n}\n.fade-leave-to[data-v-8d3c8ea2] {\r\n    opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -81,6 +81,7 @@
                         @loading="loading"
                         @commentLink="commentLink"
                         @loginOpen="loginOpen"
+                        :current_page_url="current_page"
                     ></post-component>
                     <post-selected
                         v-else
@@ -122,6 +123,7 @@ export default {
             isLoading: false,
             isLoginOpen: false,
             postSelected: null,
+            current_page: null,
         };
     },
     mounted() {
@@ -134,8 +136,9 @@ export default {
         }
     },
     methods: {
-        commentLink(id) {
+        commentLink(id, current_page) {
             this.postSelected = id;
+            this.current_page = current_page;
         },
         ...mapActions({
             signOut: "auth/logout",

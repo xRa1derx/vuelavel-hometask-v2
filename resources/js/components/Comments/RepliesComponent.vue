@@ -1,6 +1,11 @@
 <template>
     <div class="comments d-flex" :style="setOffset">
-        <div class="wrap d-flex">
+        <div
+            class="wrap d-flex"
+            :class="{
+                selectedToReply: this.$store.state.quickTextarea === comment.id,
+            }"
+        >
             <div class="avatar_wrapper">
                 <div class="avatar">
                     <img
@@ -27,13 +32,17 @@
                     </button>
                     <p class="date text-muted">{{ getFullDate(comment) }}</p>
                 </div>
-                <div
-                    v-if="this.$store.state.quickTextarea === comment.id"
-                    class="quick-textarea"
-                >
-                    <comment-textarea> </comment-textarea>
-                </div>
             </div>
+        </div>
+        <div
+            v-if="this.$store.state.quickTextarea === comment.id"
+            class="quick-textarea"
+        >
+            <comment-textarea
+                :placeholder="`Type your reply text`"
+                @addComment="addComment"
+            >
+            </comment-textarea>
         </div>
         <div
             class="show-more"
@@ -55,6 +64,7 @@
                 :key="reply.id"
                 :comment="reply"
                 @replyData="replyData"
+                @addComment="addComment"
             ></replies-component>
         </div>
         <div
@@ -70,6 +80,7 @@ export default {
     components: {
         CommentTextarea,
     },
+    emits: ["replyData", "addComment"],
     props: {
         comment: {
             type: Object,
@@ -119,6 +130,9 @@ export default {
         },
     },
     methods: {
+        addComment(event, text) {
+            this.$emit("addComment", event, text);
+        },
         toggleReply() {
             const showMoreStyle = this.$refs.showmore.style;
             if (showMoreStyle.display != "block") {
@@ -159,7 +173,7 @@ export default {
     position: relative;
     gap: 0.5rem;
     padding: 0.5rem 0;
-    margin: 0 0.8rem;
+    margin: 0.4rem 0;
 }
 
 .comment-collapsing-area {
@@ -182,11 +196,13 @@ export default {
 }
 
 .quick-textarea {
-    box-sizing: content-box;
-    height: 45px;
-    margin-top: 0.4rem;
-    border-top: 1px solid rgba(128, 128, 128, 0.349);
-    border-bottom: 1px solid rgba(128, 128, 128, 0.349);
+    background-color: #fff;
+    height: 40px;
+    padding: 5px 0;
+    /* box-sizing: content-box; */
+    /* margin-top: 0.4rem;
+    margin-right: 0.8rem; */
+    /* border-top: 1px solid rgba(128, 128, 128, 0.349); */
 }
 
 .quick-textarea > .textarea-wrap {
@@ -203,6 +219,10 @@ export default {
 .quote > p {
     padding: 0.2rem 0.5rem;
     margin: 0;
+}
+
+.comment-footer {
+    margin-right: 0.8rem;
 }
 
 .date {
@@ -285,6 +305,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-left: 0.8rem;
 }
 
 .avatar {
@@ -301,4 +322,14 @@ export default {
     /* -webkit-filter: drop-shadow(0px 0px 2px #000);
     filter: drop-shadow(0px 0px 2px #000); */
 }
+
+.selectedToReply {
+    /* border-radius: 5px; */
+    background-color: #7788994d;
+}
+
+/* .selectedToReply > .comment-collapsing-area {
+    width: 0;
+    height: 0;
+} */
 </style>

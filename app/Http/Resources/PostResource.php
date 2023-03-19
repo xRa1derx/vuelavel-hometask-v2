@@ -25,8 +25,8 @@ class PostResource extends JsonResource
             'comments' => $this->comments,
             'images' => ImageResource::collection($this->images),
             'tags' => $this->tags,
-            'all_tags' => Tag::all(),
-            'all_categories' => Category::all()
+            // 'all_tags' => Tag::all(),
+            // 'all_categories' => Category::all()
         ];
     }
 }

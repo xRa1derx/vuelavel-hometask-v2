@@ -44,8 +44,10 @@
 
             <div class="comments">
                 <button @click="commentsLink(post.id)">
+                    <i class="comments-quantity">
+                        {{ post.all_comments.length }}</i
+                    >
                     <i class="far fa-comment"> </i>
-                    <i class="comments-quantity"> {{ post.comments.length }}</i>
                 </button>
             </div>
         </div>
@@ -56,6 +58,40 @@
             ></comment-textarea>
         </div>
     </div>
+    <nav v-if="pagination.total > 3">
+        <ul class="pagination">
+            <li
+                :class="{ disabled: !pagination.prev_page_url }"
+                class="page-item"
+            >
+                <button
+                    @click="getPosts(pagination.prev_page_url)"
+                    class="page-link"
+                    :disabled="!pagination.prev_page_url"
+                >
+                    Previous
+                </button>
+            </li>
+            <li class="page-item disabled">
+                <button class="page-link">
+                    Page {{ pagination.current_page }} of
+                    {{ pagination.last_page }}
+                </button>
+            </li>
+            <li
+                :class="{ disabled: !pagination.next_page_url }"
+                class="page-item"
+            >
+                <button
+                    class="page-link"
+                    @click.prevent="getPosts(pagination.next_page_url)"
+                    :disabled="!pagination.next_page_url"
+                >
+                    Next
+                </button>
+            </li>
+        </ul>
+    </nav>
 </template>
 
 <script>
@@ -70,25 +106,29 @@ export default {
         BaseSpinner,
     },
     emits: ["loading", "commentLink", "loginOpen"],
+    props: ["current_page_url"],
     data() {
         return {
             posts: [],
+            pagination: {},
             loading: false,
         };
     },
     mounted() {
-        this.getPosts();
+        this.getPosts(this.current_page_url);
     },
     methods: {
         commentsLink(id) {
-            this.$emit("commentLink", id);
+            this.$emit("commentLink", id, this.pagination.current_page_url);
         },
-        getPosts() {
+        getPosts(page_url) {
+            page_url = page_url || "/api/admin/posts";
             this.$emit("loading", true);
             axios
-                .get("/api/admin/posts")
+                .get(page_url)
                 .then((res) => {
-                    this.posts = res.data;
+                    this.posts = res.data.data;
+                    this.makePagination(res.data);
                 })
                 .then(() => {
                     this.$refs.imageContainer.forEach((element) => {
@@ -113,6 +153,17 @@ export default {
                 .finally(() => {
                     this.$emit("loading", false);
                 });
+        },
+        makePagination(response) {
+            let pagination = {
+                current_page: response.current_page,
+                last_page: response.last_page,
+                prev_page_url: response.prev_page_url,
+                next_page_url: response.next_page_url,
+                current_page_url: `${response.path}?page=${response.current_page}`,
+                total: response.total,
+            };
+            this.pagination = pagination;
         },
         getFullDate(post) {
             let date = post.created_at.slice(0, 16).replace("T", " ");
@@ -161,9 +212,9 @@ export default {
 <style scoped>
 .post-wrapper {
     position: relative;
-    padding: 0.3rem 0;
+    /* padding: 0.3rem 0; */
     z-index: 1;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     /* border-radius: 10px; */
     /* margin: 0.8rem 0 0.8rem 0.8rem; */
 }
@@ -310,6 +361,8 @@ export default {
     border: none;
     background: inherit;
     align-self: end;
+    padding: 0;
+    gap: 3px;
 }
 
 .fa-comment {
@@ -321,13 +374,20 @@ export default {
     font-style: inherit;
     color: var(--clr-accent);
     font-weight: 600;
-    align-self: end;
-    position: absolute;
-    right: 8px;
-    bottom: 0;
+    align-self: flex-end;
 }
 
 .ql-editor {
     padding: 0;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.page-link {
+    background-color: inherit !important;
+    border: none;
+    color: var(--clr-accent);
 }
 </style>

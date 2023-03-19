@@ -102,7 +102,7 @@ export default {
             axios
                 .get("/api/admin/posts")
                 .then((res) => {
-                    this.posts = res.data;
+                    this.posts = res.data.data;
                 })
                 .then(() => {
                     if (!this.$refs.imageContainer) {

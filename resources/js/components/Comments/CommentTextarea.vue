@@ -7,13 +7,17 @@
             <button @click="$emit('loginOpen')">Guest</button>
         </div>
         <textarea
+            :placeholder="placeholder"
             :value="message"
             name=""
             id=""
             @input="autoGrow($event)"
         ></textarea>
-        <button @click="$emit('addComment', message)" class="send-comment-btn">
-            <i class="fa-regular fas fa-paper-plane"></i>
+        <button
+            @click="$emit('addComment', $event, message)"
+            class="send-comment-btn"
+        >
+            <i :id="textareaType" class="fa-regular fas fa-paper-plane"></i>
         </button>
     </div>
 </template>
@@ -21,6 +25,7 @@
 <script>
 export default {
     emits: ["addComment", "loginOpen"],
+    props: ["placeholder", "textareaType"],
     data() {
         return {
             message: "",
@@ -29,12 +34,10 @@ export default {
     methods: {
         autoGrow(element) {
             this.message = element.target.value;
-            element.target.style.height = "66px";
+            element.target.style.height = "30px";
             element.target.style.height = `${element.target.scrollHeight}px`;
-            element.target.parentElement.parentElement.style.height = "56px";
-            element.target.parentElement.parentElement.style.height = `${
-                element.target.parentElement.parentElement.scrollHeight + 10
-            }px`;
+            element.target.parentElement.parentElement.style.height = "40px";
+            element.target.parentElement.parentElement.style.height = `${element.target.parentElement.parentElement.scrollHeight}px`;
         },
     },
 };
@@ -47,26 +50,27 @@ export default {
     justify-content: space-between;
     gap: 0.5rem;
     height: 30px;
-    margin: 0.4rem 0.6rem;
+    background-color: #fff;
 }
 textarea {
     max-height: 150px;
     width: 100%;
     border: none;
-    border-radius: 10px;
     resize: none;
-    
+    padding-left: 5px;
 }
 .send-comment-btn {
-    color: #fff;
     background-color: inherit;
     border: none;
     align-self: center;
     font-size: 20px;
+    padding: 0;
+    margin-right: 0.8rem;
     /* transform: rotate(45deg); */
 }
 .name {
     /* padding: 3px; */
+    margin-left: 0.8rem;
     align-self: center;
 }
 

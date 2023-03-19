@@ -53,17 +53,25 @@
                         <span> {{ category }}</span>
                     </div>
                 </div>
+                <div class="no-comments" v-if="!comments.length">
+                    <h4 class="text-center text-muted">
+                        No comments yet! Be the first.
+                    </h4>
+                </div>
                 <replies-component
                     v-for="comment in comments"
                     :key="comment.id"
                     :comment="comment"
                     @replyData="replyData"
+                    @addComment="addComment"
                 ></replies-component>
                 <div class="post-comments-section">
                     <comment-textarea
                         v-if="!isLoading"
-                        @addComment="addComment($event, post.id)"
+                        @addComment="addComment"
                         @loginOpen="$emit('loginOpen')"
+                        :placeholder="`Type text in the new comment`"
+                        :textareaType="'main'"
                     ></comment-textarea>
                 </div>
             </div>
@@ -116,7 +124,7 @@ export default {
     },
     methods: {
         showBackBtn(blog) {
-            if (blog.target.scrollTop > 250) {
+            if (blog.target.scrollTop > 30) {
                 this.$refs.title.classList.add("back-sticky");
             } else {
                 this.$refs.title.classList.remove("back-sticky");
@@ -132,7 +140,6 @@ export default {
                     this.category = data.data.category.title;
                     this.comments = data.data.comments;
                     this.getFullDate();
-                    console.log(data.data.comments);
                 })
                 .then(() => {
                     const images = this.$refs.imageContainer;
@@ -192,9 +199,13 @@ export default {
                 event.target.style.display = "none";
             }
         },
-        async addComment(text, post_id) {
+        async addComment(event, text) {
             this.isLoading = true;
             let replyId = this.replyId;
+            if (event.target.id === "main") {
+                replyId = null;
+                this.depth = null;
+            }
             let user_id = this.$store.state.auth.user.id || 0;
             if (this.depth != null && this.depth < 5) {
                 this.depth++;
@@ -203,8 +214,8 @@ export default {
             }
             let depth = this.depth;
             const data = {
-                text: text,
-                post_id,
+                text,
+                post_id: this.post.id,
                 user_id,
                 parent_id: replyId,
                 depth,
@@ -243,7 +254,7 @@ export default {
 }
 
 .title-wrap {
-    margin: 0.5rem 0.5rem 0.8rem 0.5rem;
+    margin: 0.5rem 0 0.8rem 0;
 }
 
 .back-btn {
@@ -252,6 +263,7 @@ export default {
     border: none;
     color: #fff;
     align-self: center;
+    margin-left: 0.5rem;
 }
 
 .back-btn > i {
@@ -310,8 +322,10 @@ export default {
     margin-bottom: 1rem;
 }
 
-.post-comments-section{
-    height: 56px;
+.post-comments-section {
+    padding: 5px 0;
+    height: 40px;
+    background-color: #fff;
 }
 
 .show-more {

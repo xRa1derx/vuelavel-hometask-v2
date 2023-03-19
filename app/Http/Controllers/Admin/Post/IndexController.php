@@ -10,7 +10,7 @@ class IndexController extends Controller
 {
     public function __invoke()
     {
-        $posts = Post::latest()->with('tags', 'category', 'images', 'comments.author')->get();
+        $posts = Post::with('tags', 'category', 'images', 'allComments')->latest()->paginate(3);
         return $posts;
     }
 }

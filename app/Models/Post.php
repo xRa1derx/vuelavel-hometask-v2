@@ -36,14 +36,20 @@ class Post extends Model
         return $this->hasMany(Image::class);
     }
 
-    public function comments()
+    public function verifiedComments()
     {
-        return $this->hasMany(Comment::class)->whereNull('parent_id');
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->where('verified', '=', 1);
     }
 
-    public function allComments()
+    public function notVerifiedComments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->where('verified', '=', 0);
+    }
+
+    // verified comments for post comments-quantity
+    public function commentsQuantity()
+    {
+        return $this->hasMany(Comment::class)->where('verified', '=', 1);
     }
 
     public function sluggable(): array

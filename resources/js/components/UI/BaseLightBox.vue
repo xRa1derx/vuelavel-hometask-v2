@@ -101,6 +101,11 @@ img[lazy="loaded"] {
     position: relative;
     animation: fade 1s linear;
     visibility: hidden;
+    background-color: #1a1a1a;
+}
+
+.last-image .post-image {
+    object-fit: contain;
 }
 
 @keyframes fade {

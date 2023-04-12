@@ -30,22 +30,33 @@ export default {
     --clr-touch: #cc5f00;
     --clr-dark-blue: #212529;
     --clr-dark-grey-strip: #383f45;
+    --doc-height: 100%;
 }
 
-html,
+html {
+    width: 100%;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    background-color: #3b3b3b;
+}
+
+@font-face {
+    font-family: "Arizonia";
+    src: url(/fonts/Arizonia-Regular.ttf);
+    font-weight: 400;
+}
+
 body {
     width: 100%;
-    height: 100%;
-}
-
-body {
+    height: 100% !important;
     margin: 0;
     padding: 0;
-    min-width: fit-content;
     background-color: var(--clr-bg-dark);
+    min-width: fit-content;
+
     color: var(--clr-text);
     line-height: 1.5;
-    /* font-family: sans-serif; */
+    font-family: sans-serif;
 }
 
 body::-webkit-scrollbar {
@@ -83,6 +94,10 @@ textarea {
     font-size: 16px !important;
 }
 
+#app {
+    height: 100%;
+}
+
 .bg-dark-blue {
     background-color: var(--clr-dark-blue);
 }
@@ -91,6 +106,9 @@ textarea {
     overflow: hidden;
 }
 
+.accent-color {
+    color: var(--clr-accent);
+}
 
 /* animations */
 
@@ -137,5 +155,4 @@ textarea {
     /* box-shadow: 0 0 20px 1px rgb(136, 136, 136); */
     z-index: 1;
 }
-
 </style>

@@ -20,6 +20,8 @@ class CreateCommentsTable extends Migration
             $table->text('text');
             $table->foreignIdFor(Post::class, 'post_id');
             $table->foreignIdFor(User::class, 'user_id');
+            $table->unsignedBigInteger('verified')->default(0);
+            $table->unsignedBigInteger('new')->default(1);
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->unsignedBigInteger('depth')->default(0);
             $table->timestamps();

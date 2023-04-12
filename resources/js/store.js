@@ -1,16 +1,18 @@
 import axios from "axios";
 import { createStore } from "vuex";
-import createPersistedState from "vuex-persistedstate";
 import auth from "./auth";
+
 const store = createStore({
     modules: {
         auth,
     },
-    plugins: [createPersistedState()],
     state() {
         return {
             users: [],
+            commentIdToDelete: null,
             quickTextarea: null,
+            editCommentTextarea: null,
+            isLoginOpen: false,
         };
     },
     mutations: {
@@ -19,6 +21,15 @@ const store = createStore({
         },
         setQuickTextarea(state, quickTextarea) {
             state.quickTextarea = quickTextarea;
+        },
+        setEditCommentTextarea(state, editCommentTextarea) {
+            state.editCommentTextarea = editCommentTextarea;
+        },
+        setLoginOpen(state) {
+            state.isLoginOpen = !state.isLoginOpen;
+        },
+        setCommentIdToDelete(state, commentIdToDelete) {
+            state.commentIdToDelete = commentIdToDelete;
         },
     },
     actions: {
@@ -30,6 +41,15 @@ const store = createStore({
         getQuickTextarea(context, id) {
             context.commit("setQuickTextarea", id);
         },
+        getEditCommentTextarea(context, id) {
+            context.commit("setEditCommentTextarea", id);
+        },
+        loginOpen(context) {
+            context.commit("setLoginOpen");
+        },
+        getCommentIdToDelete(context, id) {
+            context.commit("setCommentIdToDelete", id);
+        },
     },
     getters: {
         users(state) {
@@ -37,6 +57,9 @@ const store = createStore({
         },
         currentTextarea(state) {
             return state.quickTextarea;
+        },
+        loginOpen(state) {
+            return state.isLoginOpen;
         },
     },
 });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Faker\Core\Number;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -42,6 +43,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isAdmin()
+    {
+        return $this->is_admin;
+    }
 
     public function posts()
     {
@@ -91,7 +97,7 @@ class User extends Authenticatable
 
     public function updateAvatar($image)
     {
-      
+
         if ($image == null) {
             Storage::delete('uploads/avatars/' . $this->avatar);
             $fileName = null;
@@ -109,7 +115,6 @@ class User extends Authenticatable
         $this->avatar = $fileName;
         $this->save();
     }
-
     // public function getImage()
     // {
     //     if ($this->avatar == null) {

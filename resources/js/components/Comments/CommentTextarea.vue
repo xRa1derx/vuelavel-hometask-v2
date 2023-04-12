@@ -4,25 +4,23 @@
             {{ this.$store.state.auth.user.name || "Guest" }}:
         </div>
         <div v-else class="login">
-            <button @click="$emit('loginOpen')">Guest</button>
+            <button @click="isLoginOpen()">Guest</button>
         </div>
+
         <textarea
+            ref="commentTextarea"
             :placeholder="placeholder"
             :value="message"
-            name=""
-            id=""
             @input="autoGrow($event)"
         ></textarea>
-        <button
-            @click="$emit('addComment', $event, message)"
-            class="send-comment-btn"
-        >
+        <button @click="addComment($event)" class="send-comment-btn">
             <i :id="textareaType" class="fa-regular fas fa-paper-plane"></i>
         </button>
     </div>
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
     emits: ["addComment", "loginOpen"],
     props: ["placeholder", "textareaType"],
@@ -32,12 +30,24 @@ export default {
         };
     },
     methods: {
+        ...mapActions({
+            isLoginOpen: "loginOpen",
+        }),
         autoGrow(element) {
             this.message = element.target.value;
             element.target.style.height = "30px";
             element.target.style.height = `${element.target.scrollHeight}px`;
             element.target.parentElement.parentElement.style.height = "40px";
             element.target.parentElement.parentElement.style.height = `${element.target.parentElement.parentElement.scrollHeight}px`;
+        },
+        addComment(event) {
+            this.$emit("addComment", event, this.message);
+            this.message = "";
+            const postCommentSection = document.querySelector(
+                ".post-comments-section"
+            );
+            postCommentSection.style.height = "40px";
+            this.$refs.commentTextarea.style.height = "30px";
         },
     },
 };
@@ -66,10 +76,13 @@ textarea {
     font-size: 20px;
     padding: 0;
     margin-right: 0.8rem;
-    /* transform: rotate(45deg); */
 }
 .name {
-    /* padding: 3px; */
+    margin-left: 0.8rem;
+    align-self: center;
+}
+
+.login {
     margin-left: 0.8rem;
     align-self: center;
 }

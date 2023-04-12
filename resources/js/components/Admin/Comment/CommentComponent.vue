@@ -16,20 +16,39 @@
             <b>{{ comment.author.name }}</b>
             <p class="h-100">{{ comment.text }}</p>
 
-            <p class="date text-muted">{{ getFullDate(comment) }}</p>
+            <div class="comment-footer">
+                <button
+                    v-if="comment.verified === 0 && approvingButton"
+                    class="verification"
+                    @click="confirmation(comment)"
+                >
+                    Approve
+                </button>
+                <p v-if="comment.new === 1" class="has-read">New!</p>
+                <p class="date text-muted">{{ getFullDate(comment) }}</p>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
     props: ["comment"],
-    emits: ["replyData"],
+    emits: ["replyData", "getComments"],
     data() {
-        return { childrenCount: 0 };
+        return {
+            approvingButton: true,
+        };
     },
     mounted() {},
     methods: {
+        confirmation(comment) {
+            axios
+                .patch(`/api/admin/comment/${comment.id}`)
+                .then(() => this.$emit("getComments"));
+            this.approvingButton = false;
+        },
         getFullDate(comment) {
             let date = comment.created_at.slice(0, 16).replace("T", " ");
             let t = date.split(/[- :]/);
@@ -69,10 +88,11 @@ export default {
     color: var(--clr-touch);
 }
 
-.date {
+.comment-footer p {
     font-size: 12px;
-    margin: 0;
     align-self: flex-end;
+    margin: 5px 0;
+    margin-right: 0.8rem;
 }
 
 .reply {
@@ -104,5 +124,10 @@ export default {
     border-radius: 100%;
     /* -webkit-filter: drop-shadow(0px 0px 2px #000);
     filter: drop-shadow(0px 0px 2px #000); */
+}
+
+.comment-footer {
+    display: flex;
+    justify-content: flex-end;
 }
 </style>

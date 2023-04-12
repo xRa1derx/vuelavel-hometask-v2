@@ -1,65 +1,16 @@
 <template>
+    <base-success-add-comment
+        :newCommentNotification="newCommentNotification"
+        :alertMessages="
+            $store.state.auth.user.id === undefined
+                ? alertMessages
+                : alertMessages.slice(0, 1)
+        "
+    >
+    </base-success-add-comment>
     <base-spinner v-if="loading"></base-spinner>
-    <div v-else class="post-wrapper" v-for="post in posts" :key="post.id">
-        <div class="title-wrap d-flex">
-            <div class="post-title">
-                <h5>{{ post.title }}</h5>
-            </div>
-            <div class="date">
-                <p>{{ getFullDate(post) }}</p>
-            </div>
-        </div>
-        <div
-            class="post-image-container"
-            ref="imageContainer"
-            :class="{
-                'images-hidden': post.images.length >= 3,
-            }"
-            @click.self="moreImages(post, $event)"
-            :id="post.title"
-        >
-            <base-lightbox :images="post.images"></base-lightbox>
-        </div>
-        <div class="post-content">
-            <p class="ql-editor" ref="post" v-html="post.content"></p>
-            <button class="show-more" @click="showMoreText($event)">
-                show more
-            </button>
-        </div>
-        <div class="post-footer d-flex justify-content-between">
-            <div class="tags-and-category-wrap">
-                <div class="tags-wrap m-0 d-flex">
-                    <span class="text-muted align-self-center mr-1"
-                        >Tags:
-                    </span>
-                    <span class="tags" v-for="tag in post.tags" :key="tag.id">
-                        {{ tag.title }}
-                    </span>
-                </div>
-                <div class="category d-flex flex-nowrap">
-                    <span class="text-muted mr-1">Category: </span>
-                    <span> {{ post.category.title }}</span>
-                </div>
-            </div>
-
-            <div class="comments">
-                <button @click="commentsLink(post.id)">
-                    <i class="comments-quantity">
-                        {{ post.all_comments.length }}</i
-                    >
-                    <i class="far fa-comment"> </i>
-                </button>
-            </div>
-        </div>
-        <div class="post-comments-section">
-            <comment-textarea
-                @addComment="addComment($event, post.id)"
-                @loginOpen="$emit('loginOpen')"
-            ></comment-textarea>
-        </div>
-    </div>
-    <nav v-if="pagination.total > 3">
-        <ul class="pagination">
+    <nav v-if="pagination.total > 3 && pagination.totalCountOnCurrentPage > 1">
+        <ul class="pagination mt-3">
             <li
                 :class="{ disabled: !pagination.prev_page_url }"
                 class="page-item"
@@ -84,7 +35,108 @@
             >
                 <button
                     class="page-link"
-                    @click.prevent="getPosts(pagination.next_page_url)"
+                    @click.prevent="getPosts(pagination.next_page_url, 'next')"
+                    :disabled="!pagination.next_page_url"
+                >
+                    Next
+                </button>
+            </li>
+        </ul>
+    </nav>
+    <transition-group name="list">
+        <div class="post-wrapper" v-for="post in posts" :key="post.id">
+            <div class="title-wrap d-flex">
+                <div class="post-title">
+                    <h5>{{ post.title }}</h5>
+                </div>
+                <div class="date">
+                    <p>{{ getFullDate(post) }}</p>
+                </div>
+            </div>
+            <div
+                class="post-image-container"
+                ref="imageContainer"
+                :class="{
+                    'images-hidden': post.images.length >= 3,
+                }"
+                @click.self="moreImages(post, $event)"
+                :id="post.title"
+            >
+                <base-lightbox :images="post.images"></base-lightbox>
+            </div>
+            <div class="post-content">
+                <p class="ql-editor" ref="post" v-html="post.content"></p>
+                <button class="show-more" @click="showMoreText($event)">
+                    show more
+                </button>
+            </div>
+            <div class="post-footer d-flex justify-content-between">
+                <div class="tags-and-category-wrap">
+                    <div class="tags-wrap m-0 d-flex">
+                        <span class="text-muted align-self-center mr-1"
+                            >Tags:
+                        </span>
+                        <span
+                            class="tags"
+                            v-for="tag in post.tags"
+                            :key="tag.id"
+                        >
+                            {{ tag.title }}
+                        </span>
+                    </div>
+                    <div class="category d-flex flex-nowrap">
+                        <span class="text-muted mr-1">Category: </span>
+                        <span> {{ post.category.title }}</span>
+                    </div>
+                </div>
+
+                <div class="comments">
+                    <button @click="commentsLink(post.id)">
+                        <i class="comments-quantity">
+                            {{ post.comments_quantity.length }}</i
+                        >
+                        <i class="far fa-comment"> </i>
+                    </button>
+                </div>
+            </div>
+            <div class="post-comments-section">
+                <comment-textarea
+                    @addComment="
+                        ($event, text) => {
+                            addComment($event, text, post.id);
+                        }
+                    "
+                ></comment-textarea>
+            </div>
+        </div>
+    </transition-group>
+    <nav v-if="pagination.total > 3">
+        <ul class="pagination mb-3">
+            <li
+                :class="{ disabled: !pagination.prev_page_url }"
+                class="page-item"
+            >
+                <button
+                    @click="getPosts(pagination.prev_page_url)"
+                    class="page-link"
+                    :disabled="!pagination.prev_page_url"
+                >
+                    Previous
+                </button>
+            </li>
+            <li class="page-item disabled">
+                <button class="page-link">
+                    Page {{ pagination.current_page }} of
+                    {{ pagination.last_page }}
+                </button>
+            </li>
+            <li
+                :class="{ disabled: !pagination.next_page_url }"
+                class="page-item"
+            >
+                <button
+                    class="page-link"
+                    @click.prevent="getPosts(pagination.next_page_url, 'next')"
                     :disabled="!pagination.next_page_url"
                 >
                     Next
@@ -98,30 +150,54 @@
 import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
 import CommentTextarea from "../Comments/CommentTextarea.vue";
+import BaseSuccessAddComment from "../UI/BaseSuccessAddComment.vue";
 import BaseSpinner from "../UI/BaseSpinner.vue";
+import { mapActions } from "vuex";
 export default {
     components: {
         BaseLightbox,
         CommentTextarea,
         BaseSpinner,
+        BaseSuccessAddComment,
     },
-    emits: ["loading", "commentLink", "loginOpen"],
+    emits: ["loading", "commentLink"],
     props: ["current_page_url"],
     data() {
         return {
             posts: [],
             pagination: {},
             loading: false,
+            newCommentNotification: false,
+            alertMessages: [
+                { text: "Success!", width: 65 },
+                {
+                    text: "Wait a little while your comment will be checked!",
+                    width: 290,
+                },
+            ],
         };
     },
     mounted() {
         this.getPosts(this.current_page_url);
     },
     methods: {
+        ...mapActions({
+            getRole: "auth/role",
+            isLoginOpen: "loginOpen",
+        }),
+        scrollUp() {
+            const blog = document.querySelector(".blog");
+            if (blog) {
+                blog.scrollTop = 0;
+            }
+        },
         commentsLink(id) {
+            if (localStorage.getItem("x_xsrf_token")) {
+                this.getRole();
+            }
             this.$emit("commentLink", id, this.pagination.current_page_url);
         },
-        getPosts(page_url) {
+        getPosts(page_url, destination) {
             page_url = page_url || "/api/admin/posts";
             this.$emit("loading", true);
             axios
@@ -129,6 +205,9 @@ export default {
                 .then((res) => {
                     this.posts = res.data.data;
                     this.makePagination(res.data);
+                    if (destination === "next") {
+                        this.scrollUp();
+                    }
                 })
                 .then(() => {
                     this.$refs.imageContainer.forEach((element) => {
@@ -162,6 +241,7 @@ export default {
                 next_page_url: response.next_page_url,
                 current_page_url: `${response.path}?page=${response.current_page}`,
                 total: response.total,
+                totalCountOnCurrentPage: response.data.length,
             };
             this.pagination = pagination;
         },
@@ -196,14 +276,24 @@ export default {
                 event.target.style.display = "none";
             }
         },
-        async addComment(text, post_id) {
-            this.loading = true;
+        async addComment(___, text, post_id) {
             let user_id = this.$store.state.auth.user.id || 0;
-            const data = { text, post_id, user_id };
-            await axios
-                .post("/api/user/comment/create", data)
-                .then((res) => this.getPosts())
-                .finally(() => (this.loading = false));
+            const data = { text, post_id, user_id, depth: 0, parent_id: null };
+            await axios.post("/api/user/comment/create", data).then(() => {
+                if (data.user_id !== 0) {
+                    this.getPosts();
+                }
+                this.newCommentNotification = true;
+            });
+        },
+    },
+    watch: {
+        newCommentNotification(val) {
+            if (val) {
+                setTimeout(() => {
+                    this.newCommentNotification = false;
+                }, 8000);
+            }
         },
     },
 };
@@ -212,35 +302,31 @@ export default {
 <style scoped>
 .post-wrapper {
     position: relative;
-    /* padding: 0.3rem 0; */
     z-index: 1;
-    margin-bottom: 1rem;
-    /* border-radius: 10px; */
-    /* margin: 0.8rem 0 0.8rem 0.8rem; */
+    background-color: var(--clr-bg-light);
+    border-radius: 10px;
 }
 
 .title-wrap {
-    margin-bottom: 0.5rem;
     justify-content: space-between;
 }
 
 .date {
     font-size: 10px;
     display: inline-flex;
-    align-self: end;
+    align-self: center;
     margin-right: 0.8rem;
     margin-left: auto;
     flex: 0 0 auto;
-    padding-bottom: 0.5rem;
+    /* padding-bottom: 0.5rem; */
 }
 
 .date > p {
     margin: 0;
 }
 
-.post-wrapper:nth-child(even) {
-    background-color: var(--clr-bg-light);
-    /* border: 2px solid var(--clr-bg-light); */
+.post-wrapper:nth-child(odd) {
+    /* background-color: var(--clr-bg-light); */
 }
 
 .post-title {
@@ -342,12 +428,19 @@ export default {
 .images-show {
     transition: max-height 0.25s ease-in;
     overflow: hidden;
-    background-color: #242424d5;
+    background-color: #1a1a1a;
 }
 
 .post-comments-section {
-    /* margin: 0 0.8rem; */
-    /* border-radius: 10px; */
+    background-color: #fff;
+    height: 40px;
+    padding: 5px 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.textarea-wrap {
+    border-radius: 10px;
 }
 
 .comments {
@@ -383,11 +476,25 @@ export default {
 
 .pagination {
     justify-content: center;
+    margin: 0;
 }
 
 .page-link {
     background-color: inherit !important;
     border: none;
     color: var(--clr-accent);
+}
+
+.list-enter-active {
+    transition: all 0.3s ease-in;
+}
+
+.list-leave-active {
+    transition: all 0.2s ease-out;
+}
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
 }
 </style>

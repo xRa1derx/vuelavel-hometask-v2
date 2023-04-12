@@ -10,8 +10,11 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content text-dark">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">
-                        You are trying to delete "<slot></slot>"
+                    <h5
+                        class="modal-title text-white"
+                        id="exampleModalLongTitle"
+                    >
+                        You are trying to delete <slot></slot>
                         <slot name="type"></slot>.
                     </h5>
                     <button
@@ -23,7 +26,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">Are you sure?</div>
+                <div class="modal-body text-white">Are you sure?</div>
                 <div class="modal-footer">
                     <button
                         type="button"
@@ -33,10 +36,10 @@
                         Close
                     </button>
                     <button
-                        @click="$emit('deleteConfirm', '123')"
+                        @click="$emit('deleteConfirm')"
                         data-dismiss="modal"
                         type="button"
-                        class="btn btn-primary"
+                        class="btn btn-delete"
                     >
                         Delete
                     </button>
@@ -52,4 +55,23 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.modal-content {
+    background-color: #242424;
+    color: #fff;
+}
+
+.btn-delete {
+    background-color: var(--clr-accent);
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background-color: var(--clr-touch);
+}
+
+.close {
+    color: var(--clr-accent);
+    text-shadow: none;
+}
+</style>

@@ -36,6 +36,19 @@ Route::group(['namespace' => 'Admin\Post', 'prefix' => 'admin'], function () {
     Route::delete('/post/{id}', 'DeleteController');
 });
 
+Route::group(['namespace' => 'Admin\Comment', 'prefix' => 'admin'], function () {
+    Route::get('/comments', 'IndexController');
+    Route::patch('/comment/{id}', 'UpdateController');
+});
+
 Route::group(['namespace' => 'User\Comment', 'prefix' => 'user'], function () {
     Route::post('/comment/create', 'StoreController');
+    Route::patch('/comment/{id}', 'UpdateController');
+    Route::delete('/comment/{id}', 'DeleteController');
+});
+
+Route::group(['namespace' => 'Admin\Message', 'prefix' => 'admin'], function () {
+    Route::get('/chat', 'IndexController');
+    Route::post('/chat', 'StoreController');
+    Route::get('/chat/{id}', 'ShowController');
 });

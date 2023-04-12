@@ -11,11 +11,14 @@ import TagComponent from "./components/Tag/TagComponent";
 import UserComponent from "./components/User/UserComponent";
 import CreateUserComponent from "./components/User/CreateUserComponent";
 
-import CommentComponent from "./components/Comments/CommentComponent";
+import CommentsComponent from "./components/Admin/Comment/CommentsComponent";
 
 import ShowPostComponent from "./components/Post/ShowPostComponent";
 import CreatePostComponent from "./components/Post/CreatePostComponent";
 import EditPostComponent from "./components/Post/EditPostComponent";
+
+import StartChatComponent from "./components/Chat/StartChatComponent";
+import ChatComponent from "./components/Chat/ChatComponent";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -50,7 +53,7 @@ const router = createRouter({
                     component: CreateUserComponent,
                     name: "users.create",
                 },
-                { path: "comments", component: CommentComponent },
+                { path: "comments", component: CommentsComponent },
                 { path: "posts", component: ShowPostComponent, name: "posts" },
                 {
                     path: "posts/create",
@@ -61,6 +64,22 @@ const router = createRouter({
                     path: "posts/edit/:id",
                     component: EditPostComponent,
                     name: "posts.edit.id",
+                },
+                {
+                    path: "chat",
+                    component: StartChatComponent,
+                    name: "chat.admin",
+                    meta: {
+                        sidebar: "chat",
+                    },
+                },
+                {
+                    path: "chat/:id",
+                    component: ChatComponent,
+                    name: "chat.admin.id",
+                    meta: {
+                        sidebar: "chat",
+                    },
                 },
             ],
         },
@@ -73,33 +92,6 @@ const router = createRouter({
                 title: "Dashboard",
             },
         },
-        // {
-        //     path: "/admin/users",
-        //     component: UserList,
-        //     name: "admin.users",
-        // },
-        // {
-        //     path: "/admin/users/chat/:id",
-        //     component: UserChat,
-        //     name: "admin.users.chat.id",
-        //     props: true,
-        //     children: [{ path: "edit", component: UserEdit }],
-        // },
-        // {
-        //     path: "/admin/users/register",
-        //     component: RegisterPage,
-        //     name: "register",
-        // },
-        // {
-        //     path: "/chat",
-        //     component: UserPage,
-        //     name: "chat",
-        // },
-        // {
-        //     path: "/:notFound(.*)",
-        //     component: NotFound,
-        //     name: "notfound",
-        // },
     ],
 });
 

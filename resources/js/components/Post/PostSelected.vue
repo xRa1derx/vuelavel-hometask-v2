@@ -1,81 +1,77 @@
 <template>
     <base-spinner v-if="isLoading"></base-spinner>
-    <div class="wrapper" ref="wrapper">
-        <transition name="fade">
-            <div v-show="!isLoading" class="post-wrapper">
-                <div ref="title" class="title-wrap d-flex">
-                    <button
-                        v-if="!isLoading"
-                        class="back-btn"
-                        @click="$emit('backToBlog')"
-                    >
-                        <i class="right fas fa-angle-left"></i>
-                    </button>
-                    <div class="post-title">
-                        <h5 @click="$emit('backToBlog')">{{ post.title }}</h5>
-                    </div>
-                </div>
-                <div class="date">
-                    <p>{{ time }}</p>
-                </div>
-                <div
-                    class="post-image-container"
-                    ref="imageContainer"
-                    @click.self="moreImages(post, $event)"
-                    :id="post.title"
-                >
-                    <base-lightbox :images="post.images"></base-lightbox>
-                </div>
-                <div class="post-content">
-                    <p class="ql-editor" ref="post" v-html="post.content"></p>
-                    <button class="show-more" @click="showMoreText($event)">
-                        show more
-                    </button>
-                </div>
-                <div
-                    v-if="!isLoading"
-                    class="post-footer d-flex justify-content-between"
-                >
-                    <div class="tags-wrap m-0 d-flex">
-                        <span class="text-muted align-self-center mr-1"
-                            >Tags:
-                        </span>
-                        <span
-                            class="tags"
-                            v-for="tag in post.tags"
-                            :key="tag.id"
-                        >
-                            {{ tag.title }}
-                        </span>
-                    </div>
-                    <div class="category d-flex flex-nowrap">
-                        <span class="text-muted mr-1">Category: </span>
-                        <span> {{ category }}</span>
-                    </div>
-                </div>
-                <div class="no-comments" v-if="!comments.length">
-                    <h4 class="text-center text-muted">
-                        No comments yet! Be the first.
-                    </h4>
-                </div>
-                <replies-component
-                    v-for="comment in comments"
-                    :key="comment.id"
-                    :comment="comment"
-                    @replyData="replyData"
-                    @addComment="addComment"
-                ></replies-component>
-                <div class="post-comments-section">
-                    <comment-textarea
-                        v-if="!isLoading"
-                        @addComment="addComment"
-                        @loginOpen="$emit('loginOpen')"
-                        :placeholder="`Type text in the new comment`"
-                        :textareaType="'main'"
-                    ></comment-textarea>
+    <div class="wrapper" v-show="!isLoading" ref="wrapper">
+        <base-success-add-comment
+            :newCommentNotification="newCommentNotification"
+            :alertMessages="
+                $store.state.auth.user.id === undefined
+                    ? alertMessages
+                    : alertMessages.slice(0, 1)
+            "
+        >
+        </base-success-add-comment>
+        <div class="post-wrapper">
+            <div ref="title" class="title-wrap d-flex">
+                <button class="back-btn" @click="backToBlog()">
+                    <i class="right fas fa-angle-left"></i>
+                </button>
+                <div class="post-title">
+                    <h5 @click="backToBlog()">{{ post.title }}</h5>
                 </div>
             </div>
-        </transition>
+            <div class="date">
+                <p>{{ time }}</p>
+            </div>
+            <div
+                class="post-image-container"
+                ref="imageContainer"
+                @click.self="moreImages(post, $event)"
+                :id="post.title"
+            >
+                <base-lightbox :images="post.images"></base-lightbox>
+            </div>
+            <div class="post-content">
+                <p class="ql-editor" ref="post" v-html="post.content"></p>
+                <button class="show-more" @click="showMoreText($event)">
+                    show more
+                </button>
+            </div>
+            <div class="post-footer d-flex justify-content-between">
+                <div class="tags-wrap m-0 d-flex">
+                    <span class="text-muted align-self-center mr-1"
+                        >Tags:
+                    </span>
+                    <span class="tags" v-for="tag in post.tags" :key="tag.id">
+                        {{ tag.title }}
+                    </span>
+                </div>
+                <div class="category d-flex flex-nowrap">
+                    <span class="text-muted mr-1">Category: </span>
+                    <span> {{ category }}</span>
+                </div>
+            </div>
+            <div class="no-comments" v-if="!comments.length">
+                <h4 class="text-center text-muted">
+                    No comments yet! Be the first.
+                </h4>
+            </div>
+            <replies-component
+                v-for="comment in comments"
+                :key="comment.id"
+                :comment="comment"
+                @replyData="replyData"
+                @addComment="addComment"
+                @deleteComment="deleteComment"
+            ></replies-component>
+            <div class="post-comments-section">
+                <comment-textarea
+                    @addComment="addComment"
+                    @loginOpen="$emit('loginOpen')"
+                    :placeholder="`Type text in the new comment`"
+                    :textareaType="'main'"
+                ></comment-textarea>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -84,11 +80,14 @@ import axios from "axios";
 import BaseLightbox from "../UI/BaseLightBox.vue";
 import CommentTextarea from "../Comments/CommentTextarea.vue";
 import BaseSpinner from "../UI/BaseSpinner.vue";
+import BaseSuccessAddComment from "../UI/BaseSuccessAddComment.vue";
+import { mapActions } from "vuex";
 export default {
     components: {
         BaseLightbox,
         CommentTextarea,
         BaseSpinner,
+        BaseSuccessAddComment,
     },
     props: ["postSelected"],
     emits: ["loading", "backToBlog", "loginOpen"],
@@ -103,6 +102,14 @@ export default {
             comments: [],
             isLoading: false,
             depth: null,
+            newCommentNotification: false,
+            alertMessages: [
+                { text: "Success!", width: 65 },
+                {
+                    text: "Wait a little while your comment will be checked!",
+                    width: 290,
+                },
+            ],
         };
     },
     mounted() {
@@ -123,6 +130,16 @@ export default {
         blog.style.overflow = "auto";
     },
     methods: {
+        ...mapActions({
+            getRole: "auth/role",
+            isLoginOpen: "loginOpen",
+        }),
+        backToBlog() {
+            this.$emit("backToBlog");
+            if (localStorage.getItem("x_xsrf_token")) {
+                this.getRole();
+            }
+        },
         showBackBtn(blog) {
             if (blog.target.scrollTop > 30) {
                 this.$refs.title.classList.add("back-sticky");
@@ -137,6 +154,7 @@ export default {
                 .get(`/api/admin/post/${this.postSelected}`)
                 .then(({ data }) => {
                     this.post = data.data;
+                    console.log(this.post);
                     this.category = data.data.category.title;
                     this.comments = data.data.comments;
                     this.getFullDate();
@@ -200,7 +218,6 @@ export default {
             }
         },
         async addComment(event, text) {
-            this.isLoading = true;
             let replyId = this.replyId;
             if (event.target.id === "main") {
                 replyId = null;
@@ -220,19 +237,38 @@ export default {
                 parent_id: replyId,
                 depth,
             };
+            if (data.user_id !== 0) {
+                this.isLoading = true;
+            }
             await axios
                 .post("/api/user/comment/create", data)
-                .finally(() => (this.isLoading = false));
-            this.getPost();
+                .then(() => {
+                    this.$store.state.quickTextarea = null;
+
+                    this.newCommentNotification = true;
+                })
+                .finally(() => (this.isLoading = false))
+                .catch((e) => {
+                    if (e.response.status === 419) {
+                        this.isLoginOpen();
+                    }
+                });
+            if (data.user_id !== 0) {
+                this.getPost();
+            }
             this.depth = null;
             this.replyId = null;
             this.replyName = "";
         },
         replyData(val) {
             this.$store.dispatch("getQuickTextarea", val.id);
+            this.$store.dispatch("getEditCommentTextarea", null);
             this.replyId = val.id;
             this.replyName = val.author.name;
             this.depth = val.depth;
+        },
+        deleteComment() {
+            this.getPost();
         },
         scrollDown() {
             if (this.$refs.wrapper) {
@@ -240,17 +276,25 @@ export default {
             }
         },
     },
+    watch: {
+        newCommentNotification(val) {
+            if (val) {
+                setTimeout(() => {
+                    this.newCommentNotification = false;
+                }, 8000);
+            }
+        },
+    },
 };
 </script>
 
 <style scoped>
+
+
 .post-wrapper {
-    /* padding: 0.3rem 0; */
     position: relative;
     z-index: 1;
-    /* margin-bottom: 0.5rem; */
-    /* margin: 0.8rem 0 0.8rem 0.8rem; */
-    /* border-radius: 10px; */
+    background-color: #242424 !important;
 }
 
 .title-wrap {
@@ -448,16 +492,16 @@ nav > a {
     border: 1px solid #333333;
 }
 
-.fade-enter-from {
-    opacity: 0.1;
+.list-enter-active {
+    transition: all 0.3s ease-in;
 }
-.fade-enter-active {
-    transition: all 0.5s linear;
+
+.list-leave-active {
+    transition: all 0.2s ease-out;
 }
-.fade-leave-active {
-    transition: all 0.1s ease-out;
-}
-.fade-leave-to {
+.list-enter-from,
+.list-leave-to {
     opacity: 0;
+    transform: translateY(30px);
 }
 </style>

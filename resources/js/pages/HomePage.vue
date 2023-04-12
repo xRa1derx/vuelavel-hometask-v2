@@ -6,14 +6,14 @@
                 <a
                     @click="blogOpen('blog')"
                     href="#"
-                    class="nav_link blog_test"
+                    class="nav_link blog-btn"
                     :class="{ active: navActive == 'blog' }"
                     >Blog</a
                 >
                 <a
                     @click="materialsOpen('materials')"
                     href="#"
-                    class="nav_link"
+                    class="nav_link materials-btn"
                     :class="{ active: navActive == 'materials' }"
                     >Materials</a
                 >
@@ -80,7 +80,6 @@
                         v-if="postSelected == null"
                         @loading="loading"
                         @commentLink="commentLink"
-                        @loginOpen="loginOpen"
                         :current_page_url="current_page"
                     ></post-component>
                     <post-selected
@@ -88,20 +87,74 @@
                         :postSelected="postSelected"
                         @loading="loading"
                         @backToBlog="postSelected = null"
-                        @loginOpen="loginOpen"
                     ></post-selected>
                 </section>
             </transition>
             <section class="second-page">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia
-                earum veritatis aspernatur, voluptatum debitis nam eaque, quas
-                deleniti laboriosam a nihil molestiae, atque voluptate quis
-                excepturi magnam laudantium libero reiciendis.
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <hr />
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <hr />
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <hr />
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Officia earum veritatis aspernatur, voluptatum debitis nam
+                    eaque, quas deleniti laboriosam a nihil molestiae, atque
+                    voluptate quis excepturi magnam laudantium libero
+                    reiciendis.
+                </p>
+                <hr />
             </section>
             <transition name="modal">
                 <login-component
-                    v-if="isLoginOpen"
-                    @close="isLoginOpen = false"
+                    v-if="this.$store.state.isLoginOpen"
                 ></login-component>
             </transition>
         </main>
@@ -115,25 +168,29 @@ import PostSelected from "../components/Post/PostSelected.vue";
 import axios from "axios";
 import { mapActions } from "vuex";
 export default {
-    components: { PostComponent, LoginComponent, PostSelected },
+    components: {
+        PostComponent,
+        LoginComponent,
+        PostSelected,
+    },
     data() {
         return {
             show: true,
             isActive: null,
             isLoading: false,
-            isLoginOpen: false,
             postSelected: null,
             current_page: null,
+            viewPortHeight: null,
         };
     },
     mounted() {
         const image = document.querySelector(".primary-image");
-        if (image.classList.contains("close")) {
-            image.classList.remove("close");
+        if (image.classList.contains("blogClosed")) {
+            image.classList.remove("blogClosed");
         }
-        if (document.body.classList.contains("overflow")) {
-            document.body.classList.remove("overflow");
-        }
+        // if (document.body.classList.contains("overflow")) {
+        //     document.body.classList.remove("overflow");
+        // }
     },
     methods: {
         commentLink(id, current_page) {
@@ -142,16 +199,25 @@ export default {
         },
         ...mapActions({
             signOut: "auth/logout",
+            getRole: "auth/role",
+            isLoginOpen: "loginOpen",
         }),
         async logout() {
-            await axios.post("/logout").then(({ data }) => {
+            await axios.post("/logout").then((res) => {
+                localStorage.removeItem(
+                    "x_xsrf_token",
+                    res.config.headers["X-XSRF-TOKEN"]
+                );
                 this.signOut();
             });
         },
         loginOpen() {
-            this.isLoginOpen = !this.isLoginOpen;
+            this.isLoginOpen();
         },
         blogOpen(navSection) {
+            if (localStorage.getItem("x_xsrf_token")) {
+                this.getRole();
+            }
             this.navSelectStatus(navSection);
             this.show = !this.show;
             this.blogMainImageResize();
@@ -174,10 +240,10 @@ export default {
             const image = document.querySelector(".primary-image");
             if (this.show) {
                 image.classList.add("resize");
-                image.classList.remove("close");
+                image.classList.remove("blogClosed");
             } else {
                 image.classList.remove("resize");
-                image.classList.add("close");
+                image.classList.add("blogClosed");
             }
         },
         loading(val) {
@@ -194,15 +260,25 @@ export default {
 
 <style scoped>
 .active {
-    /* border-radius: 10px; */
-    background-color: var(--clr-touch);
-    transition: all 0.2s linear;
+    box-shadow: inset rgba(0, 0, 0, 0.63) 0px 0px 15px 1px;
+}
+
+.blog-btn,
+.materials-btn {
+    border-radius: 10px;
+    padding: 0 1rem;
+}
+
+@media (min-width: 800px) {
+    .blog-btn:hover,
+    .materials-btn:hover {
+        color: var(--clr-touch);
+        box-shadow: inset rgba(0, 0, 0, 0.205) 0px 0px 15px 1px;
+    }
 }
 
 nav > a {
-    padding: 1px 15px;
     color: #fff;
-    transition: all 0.3s linear;
 }
 
 .user-dashboard {
@@ -228,7 +304,9 @@ img {
 
 main {
     position: relative;
-    height: 100vh;
+    /* height: calc(90vh - 50px); */
+    height: 100%;
+    /* height: 100vh; */
 }
 
 .btn {
@@ -266,23 +344,26 @@ main {
     color: var(--clr-accent);
     margin: 0;
     line-height: 1;
-    font-size: clamp(3rem, 5vw, 7rem);
 }
 
 .personal {
     color: var(--clr-icons);
     margin: 0;
     font-size: 1.5rem;
-    margin-bottom: 1.5em;
     font-style: italic;
 }
 
 header {
     display: flex;
     align-items: center;
-    margin: 0 1rem 1.5rem 1rem;
-    padding-top: 1rem;
+    /* margin: 0 1rem 1.5rem 1rem; */
+    padding: 1rem 1rem 1.5rem 1rem;
     gap: 5px;
+
+    /* new */
+    position: relative;
+    z-index: 1;
+    background-color: var(--clr-bg-dark);
 }
 
 header > h2 {
@@ -293,11 +374,11 @@ header > h2 {
 }
 
 .title-wrap {
-    margin: 0 1rem;
+    margin: 0 1rem 1.5rem 1rem;
 }
 
 .greetings {
-    margin: 1.5rem 1rem;
+    margin: 1.5rem 1rem 0 1rem;
 }
 
 .nav {
@@ -328,9 +409,10 @@ header > h2 {
 }
 
 .blog {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     width: 100%;
-    margin: 0 auto;
-    height: calc(100vh - 30px);
     overflow: auto;
     background-color: #242424;
     position: absolute;
@@ -338,16 +420,23 @@ header > h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    border: 1px solid rgb(73, 73, 73);
-    /* border-radius: 10px; */
-    /* box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.596); */
-    box-shadow: 0px 0px 50px 10px #00000096;
+    box-shadow: 0px 30px 50px 30px #00000096;
     z-index: 0;
+    /* new */
+    height: 100vh;
+    margin-top: -72px;
+    padding: 72px 0;
 }
 
-.nav_link:hover {
-    background-color: var(--clr-touch);
+.social-link {
+    height: 30px;
+    margin: auto 0;
 }
+
+.social-link > a > img {
+    height: 100%;
+}
+
 .social-link:hover,
 .social-link:focus {
     opacity: 0.5;
@@ -366,9 +455,50 @@ header > h2 {
 }
 
 .buttons {
+    height: 45px;
+    position: relative;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     margin: 0 1rem;
+}
+
+.buttons > .btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    animation: contact 1s ease;
+}
+
+.social-link {
+    position: absolute;
+    right: 0;
+    top: 8px;
+    animation: socialLink 1s ease;
+}
+
+.second-page {
+    margin: 1.5rem 1rem;
+    grid-column: 1 / -1;
+}
+
+@keyframes socialLink {
+    from {
+        opacity: 0;
+        right: 50%;
+    }
+    to {
+        right: 0;
+    }
+}
+
+@keyframes contact {
+    from {
+        opacity: 0;
+        left: 50%;
+    }
+    to {
+        left: 0;
+    }
 }
 
 .blog::-webkit-scrollbar {
@@ -395,9 +525,22 @@ header > h2 {
 }
 
 @media (min-width: 800px) {
+    .second-page {
+        margin: 1.5rem 0;
+        grid-column: 1 / -1;
+    }
+
     .personal {
         margin: 0;
     }
+
+    header {
+        margin: 0 1rem 1.5rem 1rem;
+        padding: 0;
+        padding-top: 1rem;
+        background-color: inherit;
+    }
+
     header > h2 {
         grid-column: 1;
         grid-row: 1;
@@ -425,6 +568,7 @@ header > h2 {
             repeat(3, minmax(15rem, 35rem))
             minmax(1em, 1fr);
         position: relative;
+        z-index: 0;
     }
 
     header {
@@ -491,10 +635,8 @@ header > h2 {
         height: 79.9vh;
         z-index: 5;
         background-color: #242424f6;
-        /* border-radius: 10px; */
-        /* -webkit-box-shadow: 0 0 15px 3px rgb(108, 108, 108);
-        -moz-box-shadow: 0 0 15px 3px rgb(108, 108, 108);
-        box-shadow: 0 0 20px 1px rgb(108, 108, 108); */
+        padding: 0;
+        border-radius: 10px;
     }
 
     .primary-image {
@@ -518,7 +660,7 @@ header > h2 {
         }
     }
 
-    .close {
+    .blogClosed {
         animation: close 0.5s linear;
         opacity: 0;
     }
@@ -560,6 +702,10 @@ header > h2 {
         align-self: end;
     }
 
+    .title {
+        font-size: clamp(2rem, 5vw, 6rem);
+    }
+
     .personal,
     .greetings {
         margin: 0;
@@ -587,17 +733,6 @@ header > h2 {
         );
         grid-column: 1 / 6;
         z-index: 1;
-    }
-
-    .social-link {
-        height: 27px;
-        margin: 9px;
-        margin-right: 1rem;
-    }
-
-    .social-link img {
-        object-fit: cover;
-        height: 100%;
     }
 
     @media (max-height: 550px) {
@@ -646,6 +781,11 @@ header > h2 {
         grid-column: 1 / 4;
     }
 
+    .title {
+        text-shadow: 1px 1px #00000063;
+        font-size: clamp(4rem, 6vw, 7rem);
+    }
+
     .personal,
     .greetings {
         grid-column: 1 / 3;
@@ -656,9 +796,9 @@ header > h2 {
         grid-row: 3;
     }
 
-    /* .social-link {
-        grid-column: 2 / 3;
-    } */
+    .social-link {
+        margin-right: 1rem;
+    }
 
     .resize {
         grid-column: 3 / 5;
@@ -671,7 +811,7 @@ header > h2 {
         }
     }
 
-    .close {
+    .blogClosed {
         grid-column: 3;
         animation: close 0.5s linear;
         opacity: 0;
@@ -720,11 +860,6 @@ header > h2 {
             object-fit: cover;
         }
     }
-}
-
-.second-page {
-    margin: 0 1rem;
-    grid-column: 1 / -1;
 }
 
 .slide-enter-from {

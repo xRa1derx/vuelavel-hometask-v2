@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-mask" @click.self="$emit('close')">
+    <div class="modal-mask" @click.self="isLoginOpen()">
         <div class="modal-wrapper">
             <div class="modal-container">
                 <transition name="errors">
@@ -24,7 +24,7 @@
                         <label for="email">Login</label>
                         <input
                             class="w-100"
-                            type="text"
+                            type="email"
                             name="email"
                             id="email"
                             v-model="auth.email"
@@ -41,16 +41,27 @@
                         />
                     </div>
                     <div class="form-group">
+                        <span
+                            v-if="disableLoginBtn"
+                            class="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                        ></span>
                         <button
                             type="button"
                             class="signIn-btn"
                             @click="login()"
+                            :disabled="disableLoginBtn"
                         >
-                            Sign in
+                            <span
+                                class="oval"
+                                :class="{ 'oval-active': disableLoginBtn }"
+                            ></span>
+                            {{ !disableLoginBtn ? "Sign in" : "Loading..." }}
                         </button>
                     </div>
                 </div>
-                <button class="close-btn" @click="$emit('close')">
+                <button class="close-btn" @click="isLoginOpen()">
                     <i class="nav-icon fas fa-window-close"></i>
                 </button>
             </div>
@@ -70,32 +81,51 @@ export default {
                 password: "",
             },
             errors: { value: "" },
+            disableLoginBtn: false,
         };
+    },
+    created() {
+        document.body.classList.toggle("overflow");
+    },
+    beforeUnmount() {
+        document.body.classList.toggle("overflow");
     },
     methods: {
         ...mapActions({
-            signIn: "auth/login",
+            getRole: "auth/role",
+            isLoginOpen: "loginOpen",
         }),
         async login() {
             this.errors.value = "";
-            try {
-                await axios.get("/sanctum/csrf-cookie").then(() => {
-                    axios.post("/login", this.auth).then(() => {
-                        this.signIn();
-                    });
-                    this.$emit("close");
-                });
-            } catch (e) {
-                if (e.response.status === 422) {
-                    this.errors.value = e.response.data.errors;
-                }
-            }
+            this.disableLoginBtn = true;
+            await axios.get("/sanctum/csrf-cookie").then(() => {
+                axios
+                    .post("/login", this.auth)
+                    .then((res) => {
+                        localStorage.setItem(
+                            "x_xsrf_token",
+                            res.config.headers["X-XSRF-TOKEN"]
+                        );
+                        this.getRole();
+                        this.isLoginOpen();
+                    })
+                    .catch((e) => {
+                        if (e.response.status === 422) {
+                            this.errors.value = e.response.data.errors;
+                        }
+                    })
+                    .finally(() => (this.disableLoginBtn = false));
+            });
         },
     },
 };
 </script>
 
 <style scoped>
+.spinner-border {
+    color: var(--clr-accent);
+}
+
 .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -140,8 +170,7 @@ export default {
     color: #fff;
 }
 
-.signIn-btn::before {
-    content: "";
+.oval {
     position: absolute;
     width: 55px;
     height: 24px;
@@ -152,7 +181,13 @@ export default {
     transition: all 0.3s linear;
 }
 
-.signIn-btn:hover::before {
+.oval:hover {
+    border-radius: 30px;
+    transform: scale(1.3);
+}
+
+.oval-active {
+    width: 75px;
     border-radius: 30px;
     transform: scale(1.3);
 }

@@ -13,13 +13,10 @@
                         ><i class="fas fa-bars"></i
                     ></a>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
+                <li class="">
                     <router-link class="btn" :to="{ name: 'home' }"
                         >Home</router-link
                     >
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="btn">Contact</a>
                 </li>
             </ul>
 
@@ -76,7 +73,6 @@
                         <a href="#" class="dropdown-item">
                             <!-- Message Start -->
                             <div class="media">
-                                <!-- <img src="../../dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         Brad Diesel
@@ -100,7 +96,6 @@
                         <a href="#" class="dropdown-item">
                             <!-- Message Start -->
                             <div class="media">
-                                <!-- <img src="../../dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3"> -->
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         John Pierce
@@ -124,7 +119,6 @@
                         <a href="#" class="dropdown-item">
                             <!-- Message Start -->
                             <div class="media">
-                                <!-- <img src="../../dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3"> -->
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         Nora Silvester
@@ -187,27 +181,6 @@
                         >
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a
-                        class="nav-link"
-                        data-widget="fullscreen"
-                        href="#"
-                        role="button"
-                    >
-                        <i class="fas fa-expand-arrows-alt white"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        class="nav-link"
-                        data-widget="control-sidebar"
-                        data-slide="true"
-                        href="#"
-                        role="button"
-                    >
-                        <i class="fas fa-th-large white"></i>
-                    </a>
-                </li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -217,7 +190,6 @@
             class="main-sidebar sidebar-dark-primary elevation-4 position-fixed"
         >
             <!-- Brand Logo -->
-            <!-- <a href="../../index3.html" class="brand-link text-center"> </a> -->
             <router-link
                 :to="{ name: 'admin' }"
                 class="brand-link text-center"
@@ -227,7 +199,10 @@
             </router-link>
 
             <!-- Sidebar -->
-            <div class="sidebar">
+            <sidebar-component
+                v-if="$route.meta.sidebar === 'chat'"
+            ></sidebar-component>
+            <div class="sidebar" v-else>
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
@@ -258,16 +233,20 @@
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
                             <router-link
-                                @click.self="toggleNav($event, 1)"
-                                class="nav-link sidebar-btn"
+                                class="nav-link"
                                 :to="{ name: 'posts' }"
+                                @click.self="closeBurgerOnMobile()"
                                 :class="{
                                     selectedNav: selected.some(
                                         (item) => item == 1
                                     ),
                                 }"
                                 ><i class="nav-icon fa fa-solid fa-blog"></i
-                                >Posts <i class="right fas fa-angle-left"></i
+                                >Posts
+                                <i
+                                    @click.prevent="toggleSubMenu($event, 1)"
+                                    class="right fas fa-angle-left"
+                                ></i
                             ></router-link>
                             <ul class="nav closed">
                                 <li class="nav-item">
@@ -298,8 +277,10 @@
                                 ><i
                                     class="nav-icon far fa-solid fa-envelope-open"
                                 ></i
-                                >Comments<span class="badge badge-info right"
-                                    >2</span
+                                >Comments<span
+                                    v-if="newCommentsQuantity > 0"
+                                    class="badge badge-info right"
+                                    >{{ newCommentsQuantity }}</span
                                 ></router-link
                             >
                         </li>
@@ -316,18 +297,21 @@
                         </li>
                         <li class="nav-item">
                             <router-link
-                                @click.self="toggleNav($event, 2)"
-                                class="nav-link sidebar-btn"
+                                class="nav-link"
                                 :class="{
                                     selectedNav: selected.some(
                                         (item) => item == 2
                                     ),
                                 }"
                                 to="/admin/users"
+                                @click.self="closeBurgerOnMobile()"
                             >
                                 <i class="nav-icon fas fa-regular fa-user"></i>
                                 Students
-                                <i class="right fas fa-angle-left"></i>
+                                <i
+                                    @click.prevent="toggleSubMenu($event, 2)"
+                                    class="right fas fa-angle-left"
+                                ></i>
                             </router-link>
                             <ul class="nav closed">
                                 <li class="nav-item">
@@ -345,8 +329,9 @@
                         </li>
                         <li class="nav-item">
                             <router-link
-                                class="nav-link sidebar-btn"
-                                to="/messages"
+                                class="nav-link"
+                                to="/admin/chat"
+                                @click="sidebarSectionToggle = true"
                                 ><i
                                     class="nav-icon fas fa-thin fa-comment-dots"
                                 ></i
@@ -375,13 +360,15 @@
                 </div>
                 <!-- /.container-fluid -->
             </section>
-
             <!-- Main content -->
-            <section class="content">
+            <section v-else class="content">
                 <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12 mt-3">
-                            <router-view v-slot="slotProps">
+                    <div class="row h-100">
+                        <div class="col-12">
+                            <router-view
+                                :key="$route.fullPath"
+                                v-slot="slotProps"
+                            >
                                 <transition name="route" mode="out-in">
                                     <component
                                         :is="slotProps.Component"
@@ -406,24 +393,34 @@
         </div>
         <!-- /.content-wrapper -->
 
-        <footer class="main-footer"></footer>
+        <!-- <footer class="main-footer"></footer> -->
 
         <aside class="control-sidebar control-sidebar-dark"></aside>
     </div>
 </template>
 
 <script>
+import axios from "axios";
+import SidebarComponent from "../components/Admin/SidebarComponent.vue";
 export default {
+    components: {
+        SidebarComponent,
+    },
     data() {
         return {
-            rotation: 0,
             selected: [],
+            newCommentsQuantity: null,
             windowWidth: window.innerWidth,
+            counterInterval: null,
+            sidebarSectionToggle: false,
         };
     },
     mounted() {
         this.$nextTick(() => {
             window.addEventListener("resize", this.onResize);
+            if (this.windowWidth <= 992) {
+                $(".burger").PushMenu("collapse");
+            }
         });
         if (document.body.classList.contains("overflow")) {
             document.body.classList.remove("overflow");
@@ -436,24 +433,44 @@ export default {
                 }
             })
         );
+        this.getNewCommentsQuantity();
+        this.counterInterval = setInterval(() => {
+            this.getNewCommentsQuantity();
+        }, 10000);
+    },
+    unmounted() {
+        clearInterval(this.counterInterval);
     },
     beforeDestroy() {
         window.removeEventListener("resize", this.onResize);
     },
     methods: {
-        toggleNav(event, val) {
+        closeBurgerOnMobile() {
+            if (this.windowWidth <= 992) {
+                $(".burger").PushMenu("collapse");
+            }
+        },
+        toggleSubMenu(event, val) {
             this.selected.push(val);
-            event.target.nextSibling.classList.toggle("opened");
-            event.target.nextSibling.classList.toggle("closed");
-            if (!event.target.lastChild.style.transform) {
-                event.target.lastChild.style.transform = `rotate(-90deg)`;
+            event.target.parentElement.nextSibling.classList.toggle("opened");
+            event.target.parentElement.nextSibling.classList.toggle("closed");
+            if (!event.target.style.transform) {
+                event.target.style.transform = `rotate(-90deg)`;
             } else {
-                event.target.lastChild.style.transform = "";
+                event.target.style.transform = "";
                 this.selected = this.selected.filter((item) => item != val);
             }
         },
         onResize() {
             this.windowWidth = window.innerWidth;
+        },
+        getNewCommentsQuantity() {
+            axios.get("/api/admin/comments").then((res) => {
+                let newCommentsQuantity = res.data.filter(
+                    (comment) => comment.new === 1
+                );
+                this.newCommentsQuantity = newCommentsQuantity.length;
+            });
         },
     },
 };
@@ -461,24 +478,33 @@ export default {
 
 <style scoped>
 .wrapper {
-    overflow: hidden;
+
+    height: 100%;
 }
+.container-fluid {
+    padding-top: 55px;
+    position: relative;
+    height: 100%;
+}
+
 .main-sidebar,
 .main-footer,
 .main-header {
     background-color: #242424;
 }
 .content-wrapper {
+    height: 100%;
     position: relative;
     background-color: #3b3b3b;
 }
 
 .admin-content {
-    margin-top: 55px;
+    /* height: 100vh; */
 }
 
 .content {
-    margin-top: 55px;
+    height: 100%;
+    background-color: #3b3b3b;
 }
 
 .main-header {

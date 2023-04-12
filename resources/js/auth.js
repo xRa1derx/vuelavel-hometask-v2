@@ -30,12 +30,14 @@ export default {
         },
     },
     actions: {
-        login({ commit }) {
-            return axios
+        async role({ commit }) {
+            await axios
                 .get("/api/user")
                 .then(({ data }) => {
                     commit("SET_USER", data);
-                    commit("SET_AUTHENTICATED", true);
+                    if (localStorage.getItem("x_xsrf_token")) {
+                        commit("SET_AUTHENTICATED", true);
+                    }
                     if (data.is_admin === 1) {
                         commit("SET_ADMIN", true);
                     }

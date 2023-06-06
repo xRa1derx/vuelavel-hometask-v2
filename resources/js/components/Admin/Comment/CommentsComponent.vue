@@ -24,12 +24,12 @@ export default {
     },
     mounted() {
         this.getComments();
-        this.counterInterval = setInterval(() => {
-            this.getComments();
-        }, 10000);
+        // this.counterInterval = setInterval(() => {
+        //     this.getComments();
+        // }, 10000);
     },
     unmounted() {
-        clearInterval(this.counterInterval);
+        // clearInterval(this.counterInterval);
     },
     methods: {
         getComments() {

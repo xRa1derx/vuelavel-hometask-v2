@@ -205,15 +205,17 @@
             <div class="sidebar" v-else>
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
+                    <div class="image d-flex">
                         <img
                             src="../../assets/images/avatar_admin.png"
-                            class="img-circle elevation-2"
+                            class="img-circle elevation-2 align-self-center"
                             alt="User Image"
                         />
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Alyona Ozhered</a>
+                        <router-link class="nav-link" :to="{ name: 'users' }"
+                            >Alyona Ozhered</router-link
+                        >
                     </div>
                 </div>
 
@@ -330,7 +332,7 @@
                         <li class="nav-item">
                             <router-link
                                 class="nav-link"
-                                to="/admin/chat"
+                                :to="{ name: 'chat.admin' }"
                                 @click="sidebarSectionToggle = true"
                                 ><i
                                     class="nav-icon fas fa-thin fa-comment-dots"
@@ -434,12 +436,12 @@ export default {
             })
         );
         this.getNewCommentsQuantity();
-        this.counterInterval = setInterval(() => {
-            this.getNewCommentsQuantity();
-        }, 10000);
+        // this.counterInterval = setInterval(() => {
+        //     this.getNewCommentsQuantity();
+        // }, 10000);
     },
     unmounted() {
-        clearInterval(this.counterInterval);
+        // clearInterval(this.counterInterval);
     },
     beforeDestroy() {
         window.removeEventListener("resize", this.onResize);
@@ -478,7 +480,6 @@ export default {
 
 <style scoped>
 .wrapper {
-
     height: 100%;
 }
 .container-fluid {

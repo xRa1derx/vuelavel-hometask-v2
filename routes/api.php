@@ -49,6 +49,16 @@ Route::group(['namespace' => 'User\Comment', 'prefix' => 'user'], function () {
 
 Route::group(['namespace' => 'Admin\Message', 'prefix' => 'admin'], function () {
     Route::get('/chat', 'IndexController');
-    Route::post('/chat', 'StoreController');
     Route::get('/chat/{id}', 'ShowController');
+    Route::post('/chat/{user}', 'StoreController');
+    Route::post('/chat/load/{id}', 'LoadMoreMessages');
+    Route::delete('/chat/{id}', 'DeleteController');
+    Route::patch('/chat/{id}', 'UpdateController');
+    Route::patch('/chat/markasread/{id}', 'MarkAsReadController');
+});
+
+Route::group(['namespace' => 'Files'], function () {
+    Route::get('/file/{id}', 'IndexController');
+    Route::post('file', 'StoreController');
+    Route::delete('/file/{id}', 'DeleteController');
 });

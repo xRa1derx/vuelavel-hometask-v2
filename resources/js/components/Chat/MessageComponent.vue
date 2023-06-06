@@ -1,168 +1,330 @@
 <template>
-    <div class="chat">
-        <div class="message" v-for="message in messages" :key="message.id">
+    <div
+        @click="contextMenu($event)"
+        class="message-container"
+        :class="[
+            $store.state.auth.user.id === message.sender.id
+                ? 'sender'
+                : 'receiver',
+            {
+                replying: quote.uuid === message.uuid,
+            },
+        ]"
+        :style="[
+            ($store.state.messageAction == 'delete' &&
+                message.uuid == messageToAction.id) ||
+            ($store.state.messageAction == 'edit' &&
+                message.uuid == messageToAction.id)
+                ? 'margin: 0.5rem 2rem'
+                : '',
+            message.message === null
+                ? 'background-color: inherit; padding: 0; box-shadow: none; margin-bottom: 6px;'
+                : '',
+        ]"
+    >
+        <span class="replied-container" v-if="message.replyMessage">
+            <p class="replied">
+                {{ message.replyMessage }}
+            </p>
+        </span>
+        <transition name="slide">
             <div
-                @click="contextMenu($event, message)"
-                :class="
-                    $store.state.auth.authenticated === true
-                        ? 'sender'
-                        : 'receiver'
+                class="actions"
+                v-if="
+                    $store.state.messageAction &&
+                    message.uuid == messageToAction.id
                 "
             >
-                <p>
-                    {{ message.message }}
-                </p>
-                <span class="time"
-                    ><p>{{ message.created_at }}</p></span
+                <i
+                    @click.stop="$emit('confirmActionMessage')"
+                    class="confirm"
+                    :style="
+                        $store.state.auth.user.id === message.sender.id
+                            ? 'left: -1.5rem'
+                            : 'right: -1.5rem'
+                    "
                 >
+                    <font-awesome-icon
+                        v-if="$store.state.messageAction === 'delete'"
+                        :icon="['fas', 'trash']"
+                    />
+
+                    <transition name="slide">
+                        <font-awesome-icon
+                            v-if="
+                                $store.state.messageAction === 'edit' &&
+                                !isInputDisabled
+                            "
+                            :icon="['fas', 'check']"
+                        />
+                    </transition>
+                </i>
+                <i
+                    @click.stop="$emit('cancelActionMessage')"
+                    class="cancel"
+                    :style="
+                        $store.state.auth.user.id === message.sender.id
+                            ? 'right: -1.5rem'
+                            : 'left: -1.5rem'
+                    "
+                >
+                    <font-awesome-icon
+                        :icon="['fas', 'xmark']"
+                        v-if="$store.state.messageAction != 'reply'"
+                    />
+                </i>
             </div>
+        </transition>
+        <textarea
+            @click.stop
+            v-if="
+                $store.state.messageAction === 'edit' &&
+                message.uuid === messageToAction.id
+            "
+            oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+            :style="{
+                width: messageTextareaEdit.width + 'px',
+                height: messageTextareaEdit.height + 'px',
+            }"
+            :value="messageToEdit"
+            @input="newMessage($event)"
+        ></textarea>
+        <p class="text-message" ref="messageRef" v-else>
+            {{ message.message }}
+        </p>
+    </div>
+    <div
+        class="message-footer"
+        :class="[
+            $store.state.auth.user.id === message.sender.id
+                ? 'footer-sender'
+                : 'footer-receiver',
+        ]"
+    >
+        <div
+            v-if="
+                spinnerForDelivery.status === true &&
+                spinnerForDelivery.messageId === message.uuid &&
+                messageStatus === null
+            "
+            class="spinner-border"
+            role="status"
+        >
+            <span class="sr-only">Loading...</span>
         </div>
-        <base-message-edit
-            v-if="isContextMenu"
-            :clientX="clientX"
-            :clientY="clientY"
-            @close="isContextMenu = false"
-        ></base-message-edit>
+        <div
+            v-else-if="
+                messageStatus === 'denied' &&
+                spinnerForDelivery.messageId === message.uuid
+            "
+            class="message-status"
+        >
+            <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
+        </div>
+        <div
+            v-else-if="$store.state.auth.user.id === message.sender.id"
+            class="message-status delivered"
+        >
+            <font-awesome-icon :icon="['fas', 'check']" />
+        </div>
+        <div
+            v-if="
+                message.new === 0 &&
+                $store.state.auth.user.id === message.sender.id
+            "
+            class="message-status have-read"
+        >
+            <font-awesome-icon :icon="['fas', 'check']" />
+        </div>
+        <span @click.stop class="time">
+            <p>
+                {{
+                    new Date().toLocaleString().slice(0, 10) ==
+                    getFullDate(message.created_at)
+                        .toLocaleString()
+                        .slice(0, 10)
+                        ? message.created_at_for_humans
+                        : getFullDate(message.created_at)
+                              .toLocaleString()
+                              .slice(12, 17)
+                }}
+            </p></span
+        >
     </div>
 </template>
 
 <script>
 import { ref } from "vue";
-import BaseMessageEdit from "./BaseMessageEdit.vue";
 export default {
-    components: {
-        BaseMessageEdit,
-    },
-    props: ["messages"],
-    setup() {
-        const isContextMenu = ref(false);
-        const clientX = ref(null);
-        const clientY = ref(null);
-        const contextMenu = (event, msg) => {
-            console.log(event);
-            console.log(msg);
-            event.preventDefault();
-            isContextMenu.value = !isContextMenu.value;
-            // this.messageId = msg.id;
-            // this.hideEditAndDeleteButtons(msg);
-            setPositionToContextMenu(event);
+    props: [
+        "message",
+        "quote",
+        "messageToAction",
+        "isInputDisabled",
+        "spinnerForDelivery",
+        "messageStatus",
+        "messageTextareaEdit",
+        "messageToEdit",
+    ],
+    emits: [
+        "contextMenu",
+        "confirmActionMessage",
+        "cancelActionMessage",
+        "inputDisabled",
+        "editedMessageWatcher",
+    ],
+    setup(props, { emit }) {
+        const messageRef = ref(null);
+        const newMessage = (event) => {
+            emit("editedMessageWatcher", event.target.value);
         };
-        const setPositionToContextMenu = (event) => {
-            let halfScreenX = document.documentElement.clientWidth / 2;
-            let halfScreenY = document.documentElement.clientHeight / 2;
-
-            if (halfScreenX < event.clientX) {
-                clientX.value = event.clientX + window.scrollX - 100;
-            } else {
-                clientX.value = event.clientX + window.scrollX + 20;
-            }
-
-            if (halfScreenY < event.clientY) {
-                clientY.value = event.clientY + window.scrollY - 50;
-            } else {
-                clientY.value = event.clientY + window.scrollY;
-            }
+        const contextMenu = (event) => {
+            emit("contextMenu", event, props.message, "message", messageRef);
         };
-        return {
-            contextMenu,
-            setPositionToContextMenu,
-            isContextMenu,
-            clientX,
-            clientY,
+        const getFullDate = (messageDate) => {
+            let date = messageDate.slice(0, 16).replace("T", " ");
+            let t = date.split(/[- :]/);
+            let time = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4]));
+            return time;
         };
+        return { messageRef, contextMenu, newMessage, getFullDate };
     },
 };
 </script>
 
 <style scoped>
-.chat {
-    height: 10%;
-    display: flex;
-    flex: 1 0 auto;
-    flex-direction: column;
-    gap: 20px;
-    overflow: auto;
-    background-color: #ffffff;
-    border-radius: 10px;
-    background-image: url("/images/chat-background.png");
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
+textarea {
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 24px;
+    height: 26px;
+    padding: 0;
+    resize: none;
 }
 
-.message {
+.message-container {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-}
-
-.message > div {
-    max-width: 90%;
+    max-width: 80%;
     overflow-wrap: break-word;
-    line-height: 24px;
-    position: relative;
     padding: 10px;
     border-radius: 10px;
+    min-width: 130px;
+    color: black;
+    cursor: pointer;
+    white-space: pre-wrap;
+    transition: margin 0.2s linear;
+    z-index: 0;
+    box-shadow: 0px 0px 3px 0px #707070;
 }
 
-.message > div > p {
+.sender {
+    align-self: flex-end;
+    background-color: #ffa04f;
+}
+.receiver {
+    align-self: flex-start;
+    background-color: #ffe083;
+}
+
+.sender:hover {
+    background-color: #ff9437;
+}
+
+.receiver:hover {
+    align-self: flex-start;
+    background-color: #ffd965;
+}
+
+.confirm {
+    position: absolute;
+    color: var(--clr-bg-light);
+}
+
+.cancel {
+    position: absolute;
+    color: var(--clr-bg-light);
+}
+
+.text-message {
     margin: 0;
     float: right;
 }
 
-.time {
-    position: absolute;
-    bottom: -20px;
-    right: 0;
+.message-footer {
+    display: flex;
     cursor: default;
+    gap: 3px;
+    color: #3c3c3c;
+    font-size: 0.7em;
+}
+
+.footer-sender {
+    justify-content: end;
+    padding-right: 15px;
+}
+
+.footer-receiver {
+    justify-content: start;
+    padding-left: 15px;
+}
+
+.spinner-border {
+    width: 0.7rem;
+    height: 0.7rem;
+    align-self: center;
+}
+
+.have-read {
+    position: relative;
+    left: -9px;
 }
 
 .time > p {
-    font-size: 0.7em;
     font-style: italic;
     text-align: end;
     margin: 0;
     white-space: nowrap;
 }
 
-.sender {
-    min-width: 100px;
-    position: relative;
-    align-self: flex-end;
-    color: black;
-    background-color: #ffa04f;
-    cursor: pointer;
-    white-space: pre-wrap;
-}
-.receiver {
-    min-width: 100px;
-    position: relative;
-    align-self: flex-start;
-    background-color: #ffe083;
-    cursor: pointer;
-    white-space: pre-wrap;
-    color: #000;
+.replying {
+    box-shadow: 0 0 3px 1px #106064;
 }
 
-.chat::-webkit-scrollbar {
-    width: 0.5rem;
-    background-color: #242424f6;
-    /* border-radius: 10px; */
+.replied-container {
+    position: relative;
+    z-index: -1;
 }
-.chat::-webkit-scrollbar:horizontal {
-    height: 12px;
-    margin-right: 20px;
+
+.replied {
+    font-style: italic;
+    padding: 5px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.185);
+    border-radius: 10px;
+    margin: 0px;
+    margin-bottom: 10px;
+    color: #000;
+    font-size: 0.9rem;
+    background-color: #fff;
+    opacity: 0.5;
 }
-.chat::-webkit-scrollbar-thumb {
-    background-color: #efe4e4;
-    border: 1px solid #000000;
-    /* border-radius: 16px; */
+
+/* animations */
+
+.slide-enter-from {
+    margin-left: 30%;
+    opacity: 0;
 }
-.chat::-webkit-scrollbar-thumb:hover {
-    background-color: #d3c9c9;
-    border: 1px solid #333333;
+
+.slide-enter-to {
+    transition: all 0.2s ease-in;
 }
-.chat::-webkit-scrollbar-thumb:active {
-    background-color: #9b8a8b;
-    border: 1px solid #333333;
+
+.slide-leave-from {
+    opacity: 1;
+}
+
+.slide-leave-to {
+    opacity: 0;
+    transition: all 0.1s ease-out;
 }
 </style>

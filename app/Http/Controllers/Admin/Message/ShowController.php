@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Admin\Message;
 
+use App\Events\ConnectingStatusEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Http\Resources\Message\MessageResource;
-use Illuminate\Http\Request;
-
-use function GuzzleHttp\Promise\all;
+use Illuminate\Support\Facades\Auth;
 
 class ShowController extends Controller
 {
@@ -15,7 +14,13 @@ class ShowController extends Controller
     {
         $sender = Message::with('sender')->where(['from' => auth()->id(), 'to' => $id])->get();
         $receiver = Message::with('sender')->where(['to' => auth()->id(), 'from' => $id])->get();
-        $sorted = $sender->merge($receiver)->sortBy('id');
-        return MessageResource::collection($sorted->values()->all())->resolve();
+        $sortedLastTenMessages = $sender->merge($receiver)->sortBy('id')->slice(-10);
+        if (Auth::user()->is_admin) {
+            broadcast(new ConnectingStatusEvent($id));
+        } else {
+            broadcast(new ConnectingStatusEvent(Auth::user()->id));
+        }
+
+        return MessageResource::collection($sortedLastTenMessages->values()->all())->resolve();
     }
 }

@@ -20,7 +20,9 @@ class CreateMessagesTable extends Migration
             $table->unsignedBigInteger('to')->default(1);
             $table->foreign('from')->references('id')->on('users');
             $table->foreign('to')->references('id')->on('users');
-            $table->text('message');
+            $table->text('message')->nullable();
+            $table->text('replyMessage')->nullable();
+            $table->unsignedSmallInteger('new')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

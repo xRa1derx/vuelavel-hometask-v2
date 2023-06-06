@@ -24,13 +24,25 @@ window.axios.interceptors.response.use({}, (err) => {
     return Promise.reject(err);
 });
 
-// import Echo from 'laravel-echo';
+import Echo from "laravel-echo";
 
-// window.Pusher = require('pusher-js');
+window.Pusher = require("pusher-js");
 
 // window.Echo = new Echo({
-//     broadcaster: 'pusher',
+//     broadcaster: "pusher",
 //     key: process.env.MIX_PUSHER_APP_KEY,
+//     wsHost: window.location.hostname,
+//     wsPort: 6001,
+//     wssPort: 6001,
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     forceTLS: true
+//     forceTLS: false,
+//     disableStats: true,
+//     enabledTransports: ['ws', 'wss'],
 // });
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: process.env.MIX_PUSHER_APP_KEY,
+    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+    forceTLS: true
+});

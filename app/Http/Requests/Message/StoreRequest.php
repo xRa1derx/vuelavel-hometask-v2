@@ -24,10 +24,12 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
+            'files' => 'nullable|array',
             'uuid' => 'required',
             'from' => 'required|integer',
             'to' => 'required|integer',
-            'message' => 'required|string'
+            'message' => 'required_without:files|nullable|string',
+            'replyMessage' => 'nullable'
         ];
     }
 }

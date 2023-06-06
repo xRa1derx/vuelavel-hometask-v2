@@ -1,16 +1,11 @@
 <template>
     <div>
-        <div v-if="!$route.params.id">show new messages</div>
-        <chat-component v-else></chat-component>
+        <p>new messages</p>
     </div>
 </template>
 
 <script>
-import ChatComponent from "./ChatComponent.vue";
 export default {
-    components: {
-        ChatComponent,
-    },
 };
 </script>
 

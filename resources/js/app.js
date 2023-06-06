@@ -6,6 +6,13 @@ import VueLazyload from "vue-lazyload";
 
 import BaseSpinner from "./components/UI/BaseSpinner";
 import RepliesComponent from "./components/Comments/RepliesComponent";
+
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+
+library.add(fas);
+
 require("./bootstrap");
 
 const preload = async () => {
@@ -26,6 +33,7 @@ const preload = async () => {
         lazyComponent: true,
     });
 
+    app.component("font-awesome-icon", FontAwesomeIcon);
     app.component("base-spinner", BaseSpinner);
     app.component("replies-component", RepliesComponent);
 

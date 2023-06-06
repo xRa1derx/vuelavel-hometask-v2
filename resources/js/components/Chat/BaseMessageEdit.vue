@@ -4,9 +4,30 @@
             :style="{ left: clientX + 'px', top: clientY + 'px' }"
             class="contextMenu"
         >
-            <button @click="$emit('replyMsg', message)">Reply</button>
-            <button @click="$emit('editMsg', message)">Edit</button>
-            <button @click="$emit('deleteMsg', message)">Delete</button>
+            <button
+                @click="$emit('actionWithMessage', message, 'addFiles')"
+                v-if="$store.state.auth.user.id === message.sender.id"
+            >
+                Add files
+            </button>
+            <button
+                @click="$emit('actionWithMessage', message, 'reply')"
+                v-if="message.message !== null"
+            >
+                Reply
+            </button>
+            <button
+                v-if="$store.state.auth.user.id === message.sender.id"
+                @click="$emit('actionWithMessage', message, 'edit')"
+            >
+                Edit
+            </button>
+            <button
+                v-if="$store.state.auth.user.id === message.sender.id"
+                @click="$emit('actionWithMessage', message, 'delete')"
+            >
+                Delete
+            </button>
         </div>
     </div>
 </template>
@@ -14,7 +35,7 @@
 <script>
 export default {
     props: ["message", "clientX", "clientY", "editBtn", "deleteBtn"],
-    emits: ["replyMsg", "deleteMsg", "editMsg", "close"],
+    emits: ["replyMsg", "actionWithMessage", "close"],
 };
 </script>
 

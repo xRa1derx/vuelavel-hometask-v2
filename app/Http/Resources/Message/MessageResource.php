@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Message;
 
+use App\Http\Resources\FileResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,9 +19,14 @@ class MessageResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'message' => $this->message,
-            'sender' => User::findOrFail($this->from),
-            'created_at' => $this->created_at->diffForHumans()
+            'new' => $this->new,
+            'replyMessage' => $this->replyMessage,
+            'sender' => UserResource::make(User::findOrFail($this->from)),
+            'created_at' => $this->created_at,
+            'created_at_for_humans' => $this->created_at->diffForHumans(),
+            'files' => FileResource::collection($this->files)
         ];
     }
 }

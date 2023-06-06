@@ -17,7 +17,6 @@ import ShowPostComponent from "./components/Post/ShowPostComponent";
 import CreatePostComponent from "./components/Post/CreatePostComponent";
 import EditPostComponent from "./components/Post/EditPostComponent";
 
-import StartChatComponent from "./components/Chat/StartChatComponent";
 import ChatComponent from "./components/Chat/ChatComponent";
 
 const router = createRouter({
@@ -67,7 +66,7 @@ const router = createRouter({
                 },
                 {
                     path: "chat",
-                    component: StartChatComponent,
+                    component: ChatComponent,
                     name: "chat.admin",
                     meta: {
                         sidebar: "chat",

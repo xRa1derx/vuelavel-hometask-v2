@@ -15,7 +15,7 @@ class StoreController extends Controller
             'content' => 'required',
             'tags' => 'required',
             'category_id' => 'required',
-            'images' => 'nullable|array'
+            'images' => 'required|array'
         ]);
 
         $post = Post::add($request->all());

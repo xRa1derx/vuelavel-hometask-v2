@@ -1,17 +1,8 @@
 <template>
     <div class="sidebar">
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <!-- <img
-                    src="../../assets/images/avatar_admin.png"
-                    class="img-circle elevation-2"
-                    alt="User Image"
-                /> -->
-            </div>
-            <div class="info">
-                <a href="#" class="d-block">{{
-                    currnetStudentName || "Chat"
-                }}</a>
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex justify-content-center">
+            <div class="info pl-1">
+                <router-link class="nav-link" :to="{ name: 'chat.admin' }">New messages</router-link>
             </div>
         </div>
         <nav class="sidebar-menu mt-2 overflow-auto">
@@ -38,7 +29,7 @@
                             class="nav-icon fas fa-circle-notch accent-color user-icon"
                         >
                             <i
-                                v-if="user.status === 'online'"
+                                v-if="getOnlineUsers(user.id)"
                                 class="online"
                             ></i></i
                         >{{ user.name }}
@@ -102,22 +93,24 @@ export default {
         return {
             currnetStudent: null,
             currnetStudentName: null,
-            users: [],
         };
     },
     mounted() {
         this.getUsers();
     },
+    computed: {
+        users() {
+            return this.$store.state.users.filter(
+                (user) => user.id !== 1 && user.id != 0
+            );
+        },
+    },
     methods: {
         getUsers() {
-            axios
-                .get("/api/admin/users")
-                .then(
-                    (res) =>
-                        (this.users = res.data.filter(
-                            (user) => user.id !== 1 && user.id != 0
-                        ))
-                );
+            this.$store.dispatch("getUsers");
+        },
+        getOnlineUsers(id) {
+            return this.$store.state.onlineUsers.find((user) => user.id === id);
         },
     },
 };

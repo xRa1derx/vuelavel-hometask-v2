@@ -16,3 +16,15 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('store_message_{id}', function ($user, $id) {
+    if ((int) $user->id === (int) $id || $user->is_admin === 1) {
+        return ['id' => $user->id, 'name' => $user->name];
+    }
+});
+
+Broadcast::channel('connecting_status_{id}', function ($user, $id) {
+    if ((int) $user->id === (int) $id || $user->is_admin === 1) {
+        return ['id' => $user->id, 'name' => $user->name];
+    }
+});

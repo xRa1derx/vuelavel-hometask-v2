@@ -9,10 +9,12 @@ const store = createStore({
     state() {
         return {
             users: [],
+            onlineUsers: [],
             commentIdToDelete: null,
             quickTextarea: null,
             editCommentTextarea: null,
             isLoginOpen: false,
+            messageAction: null,
         };
     },
     mutations: {
@@ -30,6 +32,9 @@ const store = createStore({
         },
         setCommentIdToDelete(state, commentIdToDelete) {
             state.commentIdToDelete = commentIdToDelete;
+        },
+        setActionWithMessage(state, messageAction) {
+            state.messageAction = messageAction;
         },
     },
     actions: {
@@ -50,10 +55,21 @@ const store = createStore({
         getCommentIdToDelete(context, id) {
             context.commit("setCommentIdToDelete", id);
         },
+        getActionWithMessage(context, action) {
+            context.commit("setActionWithMessage", action);
+        },
     },
     getters: {
         users(state) {
             return state.users;
+        },
+        onlineUsers(state) {
+            const key = "id";
+            return [
+                ...new Map(
+                    state.onlineUsers.map((item) => [item[key], item])
+                ).values(),
+            ];
         },
         currentTextarea(state) {
             return state.quickTextarea;

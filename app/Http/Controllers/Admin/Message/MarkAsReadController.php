@@ -6,7 +6,6 @@ use App\Events\MarkAsReadEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MarkAsReadController extends Controller
 {

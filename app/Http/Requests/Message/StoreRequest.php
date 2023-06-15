@@ -25,10 +25,11 @@ class StoreRequest extends FormRequest
     {
         return [
             'files' => 'nullable|array',
+            'images' => 'nullable|array',
             'uuid' => 'required',
             'from' => 'required|integer',
             'to' => 'required|integer',
-            'message' => 'required_without:files|nullable|string',
+            'message' => 'required_without_all:files,images|nullable|string',
             'replyMessage' => 'nullable'
         ];
     }

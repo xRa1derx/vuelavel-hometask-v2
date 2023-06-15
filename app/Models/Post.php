@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image as ImageIntervention;
 
@@ -33,7 +32,7 @@ class Post extends Model
 
     public function images()
     {
-        return $this->hasMany(Image::class);
+        return $this->hasMany(PostImage::class);
     }
 
     public function verifiedComments()
@@ -92,7 +91,7 @@ class Post extends Model
         $image->storeAs('images/posts/', $fileName);
         $path = public_path('images/posts/' . $prev_name);
         $filePath = 'images/posts/' . $fileName;
-        Image::create([
+        PostImage::create([
             'name' => $fileName,
             'preview' => $prev_name,
             'post_id' => $this->id,

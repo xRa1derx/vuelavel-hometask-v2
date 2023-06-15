@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Intervention\Image\Facades\Image as ImageIntervention;
 
 class Message extends Model
 {
@@ -33,19 +34,59 @@ class Message extends Model
 
     public function files()
     {
-        return $this->hasMany(File::class);
+        return $this->hasMany(MessageFile::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(MessageImage::class);
     }
 
     public function uploadFile($file)
     {
         $fileName =  $file->getClientOriginalName();
-        $file->storeAs('files/messages/', md5(Carbon::now()) . '_' . $fileName);
+        $file->storeAs('messages/files/', md5(Carbon::now()) . '_' . $fileName);
         // $path = public_path('files/messages/' . $fileName);
-        $filePath = 'files/messages/' . md5(Carbon::now()) . '_' . $fileName;
-        File::create([
+        $filePath = 'messages/files/' . md5(Carbon::now()) . '_' . $fileName;
+        MessageFile::create([
             'name' => $fileName,
             'message_uuid' => $this->uuid,
             'path' => $filePath
         ]);
+    }
+
+    public function uploadImage($image)
+    {
+        $imageName = md5(Carbon::now()) . '_' . $image->getClientOriginalName();
+        $imagePath = 'messages/images/' . $imageName;
+        $image->storeAs('messages/images/', $imageName);
+        // $preview_save = public_path('messages/images/' . $prev_name .  '_' . md5(Carbon::now()));
+        $preview_path = 'messages/images/prev_' . $imageName;
+        MessageImage::create([
+            'name' => $imageName,
+            'message_uuid' => $this->uuid,
+            'preview' => $preview_path,
+            'path' => $imagePath
+        ]);
+        ImageIntervention::make($image)->orientate()->heighten(500, function ($image) {
+            $image->upsize();
+        })->save($preview_path);
+        // $canvas = ImageIntervention::canvas(245, 245);
+        // $image  = ImageIntervention::make($image->getRealPath())->resize(245, 245, function ($constraint) {
+        //     $constraint->aspectRatio();
+        // });
+        // $canvas->insert($image, 'center');
+        // $canvas->save($preview_path);
+    }
+
+    public function deleteFile($id)
+    {
+        $file = MessageFile::findOrFail($id);
+        
+        if (file_exists(public_path() . '/' . $file->path)) {
+            unlink(public_path() . '/' . $file->path);
+        }
+        $file->delete();
+        return $file;
     }
 }

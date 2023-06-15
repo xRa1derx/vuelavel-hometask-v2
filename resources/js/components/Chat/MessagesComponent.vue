@@ -29,6 +29,26 @@
                 }"
             >
                 <div
+                    v-if="message.images && message.images.length"
+                    class="message-image-container"
+                    :class="[
+                        $store.state.auth.user.id === message.sender.id
+                            ? 'sender-images'
+                            : 'receiver-images',
+                        message.images.length <= 4
+                            ? `pictures${message.images.length}`
+                            : 'picturesSlider',
+                    ]"
+                >
+                    <images-component
+                        v-for="(image, index) in message.images"
+                        :key="image.id"
+                        :image="image"
+                        :index="index"
+                        :imagesQuantity="message.images.length"
+                    ></images-component>
+                </div>
+                <div
                     v-if="message.files.length"
                     class="files text-dark bg-secondary"
                     :class="[
@@ -94,7 +114,9 @@
         <teleport to="body">
             <delete-component @deleteConfirm="deleteConfirm">
                 <template v-slot:default>
-                    <span class="text-warning">{{ fileForDelete.name }}</span>
+                    <span class="text-warning text-break">{{
+                        fileForDelete.name
+                    }}</span>
                 </template>
             </delete-component>
         </teleport>
@@ -109,12 +131,14 @@ import axios from "axios";
 import MessageComponent from "./MessageComponent.vue";
 import FilesComponent from "./FilesComponent.vue";
 import DeleteComponent from "../UI/DeleteComponent.vue";
+import ImagesComponent from "./ImagesComponent.vue";
 export default {
     components: {
         BaseMessageEdit,
         FilesComponent,
         DeleteComponent,
         MessageComponent,
+        ImagesComponent,
     },
     props: [
         "messages",
@@ -198,7 +222,7 @@ export default {
             }
 
             if (halfScreenY < event.clientY) {
-                clientY.value = event.clientY + window.scrollY - 50;
+                clientY.value = event.clientY + window.scrollY - 120;
             } else {
                 clientY.value = event.clientY + window.scrollY;
             }
@@ -320,6 +344,8 @@ export default {
 
 <style scoped>
 .chat {
+    width: 598px;
+    margin: auto;
     position: relative;
     height: 10%;
     display: flex;
@@ -328,15 +354,127 @@ export default {
     gap: 20px;
     overflow: auto;
     overflow-x: hidden;
-    background-color: #ffffff;
+    background-color: #eee;
     border-radius: 10px;
-    background-image: url("/images/chat-background-min.jpg");
-    background-size: contain;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 992px) {
+    .chat {
+        width: 100%;
+    }
 }
 
 .one-chat-day {
     /* border: 5px solid black; */
+}
+
+.message-image-container {
+    position: relative;
+    gap: 10px;
+    box-shadow: 0px 0px 3px 0px #707070;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.pictures1 {
+    max-width: 500px;
+}
+
+.pictures2 {
+    max-width: 500px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.pictures3 {
+    max-width: 500px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(2, 1fr);
+}
+
+.pictures3 > #image1 {
+    max-height: 400px;
+    grid-column: 1 /2;
+    grid-row: 1 / 3;
+}
+
+.pictures3 > #image2 {
+    max-height: 195px;
+    grid-column: 2 /3;
+}
+
+.pictures3 > #image3 {
+    max-height: 195px;
+    grid-column: 2 /3;
+    grid-row: 2 / 3;
+}
+
+.pictures4 {
+    max-width: 500px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.pictures4 > #image1 {
+    max-height: 320px;
+    grid-column: 1 /2;
+    grid-row: 1 / 4;
+}
+
+.pictures4 > #image2 {
+    max-height: 100px;
+    grid-column: 2 /3;
+    grid-row: 1 / 2;
+}
+
+.pictures4 > #image3 {
+    max-height: 100px;
+    grid-column: 2 /3;
+    grid-row: 2 / 3;
+}
+
+.pictures4 > #image4 {
+    max-height: 100px;
+    grid-column: 2 /3;
+    grid-row: 3 / 4;
+}
+
+.picturesSlider {
+    max-width: 500px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 150px);
+}
+
+.picturesSlider > #image1 {
+    max-height: 310px;
+    grid-column: 1 / -1;
+    grid-row: 1 / 3;
+}
+
+.picturesSlider > #images2 {
+    max-height: 150px;
+    grid-row: 3;
+    grid-column: 1 / 2;
+}
+.picturesSlider > #images3 {
+    max-height: 150px;
+    grid-row: 3;
+    grid-column: 2 / 3;
+}
+.picturesSlider > #images4 {
+    max-height: 150px;
+    grid-row: 3;
+    grid-column: 3 / 4;
+}
+.picturesSlider > #images5 {
+    max-height: 150px;
+    grid-row: 3;
+    grid-column: 4 / 5;
 }
 
 .fulldate {
@@ -361,7 +499,7 @@ export default {
     display: flex;
     flex-direction: column;
     /* margin-bottom: 20px; */
-    padding: 10px;
+    padding: 20px;
     gap: 3px;
 }
 
@@ -374,6 +512,8 @@ export default {
     justify-content: space-between;
     background-color: #eee;
     padding: 2px 5px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
 }
 
 .files-header > svg {
@@ -387,7 +527,7 @@ export default {
 }
 
 .files {
-    border-radius: 3px;
+    border-radius: 10px;
 }
 
 .sender-files,
@@ -399,17 +539,22 @@ export default {
     z-index: 0;
     box-shadow: 0px 0px 3px 0px #707070;
     font-size: 12px;
-    top: 5px;
+    /* top: 5px; */
 }
 
-.sender-files {
-    right: 10px;
+.sender-files,
+.sender-images {
+    /* right: 10px; */
+    /* margin-left: 60px; */
     align-self: flex-end;
+    margin-left: 50px;
 }
 
-.receiver-files {
-    left: 10px;
+.receiver-files,
+.receiver-images {
+    /* left: 10px; */
     align-self: flex-start;
+    margin-right: 50px;
 }
 
 .messages-loader {

@@ -17,7 +17,6 @@ class StoreController extends Controller
             'category_id' => 'required',
             'images' => 'required|array'
         ]);
-
         $post = Post::add($request->all());
         $images = $data['images'];
         foreach ($images as $image) {

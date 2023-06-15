@@ -1,13 +1,15 @@
 <template>
-    <div class="file" @click.self="fileContextMenu($event)" ref="fileRef">
-        <div class="files-actions">
+    <div class="file" ref="fileRef">
+        <div class="files-actions" @click.self="fileContextMenu($event)">
             <font-awesome-icon
                 :icon="['fas', 'download']"
                 @click="downloadFile(file)"
             />
-            <p class="m-0" @click.self="fileContextMenu($event)">
-                {{ subString }}
-            </p>
+            <p
+                class="file-name"
+                @click.self="fileContextMenu($event)"
+                v-html="subString"
+            ></p>
 
             <font-awesome-icon
                 v-if="$store.state.auth.user.id === message.sender.id"
@@ -48,6 +50,7 @@ export default {
             });
         };
         const fileContextMenu = (event) => {
+            console.log(event.target);
             emit("fileContextMenu", event, props.message, "file", fileRef);
         };
         const deleteFile = (file) => {
@@ -58,10 +61,22 @@ export default {
             emit("deleteFile", res);
         };
         const subString = computed(() => {
-            if (props.file.name && props.file.name.length > 20) {
-                return props.file.name.slice(0, 20) + "...";
+            const ext = props.file.name.split(".").reverse()[0];
+            if (ext === "pdf") {
+                if (props.file.name && props.file.name.length > 20) {
+                    return `<a href='../../${
+                        props.file.path
+                    }' target='_blank'>${
+                        props.file.name.slice(0, 16) + "..." + ext
+                    }</a>`;
+                }
+                return `<a href='../../${props.file.path}' target='_blank'>${props.file.name}</a>`;
+            } else {
+                if (props.file.name && props.file.name.length > 20) {
+                    return props.file.name.slice(0, 16) + "..." + ext;
+                }
+                return props.file.name;
             }
-            return props.file.name;
         });
         return {
             downloadFile,
@@ -79,6 +94,7 @@ export default {
     display: flex;
     padding: 10px 5px;
     gap: 7px;
+    cursor: pointer;
 }
 
 .files-actions > svg {
@@ -94,5 +110,18 @@ export default {
 
 .delete-file {
     margin-left: auto;
+}
+
+.file-name {
+    margin: 0;
+}
+
+:deep(a) {
+    color: #fff;
+    text-decoration: underline;
+}
+
+:deep(a:hover) {
+    color: #ffb96f;
 }
 </style>

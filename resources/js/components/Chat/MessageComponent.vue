@@ -204,7 +204,7 @@ textarea {
 
 .message-container {
     position: relative;
-    max-width: 80%;
+    max-width: 500px;
     overflow-wrap: break-word;
     padding: 10px;
     border-radius: 10px;
@@ -219,7 +219,9 @@ textarea {
 
 .sender {
     align-self: flex-end;
-    background-color: #ffa04f;
+    /* background-color: #ffa04f; */
+    background-color: #fff;
+    margin-left: 50px;
 }
 .receiver {
     align-self: flex-start;
@@ -227,7 +229,8 @@ textarea {
 }
 
 .sender:hover {
-    background-color: #ff9437;
+    /* background-color: #ff9437; */
+    background-color: rgb(223, 222, 222);
 }
 
 .receiver:hover {

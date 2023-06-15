@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Files;
 
+use App\Events\AdditionalFileEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FileResource;
-use App\Models\File;
+use App\Models\MessageFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StoreController extends Controller
 {
@@ -13,9 +15,14 @@ class StoreController extends Controller
     {
         $data = $this->validate($request, [
             'uuid' => 'required',
-            'files' => 'required|array'
+            'files' => 'required|array',
+            'from' => 'required|integer',
+            'to' => 'required|integer',
         ]);
-        $currentFiles = new File();
-        return FileResource::collection($currentFiles->uploadFile($data))->resolve();
+        $roomId = Auth::user()->is_admin ? $data['to'] : $data['from'];
+        $currentFiles = new MessageFile();
+        $savedFiles = FileResource::collection($currentFiles->uploadFile($data))->resolve();
+        broadcast(new AdditionalFileEvent($data['uuid'], $roomId, $savedFiles))->toOthers();
+        return $savedFiles;
     }
 }

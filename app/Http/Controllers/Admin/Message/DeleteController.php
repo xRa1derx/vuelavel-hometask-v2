@@ -13,6 +13,10 @@ class DeleteController extends Controller
     public function __invoke($id)
     {
         $message = Message::findOrFail($id);
+        foreach ($message->files as $file) {
+            $message->deleteFile($file->id);
+            $file->delete();
+        }
         $message->delete();
         $roomId = Auth::user()->is_admin ? $message->receiver->id : $message->sender->id;
         broadcast(new DeleteMessageEvent($message, $roomId))->toOthers();

@@ -19,17 +19,22 @@ class StoreController extends Controller
         if (Auth::user()->id != $request->from) {
             return 'ERROR';
         }
-
-        if (!array_key_exists('files', $data)) {
-            $message = Message::create($data);
-        } else {
+        if (array_key_exists('files', $data)) {
             $files = $data['files'];
             unset($data['files']);
             $message = Message::create($data);
             foreach ($files as $file) {
                 $message->uploadFile($file);
             }
-            
+        } else if (array_key_exists('images', $data)) {
+            $images = $data['images'];
+            unset($data['images']);
+            $message = Message::create($data);
+            foreach ($images as $image) {
+                $message->uploadImage($image);
+            }
+        } else {
+            $message = Message::create($data);
         }
         broadcast(new StoreMessageEvent($message, $user->id))->toOthers();
         return MessageResource::make($message)->resolve();

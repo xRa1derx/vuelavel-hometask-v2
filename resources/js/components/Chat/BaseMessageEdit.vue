@@ -23,7 +23,10 @@
                 Edit
             </button>
             <button
-                v-if="$store.state.auth.user.id === message.sender.id"
+                v-if="
+                    $store.state.auth.user.id === message.sender.id &&
+                    message.message != null
+                "
                 @click="$emit('actionWithMessage', message, 'delete')"
             >
                 Delete

@@ -14,8 +14,22 @@
         ></div>
     </div>
     <div class="textarea-wrapper">
-        <div class="addFile-container">
-            <button class="addFile" @click.prevent="attachFiles()">
+        <div class="attach-image-preview">
+            <div
+                class="image-preview"
+                v-for="image in previewImages"
+                :key="image"
+            >
+                <img :src="image" alt="" />
+                <font-awesome-icon
+                    icon="circle-xmark"
+                    size="2xl"
+                    style="color: #e1e4ea"
+                />
+            </div>
+        </div>
+        <div class="addFile-container" id="file-container">
+            <button class="addFile" @click.prevent="attachMenu()">
                 <font-awesome-icon :icon="['fas', 'paperclip']" />
             </button>
             <input
@@ -26,8 +40,40 @@
                 style="display: none"
                 id="attach-file"
             />
+            <input
+                v-on:change="onChangeImageUpload"
+                :key="fileInputKey"
+                type="file"
+                multiple
+                style="display: none"
+                id="attach-image"
+                accept="image/x-png,image/gif,image/jpeg"
+            />
         </div>
-        <div class="textarea">
+        <div class="textarea" id="chat-textarea-container">
+            <div
+                class="attach-menu-backdrop"
+                v-if="isAttachMenu"
+                @click="isAttachMenu = false"
+            >
+                <teleport to="#chat-textarea-container">
+                    <div class="attach-menu">
+                        <div class="attach-container" @click="attachImages()">
+                            <div class="attach-image">
+                                <font-awesome-icon icon="image" size="2xl" />
+                            </div>
+                            <p class="m-0">attach image</p>
+                        </div>
+                        <div class="attach-container" @click="attachFiles()">
+                            <div class="attach-file">
+                                <font-awesome-icon icon="file" size="2xl" />
+                            </div>
+                            <p class="m-0">attach file</p>
+                        </div>
+                    </div>
+                </teleport>
+            </div>
+
             <transition @enter="enter" @leave="leave" key="quote">
                 <p key="quote" v-show="quote.message" class="quote">
                     {{ subString }}
@@ -40,6 +86,11 @@
                 <div v-for="file in selectedFile" :key="file.name">
                     {{ file.name }}
                 </div>
+                <i @click="removeFiles()" class="remove-files">
+                    <font-awesome-icon :icon="['fas', 'xmark']" />
+                </i>
+            </div>
+            <div v-if="selectedImage.length" class="position-relative">
                 <i @click="removeFiles()" class="remove-files">
                     <font-awesome-icon :icon="['fas', 'xmark']" />
                 </i>
@@ -99,7 +150,9 @@ export default {
     setup(props, { emit, expose }) {
         const fileInputKey = ref(0);
         const fileProgress = ref(0);
-        const currentFileUpload = ref(null);
+        const isAttachMenu = ref(false);
+        const previewImages = ref([]);
+        // const currentFileUpload = ref(null);
         const isInputDisabled = ref(true);
         const prepareToAddNewFile = ref(null);
         const messageForAddingFile = ref(null);
@@ -108,14 +161,55 @@ export default {
         const store = useStore();
         const chatTextarea = ref(null);
         const selectedFile = ref(null);
+        const selectedImage = ref([]);
+        const attachMenu = () => {
+            isAttachMenu.value = !isAttachMenu.value;
+        };
         const attachFiles = (message) => {
             document.getElementById("attach-file").click();
+            isAttachMenu.value = false;
             if (message) {
                 prepareToAddNewFile.value = message;
             }
         };
+        const attachImages = () => {
+            document.getElementById("attach-image").click();
+            isAttachMenu.value = false;
+        };
+        const onChangeImageUpload = (e) => {
+            selectedImage.value = [];
+            let fileList = e.target.files;
+
+            // let fileListForPreview = Array.prototype.slice.call(e.target.files);
+            // fileListForPreview.forEach((image) => {
+            //     if (!image.type.match("image.*")) {
+            //         return;
+            //     }
+            //     selectedImage.value.push(image);
+            //     let reader = new FileReader();
+            //     reader.onload = function (e) {
+            //         previewImages.value.push(e.target.result);
+            //     };
+            //     reader.readAsDataURL(image);
+            // });
+
+            for (let i = 0; i < fileList.length; i++) {
+                let image = fileList[i];
+                if (!image.type.match("image.*")) {
+                    return;
+                }
+                selectedImage.value.push(image);
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImages.value.push(e.target.result);
+                };
+                reader.readAsDataURL(image);
+            }
+            selectedFile.value = null;
+        };
         const onChangeFileUpload = (e) => {
             const files = e.target.files;
+            selectedImage.value = [];
             if (e.target.files.length > 0) {
                 messageForAddingFile.value = prepareToAddNewFile.value;
                 selectedFile.value = files;
@@ -124,6 +218,7 @@ export default {
         };
         const removeFiles = () => {
             selectedFile.value = null;
+            selectedImage.value = [];
             messageForAddingFile.value = null;
             prepareToAddNewFile.value = null;
             clearFileInputKey();
@@ -179,6 +274,8 @@ export default {
                 }
             }
             formData.append("uuid", messageForAddingFile.value.uuid);
+            formData.append("to", +route.params.id || 1);
+            formData.append("from", store.state.auth.user.id);
             axios.post("/api/file", formData).then((res) => {
                 const files = {
                     files: res.data,
@@ -192,16 +289,27 @@ export default {
         const addMessage = (event) => {
             if (text.value.trim() !== "" || selectedFile.value != null) {
                 if (event.ctrlKey || event.type == "click") {
+                    const config = {
+                        "Content-Type": "multipart/form-data",
+                    };
                     const uuid = uuidv4();
                     const replyMessage = props.quote.message || "";
                     const message = text.value;
-                    const attachedFiles = [];
+                    // const attachedFiles = [];
+                    // const attachedImages = [];
                     const formData = new FormData();
                     if (selectedFile.value) {
                         for (let i = 0; i < selectedFile.value.length; i++) {
                             let file = selectedFile.value[i];
                             formData.append(`files[${i}]`, file);
-                            attachedFiles.push(file);
+                            // attachedFiles.push(file);
+                        }
+                    }
+                    if (selectedImage.value.length) {
+                        for (let i = 0; i < selectedImage.value.length; i++) {
+                            let image = selectedImage.value[i];
+                            formData.append(`images[${i}]`, image);
+                            // attachedImages.push(image);
                         }
                     }
                     formData.append("uuid", uuid);
@@ -222,6 +330,7 @@ export default {
                                             100
                                     );
                                 },
+                                config,
                             }
                         )
                         .then((res) => {
@@ -238,7 +347,7 @@ export default {
                         replyMessage,
                         created_at: new Date().toISOString(),
                         new: 1,
-                        created_at_for_humans: "just added",
+                        created_at_for_humans: "sending",
                         sender: {
                             id: store.state.auth.user.id,
                             name: store.state.auth.user.name,
@@ -284,10 +393,16 @@ export default {
             attachFiles,
             fileInputKey,
             fileProgress,
-            currentFileUpload,
+            // currentFileUpload,
             messageForAddingFile,
             prepareToAddNewFile,
             additionlFile,
+            isAttachMenu,
+            attachMenu,
+            onChangeImageUpload,
+            attachImages,
+            selectedImage,
+            previewImages,
         };
     },
 };
@@ -295,19 +410,71 @@ export default {
 
 <style scoped>
 .textarea-wrapper {
+    width: 598px;
+    align-self: center;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     gap: 8px;
+}
+
+@media (max-width: 992px) {
+    .textarea-wrapper {
+        width: 100%;
+    }
 }
 .textarea {
     position: relative;
     display: flex;
     flex-direction: column;
-    position: relative;
-    width: 50%;
-    /* margin: 0 auto; */
+    width: 100%;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
     border-top-left-radius: 10px;
+}
+
+.attach-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: absolute;
+    bottom: 102px;
+    left: -37px;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+}
+
+.attach-container {
+    display: flex;
+    gap: 5px;
+    width: fit-content;
+    height: fit-content;
+    cursor: pointer;
+    padding: 2px 10px;
+}
+
+.attach-container:hover {
+    border-radius: 20px;
+    box-shadow: 0 0 3px #fff;
+}
+
+.attach-container > p {
+    line-height: 2;
+}
+
+.attach-file,
+.attach-image {
+    width: 32px;
+    height: 32px;
+}
+
+.attach-menu-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 998;
 }
 
 .addFile-container {
@@ -318,6 +485,42 @@ export default {
     background-color: inherit;
     border: none;
     color: #fff;
+}
+
+.attach-image-preview {
+    display: flex;
+    position: absolute;
+    width: 50%;
+    height: fit-content;
+    bottom: 45px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.image-preview {
+    position: relative;
+    flex-basis: 25%;
+    height: 10vh;
+    padding: 2px;
+    box-shadow: 0 0 20px 1px #0000003d;
+}
+
+.image-preview > svg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.image-preview > svg:hover {
+    color: rgb(88, 88, 88) !important;
+}
+
+.image-preview > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .cancel {
@@ -333,7 +536,8 @@ export default {
 }
 
 @media (max-width: 500px) {
-    .textarea {
+    .textarea,
+    .attach-image-preview {
         width: 100%;
     }
 }

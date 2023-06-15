@@ -80,6 +80,7 @@ export default {
         const handleDebouncedScroll = ref(null);
         const idOfCurrentUser = ref(null);
         const textareaComponent = ref(null);
+        const stopFindingMoreMessages = ref(false);
         const getCurrentUserName = computed(() => {
             return store.getters.users.filter(
                 (user) => user.id == route.params.id
@@ -98,8 +99,9 @@ export default {
             }
         );
         onMounted(() => {
+            const chat = document.querySelector(".chat");
             document.body.style.position = "fixed";
-            getUser();
+            getUser(chat);
             webSocketStoreMessage();
             if (store.state.auth.isAdmin) {
                 axios.get("/api/admin/users").then((res) => {
@@ -114,7 +116,6 @@ export default {
             } else {
                 connecting([{ id: store.state.auth.user.id }]);
             }
-            const chat = document.querySelector(".chat");
             if (chat) {
                 handleDebouncedScroll.value = _.debounce(
                     () => checkScrollPositon(chat),
@@ -135,6 +136,23 @@ export default {
                 }`
             ).stopListening(".store_message");
         });
+        const findNewMessages = () => {
+            const newMessages = messages.value.filter(
+                (message) =>
+                    message.new != 0 &&
+                    store.state.auth.user.id !== message.sender.id
+            );
+            if (newMessages.length) {
+                // get uuid of all new messages
+                const arrayUuidOfNewMessages = newMessages.map(
+                    (message) => message.uuid
+                );
+                setMessageAsRead(arrayUuidOfNewMessages);
+                setTimeout(() => {
+                    newMessages.map((message) => (message.new = 0));
+                }, 3000);
+            }
+        };
         const webSocketStoreMessage = () => {
             const chat = document.querySelector(".chat");
             window.Echo.private(
@@ -151,6 +169,7 @@ export default {
                         setMessageAsRead([newMessage.uuid]);
                         scrollDown();
                     } else {
+                        console.log("we are in listen STORE_MESSAGE");
                         newMessageAlert.value = true;
                         messages.value.push(newMessage);
                     }
@@ -168,29 +187,35 @@ export default {
                         (message) => message.uuid != res.message
                     );
                 })
+                .listen(".add_additional_files", (res) => {
+                    messages.value.forEach((message) => {
+                        if (message.uuid == res.uuid) {
+                            message.files = message.files.concat(res.files);
+                            return;
+                        }
+                    });
+                })
                 .listen(".mark_as_read", (res) => {
                     const message = messages.value.find(
                         (message) => message.uuid == res.message.uuid
                     );
-                    message.new = 0;
+                    if (message) {
+                        message.new = 0;
+                    }
                 });
         };
         const connecting = (users) => {
-            console.log("users: ", users);
             users.map((user) =>
                 window.Echo.join(`connecting_status_${user.id}`)
                     .here((users) => {
-                        console.log("here", users);
                         let currentUsers =
                             store.state.onlineUsers.concat(users);
                         store.state.onlineUsers = currentUsers;
                     })
                     .joining((user) => {
-                        console.log("joining", users);
                         store.state.onlineUsers.push(user);
                     })
                     .leaving((user) => {
-                        console.log("leaving", users);
                         store.state.onlineUsers =
                             store.state.onlineUsers.filter(
                                 (onlineUsers) => onlineUsers.id !== user.id
@@ -198,11 +223,17 @@ export default {
                     })
             );
         };
-        const getUser = () => {
+        const getUser = (chat) => {
             axios.get(`/api/admin/chat/${route.params.id || 1}`).then((res) => {
                 idOfCurrentUser.value = route.params.id;
                 messages.value = res.data;
-                scrollDown();
+                nextTick(() => {
+                    if (chat && chat.clientHeight == chat.scrollHeight) {
+                        findNewMessages();
+                    } else {
+                        scrollDown();
+                    }
+                });
             });
         };
         const newMessage = (message) => {
@@ -226,14 +257,21 @@ export default {
         };
         const newMessageStatus = (status) => {
             messageStatus.value = status;
+            if (messageStatus.value === "accept") {
+                messages.value[
+                    messages.value.length - 1
+                ].created_at_for_humans = "just added";
+            } else {
+                messages.value[
+                    messages.value.length - 1
+                ].created_at_for_humans = "connection problems!";
+            }
         };
         const setMessageAsRead = (arrayOfNewMessages) => {
             arrayOfNewMessages.forEach((messageUuid) =>
-                axios
-                    .patch(`/api/admin/chat/markasread/${messageUuid}`, {
-                        new: 0,
-                    })
-                    .then((res) => console.log(res))
+                axios.patch(`/api/admin/chat/markasread/${messageUuid}`, {
+                    new: 0,
+                })
             );
             newMessageAlert.value = false;
         };
@@ -302,37 +340,28 @@ export default {
         };
         const checkScrollPositon = (chat) => {
             if (chat.scrollTop + chat.clientHeight >= chat.scrollHeight - 5) {
-                console.log("down!");
                 // get uuid of all new messages
-                const newMessages = messages.value.filter(
-                    (message) =>
-                        message.new != 0 &&
-                        store.state.auth.user.id !== message.sender.id
-                );
-                if (newMessages.length) {
-                    // get uuid of all new messages
-                    const arrayUuidOfNewMessages = newMessages.map(
-                        (message) => message.uuid
-                    );
-                    setMessageAsRead(arrayUuidOfNewMessages);
-                    setTimeout(() => {
-                        newMessages.map((message) => (message.new = 0));
-                    }, 3000);
-                }
+                findNewMessages();
             }
             if (chat.scrollTop <= 50) {
-                moreMessagesLoader.value = true;
+                if (stopFindingMoreMessages.value === false) {
+                    moreMessagesLoader.value = true;
+                }
                 axios
                     .post(`/api/admin/chat/load/${route.params.id || 1}`, {
                         uuid: messages.value[0].uuid,
                     })
                     .then((res) => {
-                        messages.value = res.data.concat(messages.value);
-                        if (res.data.length >= 10) {
-                            const chat = document.querySelector(".chat");
-                            if (chat) {
-                                chat.scrollTop = 60;
+                        if (res.data.length != 0) {
+                            messages.value = res.data.concat(messages.value);
+                            if (res.data.length >= 10) {
+                                const chat = document.querySelector(".chat");
+                                if (chat) {
+                                    chat.scrollTop = 60;
+                                }
                             }
+                        } else {
+                            stopFindingMoreMessages.value = true;
                         }
                     })
                     .finally(() => (moreMessagesLoader.value = false));
@@ -361,6 +390,8 @@ export default {
             addAdditionalFiles,
             textareaComponent,
             moreMessagesLoader,
+            findNewMessages,
+            stopFindingMoreMessages,
         };
     },
 };
@@ -396,5 +427,4 @@ export default {
         margin-right: 20px;
     }
 }
-
 </style>

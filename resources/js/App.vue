@@ -37,7 +37,7 @@ html {
     width: 100%;
     -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
-    background-color: #3b3b3b;
+    /* background-color: #3b3b3b; */
 }
 
 @font-face {
@@ -150,9 +150,7 @@ textarea {
     max-width: 485px;
     margin: auto;
     background-color: #242424;
-    /* border: 1px solid rgb(136, 136, 136); */
     border-radius: 10px;
-    /* box-shadow: 0 0 20px 1px rgb(136, 136, 136); */
     z-index: 1;
 }
 </style>

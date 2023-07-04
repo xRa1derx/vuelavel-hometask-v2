@@ -8,14 +8,14 @@
                     href="#"
                     class="nav_link blog-btn"
                     :class="{ active: navActive == 'blog' }"
-                    >Blog</a
+                    >Блог</a
                 >
                 <a
                     @click="materialsOpen('materials')"
                     href="#"
                     class="nav_link materials-btn"
                     :class="{ active: navActive == 'materials' }"
-                    >Materials</a
+                    ><del>Материалы</del> <span class="text-muted"><small>в разработке</small></span></a
                 >
             </nav>
             <div
@@ -48,27 +48,32 @@
             </div>
         </header>
         <main>
-            <section class="fullscreen">
-                <div class="title-wrap">
-                    <h1 class="title">MY HOMETASK</h1>
-                    <p class="personal">personal website</p>
+            <section class="greetings-page">
+                <div class="title">
+                    <h1 class="title__text">MY HOMETASK</h1>
+                    <!-- <p class="title__personal">personal website</p> -->
                 </div>
                 <img
                     class="primary-image"
                     src="../../assets/images/main-image.jpg"
                     alt=""
                 />
-                <p class="greetings">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Ducimus nihil veniam quod vero? Ab praesentium obcaecati
-                    molestiae? Recusandae ipsa rem.
-                </p>
-                <div class="buttons">
-                    <button class="btn">Contact</button>
-                    <div class="social-link">
-                        <a href=""
-                            ><img src="../../assets/images/vk.png" alt=""
-                        /></a>
+                <div class="about-me greetings-page__teacher">
+                    <p class="about-me__teacher-title">
+                        Немного о
+                        <span class="about-me__teacher--accent-color">себе</span>
+                    </p>
+                    <p class="greetings">
+                        Здравствуйте, гости моего сайта, меня зовут Ожеред Алёна Сергеевна. Я преподаю английский язык с
+                        2008 года.
+                    </p>
+                    <div class="buttons">
+                        <button title="в разработке" disabled class="btn">Написать мне</button>
+                        <div class="social-link">
+                            <a target="_blank" href="https://vk.com/alyonamilka"
+                                ><img src="../../assets/images/vk.png" alt=""
+                            /></a>
+                        </div>
                     </div>
                 </div>
                 <img class="book" src="../../assets/images/book.svg" alt="" />
@@ -90,68 +95,7 @@
                     ></post-selected>
                 </section>
             </transition>
-            <section class="second-page">
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <hr />
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <hr />
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <hr />
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Officia earum veritatis aspernatur, voluptatum debitis nam
-                    eaque, quas deleniti laboriosam a nihil molestiae, atque
-                    voluptate quis excepturi magnam laudantium libero
-                    reiciendis.
-                </p>
-                <hr />
-            </section>
+            <service-page></service-page>
             <transition name="modal">
                 <login-component
                     v-if="this.$store.state.isLoginOpen"
@@ -165,6 +109,7 @@
 import PostComponent from "../components/Post/PostComponent.vue";
 import LoginComponent from "../components/LoginComponent.vue";
 import PostSelected from "../components/Post/PostSelected.vue";
+import ServicePage from "../pages/ServicePage.vue";
 import axios from "axios";
 import { mapActions } from "vuex";
 export default {
@@ -172,6 +117,7 @@ export default {
         PostComponent,
         LoginComponent,
         PostSelected,
+        ServicePage,
     },
     data() {
         return {
@@ -304,9 +250,7 @@ img {
 
 main {
     position: relative;
-    /* height: calc(90vh - 50px); */
     height: 100%;
-    /* height: 100vh; */
 }
 
 .btn {
@@ -340,19 +284,11 @@ main {
     transform: scale(1.35, 1.85);
 }
 
-.title {
+.title__text {
     color: var(--clr-accent);
     margin: 0;
     line-height: 1;
 }
-
-.personal {
-    color: var(--clr-icons);
-    margin: 0;
-    font-size: 1.5rem;
-    font-style: italic;
-}
-
 header {
     display: flex;
     align-items: center;
@@ -373,12 +309,16 @@ header > h2 {
     margin: 0;
 }
 
-.title-wrap {
+.title {
     margin: 0 1rem 1.5rem 1rem;
 }
 
 .greetings {
-    margin: 1.5rem 1rem 0 1rem;
+    margin: 0 1rem;
+}
+
+.greetings-page{
+    margin-bottom: 3rem;
 }
 
 .nav {
@@ -476,9 +416,13 @@ header > h2 {
     animation: socialLink 1s ease;
 }
 
-.second-page {
-    margin: 1.5rem 1rem;
-    grid-column: 1 / -1;
+.about-me__teacher-title {
+    margin: 1.5rem 1rem 0 1rem;
+    font-size: 1.5rem;
+}
+
+.about-me__teacher--accent-color {
+    color: var(--clr-accent);
 }
 
 @keyframes socialLink {
@@ -525,17 +469,13 @@ header > h2 {
 }
 
 @media (min-width: 800px) {
-    .second-page {
-        margin: 1.5rem 0;
-        grid-column: 1 / -1;
-    }
-
-    .personal {
+    /* 
+    .title__personal {
         margin: 0;
-    }
+    } */
 
     header {
-        margin: 0 1rem 1.5rem 1rem;
+        /* margin: 0 1rem 1.5rem 1rem; */
         padding: 0;
         padding-top: 1rem;
         background-color: inherit;
@@ -572,7 +512,6 @@ header > h2 {
     }
 
     header {
-        margin: 0;
         position: relative;
         height: 10vh;
         grid-column: 2 / 5;
@@ -580,7 +519,7 @@ header > h2 {
         grid-template-columns: repeat(3, 1fr);
     }
 
-    header::after {
+    .main-page::after {
         content: "";
         position: absolute;
         width: 1px;
@@ -594,8 +533,8 @@ header > h2 {
         z-index: -1;
     }
 
-    header::after {
-        grid-column: 2;
+    .main-page::after {
+        grid-column: 3;
     }
 
     .nav {
@@ -605,7 +544,7 @@ header > h2 {
 
     main {
         position: static;
-        grid-column: 2 / -2;
+        grid-column: 1 / -1;
         display: grid;
         grid-template-columns:
             minmax(1em, 1fr)
@@ -613,10 +552,10 @@ header > h2 {
             minmax(1em, 1fr);
     }
 
-    .fullscreen {
+    .greetings-page {
         position: relative;
         height: 90vh;
-        grid-column: 1 / -1;
+        grid-column: 2 / -2;
         grid-row: 1;
         display: grid;
         grid-template-columns: repeat(3, minmax(15rem, 35rem));
@@ -629,7 +568,7 @@ header > h2 {
         width: 100%;
         margin: 0;
         position: relative;
-        grid-column: 3 / 6;
+        grid-column: 3 / 5;
         grid-row: 1;
         overflow: auto;
         height: 79.9vh;
@@ -647,7 +586,6 @@ header > h2 {
     }
 
     .resize {
-        /* grid-column: 3 / -2; */
         animation: resize 1s linear;
     }
 
@@ -695,21 +633,26 @@ header > h2 {
         height: 90vh;
     }
 
-    .title-wrap {
+    .greetings-page__teacher {
+        grid-row: 2/4;
+        margin-top: auto;
+    }
+
+    .title {
         margin: 0;
         grid-column: 1 / 2;
         grid-row: 1;
         align-self: end;
     }
 
-    .title {
+    .title__text {
         font-size: clamp(2rem, 5vw, 6rem);
     }
 
-    .personal,
-    .greetings {
+    /* .title__personal, */
+    .greetings,
+    .about-me__teacher-title {
         margin: 0;
-        grid-column: 1 / 2;
     }
 
     .buttons {
@@ -717,7 +660,7 @@ header > h2 {
         margin: 0;
     }
 
-    .fullscreen::after {
+    .greetings-page::after {
         content: "";
         position: absolute;
         bottom: 10vh;
@@ -737,7 +680,7 @@ header > h2 {
 
     @media (max-height: 550px) {
         .primary-image {
-            width: 100vh;
+            /* width: 100vh; */
             object-fit: cover;
         }
     }
@@ -745,12 +688,14 @@ header > h2 {
 
 @media (min-width: 1200px) {
     .main-page {
-        max-width: 1600px;
+        /* max-width: 1600px; */
     }
 
-    .fullscreen {
+    .greetings-page {
+        max-width: 1280px;
+        margin: auto;
+        margin-bottom: 3rem;
         grid-row: 1;
-
         grid-template-columns:
             minmax(1em, 1fr)
             repeat(3, minmax(15rem, 35rem))
@@ -760,6 +705,12 @@ header > h2 {
     .blog {
         grid-column: 3 / 4;
         grid-row: 1;
+    }
+
+    .greetings-page__teacher {
+        grid-column: 1 / 3;
+        grid-row: 2 / 4;
+        margin: auto;
     }
 
     .user-login,
@@ -774,19 +725,19 @@ header > h2 {
     }
 
     .primary-image {
-        grid-column: 3 / 5;
-    }
-
-    .title-wrap {
-        grid-column: 1 / 4;
+        grid-column: 3 / -1;
     }
 
     .title {
-        text-shadow: 1px 1px #00000063;
-        font-size: clamp(4rem, 6vw, 7rem);
+        grid-column: 1 / 3;
     }
 
-    .personal,
+    .title__text {
+        text-shadow: 1px 1px #00000063;
+        font-size: clamp(4rem, 6vw, 5.5rem);
+    }
+
+    /* .title__personal, */
     .greetings {
         grid-column: 1 / 3;
     }
@@ -801,7 +752,7 @@ header > h2 {
     }
 
     .resize {
-        grid-column: 3 / 5;
+        grid-column: 3 / 6;
         animation: resize 0.5s linear;
     }
 
@@ -825,6 +776,9 @@ header > h2 {
     }
 
     header {
+        max-width: 1280px;
+        width: 100%;
+        margin: auto;
         grid-column: 2 / 5;
         grid-template-columns: repeat(3, 1fr);
     }
@@ -837,7 +791,7 @@ header > h2 {
         grid-column: 3 /4;
     }
 
-    .fullscreen::after {
+    .greetings-page::after {
         grid-column: 1 / 6;
         background: linear-gradient(
             90deg,
@@ -849,14 +803,14 @@ header > h2 {
         );
     }
 
-    .fullscreen::before {
+    .greetings-page::before {
         grid-row: 1 / 3;
         grid-column: 1 / 3;
     }
 
     @media (max-height: 850px) {
         .primary-image {
-            width: 100vh;
+            /* width: 100vh; */
             object-fit: cover;
         }
     }

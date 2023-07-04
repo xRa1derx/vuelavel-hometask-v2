@@ -17,11 +17,12 @@
         <div class="attach-image-preview">
             <div
                 class="image-preview"
-                v-for="image in previewImages"
+                v-for="(image, index) in previewImages"
                 :key="image"
             >
                 <img :src="image" alt="" />
                 <font-awesome-icon
+                    @click="removeImage(index)"
                     icon="circle-xmark"
                     size="2xl"
                     style="color: #e1e4ea"
@@ -90,11 +91,11 @@
                     <font-awesome-icon :icon="['fas', 'xmark']" />
                 </i>
             </div>
-            <div v-if="selectedImage.length" class="position-relative">
+            <!-- <div v-if="selectedImage.length" class="position-relative">
                 <i @click="removeFiles()" class="remove-files">
                     <font-awesome-icon :icon="['fas', 'xmark']" />
                 </i>
-            </div>
+            </div> -->
             <i @click="$emit('cancelReply')" class="cancel">
                 <font-awesome-icon
                     :icon="['fas', 'xmark']"
@@ -179,20 +180,6 @@ export default {
         const onChangeImageUpload = (e) => {
             selectedImage.value = [];
             let fileList = e.target.files;
-
-            // let fileListForPreview = Array.prototype.slice.call(e.target.files);
-            // fileListForPreview.forEach((image) => {
-            //     if (!image.type.match("image.*")) {
-            //         return;
-            //     }
-            //     selectedImage.value.push(image);
-            //     let reader = new FileReader();
-            //     reader.onload = function (e) {
-            //         previewImages.value.push(e.target.result);
-            //     };
-            //     reader.readAsDataURL(image);
-            // });
-
             for (let i = 0; i < fileList.length; i++) {
                 let image = fileList[i];
                 if (!image.type.match("image.*")) {
@@ -223,6 +210,12 @@ export default {
             prepareToAddNewFile.value = null;
             clearFileInputKey();
             store.dispatch("getActionWithMessage", "");
+        };
+        const removeImage = (index) => {
+            const fileListArray = Array.from(selectedImage.value);
+            fileListArray.splice(index, 1);
+            selectedImage.value = fileListArray;
+            previewImages.value.splice(index, 1);
         };
         const clearFileInputKey = () => {
             fileInputKey.value++;
@@ -403,6 +396,7 @@ export default {
             attachImages,
             selectedImage,
             previewImages,
+            removeImage,
         };
     },
 };

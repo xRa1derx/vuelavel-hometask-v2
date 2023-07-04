@@ -46,6 +46,7 @@
                         :image="image"
                         :index="index"
                         :imagesQuantity="message.images.length"
+                        :images="message.images"
                     ></images-component>
                 </div>
                 <div
@@ -350,7 +351,8 @@ export default {
     height: 10%;
     display: flex;
     flex: 1 0 auto;
-    flex-direction: column;
+    flex-direction: column-reverse;
+    /* flex-flow: column-reverse; */
     gap: 20px;
     overflow: auto;
     overflow-x: hidden;
@@ -366,6 +368,8 @@ export default {
 }
 
 .one-chat-day {
+    display: flex;
+    flex-direction: column-reverse;
     /* border: 5px solid black; */
 }
 
@@ -392,7 +396,8 @@ export default {
     max-width: 500px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: repeat(2, 1fr);
+    /* grid-template-rows: repeat(2, 1fr); */
+    /* grid-auto-rows: 1fr; */
 }
 
 .pictures3 > #image1 {
@@ -416,7 +421,7 @@ export default {
     max-width: 500px;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
-    grid-template-rows: repeat(3, 1fr);
+    /* grid-template-rows: repeat(3, 1fr); */
 }
 
 .pictures4 > #image1 {
@@ -447,37 +452,38 @@ export default {
     max-width: 500px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 150px);
+    /* grid-template-rows: repeat(3, 150px); */
 }
 
 .picturesSlider > #image1 {
-    max-height: 310px;
+    max-height: 340px;
     grid-column: 1 / -1;
     grid-row: 1 / 3;
 }
 
-.picturesSlider > #images2 {
-    max-height: 150px;
+.picturesSlider > #image2 {
+    max-height: 110px;
     grid-row: 3;
     grid-column: 1 / 2;
 }
-.picturesSlider > #images3 {
-    max-height: 150px;
+.picturesSlider > #image3 {
+    max-height: 110px;
     grid-row: 3;
     grid-column: 2 / 3;
 }
-.picturesSlider > #images4 {
-    max-height: 150px;
+.picturesSlider > #image4 {
+    max-height: 110px;
     grid-row: 3;
     grid-column: 3 / 4;
 }
-.picturesSlider > #images5 {
-    max-height: 150px;
+.picturesSlider > #image5 {
+    max-height: 110px;
     grid-row: 3;
     grid-column: 4 / 5;
 }
 
 .fulldate {
+    order: 1;
     background-color: #fff;
     color: rgba(0, 0, 0, 0.83);
     padding: 3px 12px;
@@ -558,7 +564,7 @@ export default {
 }
 
 .messages-loader {
-    position: absolute;
+    position: sticky;
     display: flex;
     justify-content: center;
     top: 0;

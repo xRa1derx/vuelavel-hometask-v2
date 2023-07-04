@@ -160,18 +160,14 @@ export default {
             )
                 .listen(".store_message", (res) => {
                     const newMessage = res.message;
-                    if (
-                        chat.scrollTop + chat.clientHeight >=
-                        chat.scrollHeight - 5
-                    ) {
+                    if (chat.scrollTop >= -10) {
                         newMessage.new = 0;
-                        messages.value.push(newMessage);
+                        messages.value.unshift(newMessage);
                         setMessageAsRead([newMessage.uuid]);
                         scrollDown();
                     } else {
-                        console.log("we are in listen STORE_MESSAGE");
                         newMessageAlert.value = true;
-                        messages.value.push(newMessage);
+                        messages.value.unshift(newMessage);
                     }
                 })
                 .listen(".update_message", (res) => {
@@ -228,18 +224,14 @@ export default {
                 idOfCurrentUser.value = route.params.id;
                 messages.value = res.data;
                 nextTick(() => {
-                    if (chat && chat.clientHeight == chat.scrollHeight) {
-                        findNewMessages();
-                    } else {
-                        scrollDown();
-                    }
+                    findNewMessages();
                 });
             });
         };
         const newMessage = (message) => {
             spinnerForDelivery.value.status = true;
             spinnerForDelivery.value.messageId = message.uuid;
-            messages.value.push(message);
+            messages.value.unshift(message);
             quote.value = {};
             scrollDown();
         };
@@ -258,13 +250,10 @@ export default {
         const newMessageStatus = (status) => {
             messageStatus.value = status;
             if (messageStatus.value === "accept") {
-                messages.value[
-                    messages.value.length - 1
-                ].created_at_for_humans = "just added";
+                messages.value[0].created_at_for_humans = "just added";
             } else {
-                messages.value[
-                    messages.value.length - 1
-                ].created_at_for_humans = "connection problems!";
+                messages.value[0].created_at_for_humans =
+                    "connection problems!";
             }
         };
         const setMessageAsRead = (arrayOfNewMessages) => {
@@ -279,7 +268,7 @@ export default {
             nextTick(() => {
                 const chat = document.querySelector(".chat");
                 if (chat) {
-                    chat.scrollTop = chat.scrollHeight;
+                    chat.scrollTop = 0;
                 }
             });
         };
@@ -339,32 +328,35 @@ export default {
             return time;
         };
         const checkScrollPositon = (chat) => {
-            if (chat.scrollTop + chat.clientHeight >= chat.scrollHeight - 5) {
-                // get uuid of all new messages
+            const top = chat.clientHeight - chat.scrollHeight;
+            if (chat.scrollTop <= 50) {
                 findNewMessages();
             }
-            if (chat.scrollTop <= 50) {
+            if (top >= chat.scrollTop - 50) {
                 if (stopFindingMoreMessages.value === false) {
                     moreMessagesLoader.value = true;
                 }
-                axios
-                    .post(`/api/admin/chat/load/${route.params.id || 1}`, {
-                        uuid: messages.value[0].uuid,
-                    })
-                    .then((res) => {
-                        if (res.data.length != 0) {
-                            messages.value = res.data.concat(messages.value);
-                            if (res.data.length >= 10) {
+                if (moreMessagesLoader.value === true) {
+                    axios
+                        .post(`/api/admin/chat/load/${route.params.id || 1}`, {
+                            uuid: messages.value[messages.value.length - 1]
+                                .uuid,
+                        })
+                        .then((res) => {
+                            if (res.data.length != 0) {
+                                messages.value = messages.value.concat(
+                                    res.data
+                                );
                                 const chat = document.querySelector(".chat");
                                 if (chat) {
-                                    chat.scrollTop = 60;
+                                    chat.scrollTop = top + 60;
                                 }
+                            } else {
+                                stopFindingMoreMessages.value = true;
                             }
-                        } else {
-                            stopFindingMoreMessages.value = true;
-                        }
-                    })
-                    .finally(() => (moreMessagesLoader.value = false));
+                        })
+                        .finally(() => (moreMessagesLoader.value = false));
+                }
             }
         };
         return {

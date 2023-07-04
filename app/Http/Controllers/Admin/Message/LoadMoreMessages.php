@@ -16,17 +16,17 @@ class LoadMoreMessages extends Controller
         ]);
         $sender = Message::with('sender')->where(['from' => auth()->id(), 'to' => $id])->get();
         $receiver = Message::with('sender')->where(['to' => auth()->id(), 'from' => $id])->get();
-        $messages = $sender->merge($receiver)->sortBy('id')->values();
+        $messages = $sender->merge($receiver)->sortBy('id')->reverse()->values();
         $index = $messages->search(function ($message) use ($data) {
             return $message->uuid == $data['uuid'];
         });
-        if ($index < 10) {
-            $startIndex = 0;
-        } else {
-            $startIndex = $index - 10;
-            $index = 10;
-        }
-        $nextTenMessages = $messages->splice($startIndex, $index);
+        // if ($index < 10) {
+        //     $startIndex = 0;
+        // } else {
+        //     $startIndex = $index - 10;
+        //     $index = 10;
+        // }
+        $nextTenMessages = $messages->splice($index + 1, 10);
         $indexOfLastMessage = MessageResource::collection($nextTenMessages->values()->all())->resolve();
 
         return $indexOfLastMessage;

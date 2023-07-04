@@ -71,6 +71,8 @@ class Message extends Model
         ImageIntervention::make($image)->orientate()->heighten(500, function ($image) {
             $image->upsize();
         })->save($preview_path);
+
+
         // $canvas = ImageIntervention::canvas(245, 245);
         // $image  = ImageIntervention::make($image->getRealPath())->resize(245, 245, function ($constraint) {
         //     $constraint->aspectRatio();
@@ -82,7 +84,7 @@ class Message extends Model
     public function deleteFile($id)
     {
         $file = MessageFile::findOrFail($id);
-        
+
         if (file_exists(public_path() . '/' . $file->path)) {
             unlink(public_path() . '/' . $file->path);
         }

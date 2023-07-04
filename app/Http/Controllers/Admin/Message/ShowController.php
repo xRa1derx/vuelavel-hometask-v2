@@ -14,7 +14,7 @@ class ShowController extends Controller
     {
         $sender = Message::with('sender')->where(['from' => auth()->id(), 'to' => $id])->get();
         $receiver = Message::with('sender')->where(['to' => auth()->id(), 'from' => $id])->get();
-        $sortedLastTenMessages = $sender->merge($receiver)->sortBy('id')->slice(-10);
+        $sortedLastTenMessages = $sender->merge($receiver)->sortBy('id')->reverse()->slice(0, 10);
         if (Auth::user()->is_admin) {
             broadcast(new ConnectingStatusEvent($id));
         } else {

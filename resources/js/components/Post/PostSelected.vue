@@ -33,26 +33,26 @@
             <div class="post-content">
                 <p class="ql-editor" ref="post" v-html="post.content"></p>
                 <button class="show-more" @click="showMoreText($event)">
-                    show more
+                    показать ещё
                 </button>
             </div>
             <div class="post-footer d-flex justify-content-between">
                 <div class="tags-wrap m-0 d-flex">
                     <span class="text-muted align-self-center mr-1"
-                        >Tags:
+                        >Теги:
                     </span>
                     <span class="tags" v-for="tag in post.tags" :key="tag.id">
                         {{ tag.title }}
                     </span>
                 </div>
                 <div class="category d-flex flex-nowrap">
-                    <span class="text-muted mr-1">Category: </span>
+                    <span class="text-muted mr-1">Категория: </span>
                     <span> {{ category }}</span>
                 </div>
             </div>
             <div class="no-comments" v-if="!comments.length">
                 <h4 class="text-center text-muted">
-                    No comments yet! Be the first.
+                    Пока нет ни одного комментария
                 </h4>
             </div>
             <replies-component
@@ -67,7 +67,7 @@
                 <comment-textarea
                     @addComment="addComment"
                     @loginOpen="$emit('loginOpen')"
-                    :placeholder="`Type text in the new comment`"
+                    :placeholder="`Напишите что-нибудь`"
                     :textareaType="'main'"
                 ></comment-textarea>
             </div>
@@ -104,10 +104,10 @@ export default {
             depth: null,
             newCommentNotification: false,
             alertMessages: [
-                { text: "Success!", width: 65 },
+                { text: "Отправлено!", width: 100 },
                 {
-                    text: "Wait a little while your comment will be checked!",
-                    width: 290,
+                    text: "Подождите немного пока ваш комментарий проверят!",
+                    width: 350,
                 },
             ],
         };
@@ -154,7 +154,6 @@ export default {
                 .get(`/api/admin/post/${this.postSelected}`)
                 .then(({ data }) => {
                     this.post = data.data;
-                    console.log(this.post);
                     this.category = data.data.category.title;
                     this.comments = data.data.comments;
                     this.getFullDate();

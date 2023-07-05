@@ -22,7 +22,7 @@
                 <div class="post-footer d-flex justify-content-between">
                     <div class="tags-wrap m-0 d-flex">
                         <span class="text-muted align-self-center mr-1"
-                            >Tags:
+                            >Теги:
                         </span>
                         <span
                             class="tags"
@@ -33,7 +33,7 @@
                         </span>
                     </div>
                     <div class="category d-flex flex-nowrap">
-                        <span class="text-muted mr-1">Category: </span>
+                        <span class="text-muted mr-1">Категория: </span>
                         <span> {{ selectedCategoryName }}</span>
                     </div>
                 </div>
@@ -78,33 +78,6 @@ export default {
 </script>
 
 <style scoped>
-/* .modal-mask {
-    position: absolute;
-    z-index: 9998;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: table;
-    transition: opacity 0.3s ease;
-}
-
-.modal-wrapper {
-    width: 95%;
-    height: fit-content;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    max-width: 485px;
-    margin: auto;
-    background-color: #242424;
-    border-radius: 10px;
-    z-index: 1;
-} */
-
 .post-wrapper {
     position: relative;
     padding: 3rem 0;

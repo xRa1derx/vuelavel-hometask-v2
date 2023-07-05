@@ -50,7 +50,6 @@ export default {
             });
         };
         const fileContextMenu = (event) => {
-            console.log(event.target);
             emit("fileContextMenu", event, props.message, "file", fileRef);
         };
         const deleteFile = (file) => {

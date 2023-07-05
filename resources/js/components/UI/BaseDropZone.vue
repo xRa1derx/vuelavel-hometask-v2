@@ -8,11 +8,11 @@
                 </div>
                 <div class="d-flex flex-column">
                     <div class="dz-filename">
-                        <span class="text-muted">File name: </span>
+                        <span class="text-muted">Имя файла: </span>
                         <span data-dz-name></span>
                     </div>
                     <div class="dz-size">
-                        <span class="text-muted">Size: </span
+                        <span class="text-muted">Размер: </span
                         ><span data-dz-size></span>
                     </div>
                     <div class="dz-error-message">

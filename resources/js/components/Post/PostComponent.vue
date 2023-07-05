@@ -20,12 +20,12 @@
                     class="page-link"
                     :disabled="!pagination.prev_page_url"
                 >
-                    Previous
+                    Предыдущая
                 </button>
             </li>
             <li class="page-item disabled">
                 <button class="page-link">
-                    Page {{ pagination.current_page }} of
+                    Страница {{ pagination.current_page }} из
                     {{ pagination.last_page }}
                 </button>
             </li>
@@ -38,7 +38,7 @@
                     @click.prevent="getPosts(pagination.next_page_url, 'next')"
                     :disabled="!pagination.next_page_url"
                 >
-                    Next
+                    Следующая
                 </button>
             </li>
         </ul>
@@ -67,14 +67,14 @@
             <div class="post-content">
                 <p class="ql-editor" ref="post" v-html="post.content"></p>
                 <button class="show-more" @click="showMoreText($event)">
-                    show more
+                    показать ещё
                 </button>
             </div>
             <div class="post-footer d-flex justify-content-between">
                 <div class="tags-and-category-wrap">
                     <div class="tags-wrap m-0 d-flex">
                         <span class="text-muted align-self-center mr-1"
-                            >Tags:
+                            >Теги:
                         </span>
                         <span
                             class="tags"
@@ -85,7 +85,7 @@
                         </span>
                     </div>
                     <div class="category d-flex flex-nowrap">
-                        <span class="text-muted mr-1">Category: </span>
+                        <span class="text-muted mr-1">Категория: </span>
                         <span> {{ post.category.title }}</span>
                     </div>
                 </div>
@@ -121,12 +121,12 @@
                     class="page-link"
                     :disabled="!pagination.prev_page_url"
                 >
-                    Previous
+                    Предыдущая
                 </button>
             </li>
             <li class="page-item disabled">
                 <button class="page-link">
-                    Page {{ pagination.current_page }} of
+                    Страница {{ pagination.current_page }} из
                     {{ pagination.last_page }}
                 </button>
             </li>
@@ -139,7 +139,7 @@
                     @click.prevent="getPosts(pagination.next_page_url, 'next')"
                     :disabled="!pagination.next_page_url"
                 >
-                    Next
+                    Следующая
                 </button>
             </li>
         </ul>
@@ -169,10 +169,10 @@ export default {
             loading: false,
             newCommentNotification: false,
             alertMessages: [
-                { text: "Success!", width: 65 },
+                { text: "Отправлено!", width: 100 },
                 {
-                    text: "Wait a little while your comment will be checked!",
-                    width: 290,
+                    text: "Подождите немного пока ваш комментарий проверят!",
+                    width: 350,
                 },
             ],
         };

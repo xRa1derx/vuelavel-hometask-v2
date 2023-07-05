@@ -8,7 +8,6 @@
                     $store.state.editCommentTextarea === comment.id,
             }"
         >
-            <!-- <div v-if="comment.parent_id !== null && comment.depth != 5" class="line"></div> -->
             <div class="avatar_wrapper">
                 <div class="avatar">
                     <img
@@ -21,11 +20,6 @@
             </div>
             <div class="comment-body">
                 <b>{{ comment.author.name }}</b>
-                <!-- <div class="text-muted" :class="comment.parent ? 'quote' : ''">
-                    <p v-if="comment.parent" class="h-100">
-                        {{ comment.parent.text }}
-                    </p>
-                </div> -->
                 <edit-comment-component
                     v-if="$store.state.editCommentTextarea === comment.id"
                     :comment="comment"
@@ -40,7 +34,7 @@
                         }"
                         @click="replyData(comment)"
                     >
-                        Reply
+                        Ответить
                     </button>
                     <button
                         class="comment-edit"
@@ -54,7 +48,7 @@
                             !comment.replies.length
                         "
                     >
-                        Edit
+                        Редактировать
                     </button>
                     <button
                         @click="commentDelete(comment)"
@@ -77,7 +71,7 @@
                         @deleteConfirm="deleteConfirm"
                         :commentId="comment.id"
                     >
-                        <template v-slot:type>a comment</template>
+                        <template v-slot:type>комментарий</template>
                     </delete-component>
                 </teleport>
             </div>
@@ -88,7 +82,7 @@
                 class="post-comments-section"
             >
                 <comment-textarea
-                    :placeholder="`Type your reply text`"
+                    :placeholder="`Напишите ответ`"
                     @addComment="addComment"
                 >
                 </comment-textarea>
@@ -101,7 +95,7 @@
             @click="toggleReply()"
         >
             <span :class="toggleReplyIcon"></span>
-            <span>more</span>
+            <span>показать ещё</span>
         </div>
 
         <div
@@ -311,6 +305,7 @@ export default {
 .comment-footer {
     align-items: center;
     gap: 15px;
+    flex-wrap: wrap;
 }
 
 .date {

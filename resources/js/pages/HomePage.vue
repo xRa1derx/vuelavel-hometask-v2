@@ -15,7 +15,10 @@
                     href="#"
                     class="nav_link materials-btn"
                     :class="{ active: navActive == 'materials' }"
-                    ><del>Материалы</del> <span class="text-muted"><small>в разработке</small></span></a
+                    ><del>Материалы</del>
+                    <span class="text-muted"
+                        ><small>в разработке</small></span
+                    ></a
                 >
             </nav>
             <div
@@ -61,14 +64,18 @@
                 <div class="about-me greetings-page__teacher">
                     <p class="about-me__teacher-title">
                         Немного о
-                        <span class="about-me__teacher--accent-color">себе</span>
+                        <span class="about-me__teacher--accent-color"
+                            >себе</span
+                        >
                     </p>
                     <p class="greetings">
-                        Здравствуйте, гости моего сайта, меня зовут Ожеред Алёна Сергеевна. Я преподаю английский язык с
-                        2008 года.
+                        Здравствуйте, гости моего сайта, меня зовут Ожеред Алёна
+                        Сергеевна. Я преподаю английский язык с 2008 года.
                     </p>
                     <div class="buttons">
-                        <button title="в разработке" disabled class="btn">Написать мне</button>
+                        <button title="в разработке" disabled class="btn">
+                            Написать мне
+                        </button>
                         <div class="social-link">
                             <a target="_blank" href="https://vk.com/alyonamilka"
                                 ><img src="../../assets/images/vk.png" alt=""
@@ -95,6 +102,7 @@
                     ></post-selected>
                 </section>
             </transition>
+            <about-me></about-me>
             <service-page></service-page>
             <transition name="modal">
                 <login-component
@@ -112,12 +120,14 @@ import PostSelected from "../components/Post/PostSelected.vue";
 import ServicePage from "../pages/ServicePage.vue";
 import axios from "axios";
 import { mapActions } from "vuex";
+import AboutMe from "./AboutMe.vue";
 export default {
     components: {
         PostComponent,
         LoginComponent,
         PostSelected,
         ServicePage,
+        AboutMe,
     },
     data() {
         return {
@@ -292,13 +302,10 @@ main {
 header {
     display: flex;
     align-items: center;
-    /* margin: 0 1rem 1.5rem 1rem; */
     padding: 1rem 1rem 1.5rem 1rem;
     gap: 5px;
-
-    /* new */
     position: relative;
-    z-index: 1;
+    z-index: 2;
     background-color: var(--clr-bg-dark);
 }
 
@@ -317,7 +324,7 @@ header > h2 {
     margin: 0 1rem;
 }
 
-.greetings-page{
+.greetings-page {
     margin-bottom: 3rem;
 }
 
@@ -361,8 +368,7 @@ header > h2 {
     right: 0;
     bottom: 0;
     box-shadow: 0px 30px 50px 30px #00000096;
-    z-index: 0;
-    /* new */
+    z-index: 1;
     height: 100vh;
     margin-top: -72px;
     padding: 72px 0;
@@ -703,7 +709,7 @@ header > h2 {
     }
 
     .blog {
-        grid-column: 3 / 4;
+        max-width: 850px;
         grid-row: 1;
     }
 

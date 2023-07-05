@@ -11,10 +11,10 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-body">
-          <h5 class="text-center mb-0">Save changes?</h5>
+          <h5 class="text-center mb-0">Сохранить изменения?</h5>
         </div>
         <div class="modal-footer mx-auto">
-          <button class="btn btn-secondary" @click.prevent="$refs.confirmToEdit.click()">Cancel</button>
+          <button class="btn btn-secondary" @click.prevent="$refs.confirmToEdit.click()">Отмена</button>
           <slot></slot>
         </div>
       </div>

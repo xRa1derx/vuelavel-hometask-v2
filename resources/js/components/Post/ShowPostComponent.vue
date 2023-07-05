@@ -45,27 +45,27 @@
             <div class="post-content">
                 <p class="ql-editor" v-html="post.content"></p>
                 <button class="show-more" @click="showMoreText($event)">
-                    show more
+                    показать ещё
                 </button>
             </div>
             <div class="post-footer d-flex justify-content-between">
                 <div class="tags-wrap m-0 d-flex">
                     <span class="text-muted align-self-center mr-1"
-                        >Tags:
+                        >Теги:
                     </span>
                     <span class="tags" v-for="tag in post.tags" :key="tag.id">
                         {{ tag.title }}
                     </span>
                 </div>
                 <div class="category d-flex flex-nowrap">
-                    <span class="text-muted mr-1">Category: </span>
+                    <span class="text-muted mr-1">Категория: </span>
                     <span> {{ post.category.title }}</span>
                 </div>
             </div>
         </div>
         <delete-component @deleteConfirm="deleteConfirm">
             <template v-slot:default>{{ postTitleToDelete }}</template>
-            <template v-slot:type>post</template>
+            <template v-slot:type>пост</template>
         </delete-component>
     </div>
 </template>

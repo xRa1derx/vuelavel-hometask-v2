@@ -1,7 +1,7 @@
 <template>
     <form class="mx-auto table-dark">
         <div class="form-group">
-            <label for="title">Title</label>
+            <label for="title">Заголовок</label>
             <input
                 type="title"
                 class="form-control"
@@ -11,13 +11,13 @@
                 v-model="title"
             />
             <small id="titleHelp" class="form-text text-muted"
-                >Give a title to your new post</small
+                >Заголовок для поста</small
             >
         </div>
         <div class="form-group">
             <div class="form-row align-items-start justify-content-between">
                 <div class="col-auto my-1 w-50 category">
-                    <label class="mr-sm-2" for="category">Category</label>
+                    <label class="mr-sm-2" for="category">Категория</label>
                     <select
                         @change="onChangeCategories($event)"
                         class="custom-select mr-sm-2"
@@ -34,11 +34,11 @@
                         </option>
                     </select>
                     <small id="categoryHelp" class="form-text text-muted"
-                        >Choose a category</small
+                        >Выбрать категорию</small
                     >
                 </div>
                 <div class="tagSelect col-auto my-1 w-50">
-                    <label for="tags">Tags</label>
+                    <label for="tags">Теги</label>
                     <select
                         multiple
                         class="form-control mb-2"
@@ -66,11 +66,11 @@
                         class="d-flex flex-wrap"
                     ></div>
                     <small id="tagHelp" class="form-text text-muted">
-                        Use
+                        Используйте
                         <span class="text-warning"
-                            >'CTRL' + 'left mouse click'</span
+                            >'CTRL' + 'левая кнопка мыши'</span
                         >
-                        to select multiple tags</small
+                        чтобы выбрать несколько тегов</small
                     >
                 </div>
                 <base-drop-zone
@@ -90,7 +90,7 @@
                     class="btn btn-warning float-right"
                     @click.prevent="saveChanges()"
                 >
-                    Save changes
+                    Сохранить изменения
                 </button>
             </div>
         </div>

@@ -14,7 +14,7 @@
                         class="modal-title text-white"
                         id="exampleModalLongTitle"
                     >
-                        You are trying to delete <slot></slot>
+                        Вы пытаетесь удалить <slot></slot>
                         <slot name="type"></slot>.
                     </h5>
                     <button
@@ -26,14 +26,14 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body text-white">Are you sure?</div>
+                <div class="modal-body text-white">Вы уверены?</div>
                 <div class="modal-footer">
                     <button
                         type="button"
                         class="btn btn-secondary"
                         data-dismiss="modal"
                     >
-                        Close
+                        Закрыть
                     </button>
                     <button
                         @click="$emit('deleteConfirm')"
@@ -41,7 +41,7 @@
                         type="button"
                         class="btn btn-delete"
                     >
-                        Delete
+                        Удалить
                     </button>
                 </div>
             </div>

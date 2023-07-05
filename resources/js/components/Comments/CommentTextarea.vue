@@ -1,10 +1,10 @@
 <template>
     <div class="textarea-wrap">
         <div v-if="this.$store.state.auth.user.name" class="name text-muted">
-            {{ this.$store.state.auth.user.name || "Guest" }}:
+            {{ this.$store.state.auth.user.name || "Гость" }}:
         </div>
         <div v-else class="login">
-            <button @click="isLoginOpen()">Guest</button>
+            <button @click="isLoginOpen()">Гость</button>
         </div>
 
         <textarea

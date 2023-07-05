@@ -70,10 +70,6 @@ export default {};
     gap: 3rem;
 }
 
-.services {
-    background-color: var(--clr-bg-light);
-}
-
 .services__cards {
     display: flex;
     max-width: 1280px;

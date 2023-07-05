@@ -77,31 +77,6 @@ export default {
     box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.582);
 }
 
-/* .increase-enter-from {
-    width: 0;
-    opacity: 0.3;
-}
-
-.increase-enter-from p {
-    padding-left: 0;
-    transition: all 0.5s ease-in;
-}
-
-.increase-enter-to {
-    width: 270px;
-    transition: all 0.5s ease-in;
-    opacity: 1;
-}
-
-.increase-enter-to p {
-    transition: all 0.5s ease-in;
-    padding-left: 0.5rem;
-}
-
-.increase-enter-active p {
-    transition-delay: 1s;
-} */
-
 .alert-leave-active {
     transition: all 0.5s ease-out;
     padding-left: 0.5rem;

@@ -2,7 +2,9 @@
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex justify-content-center">
             <div class="info pl-1">
-                <router-link class="nav-link" :to="{ name: 'chat.admin' }">New messages</router-link>
+                <router-link class="nav-link" :to="{ name: 'chat.admin' }"
+                    >New messages</router-link
+                >
             </div>
         </div>
         <nav class="sidebar-menu mt-2 overflow-auto">
@@ -21,6 +23,11 @@
                 <li class="nav-item" v-for="user in users" :key="user.id">
                     <router-link
                         class="nav-link"
+                        :style="
+                            $route.params.id == user.id
+                                ? 'background-color: #eee; color: #000;'
+                                : ''
+                        "
                         :to="{
                             name: 'chat.admin.id',
                             params: { id: user.id },
@@ -41,53 +48,6 @@
 </template>
 
 <script>
-import axios from "axios";
-// export default {
-//     setup() {
-//         const students = [
-//             { name: "Oleg", id: 1 },
-//             {
-//                 name: "Varvara",
-//                 id: 2,
-//                 status: "online",
-//                 messages: [{ id: 1, text: "124" }],
-//             },
-//             {
-//                 name: "Lera",
-//                 id: 3,
-//                 status: "online",
-//                 messages: [{ id: 1, text: "124" }],
-//             },
-//             { name: "Nika", id: 4, messages: [{ id: 1, text: "124" }] },
-//             { name: "John", id: 5, messages: [{ id: 1, text: "124" }] },
-//             {
-//                 name: "Olya",
-//                 id: 6,
-//                 status: "online",
-//                 messages: [{ id: 1, text: "124" }],
-//             },
-//             { name: "Anya", id: 7, messages: [{ id: 1, text: "124" }] },
-//             { name: "Vera", id: 8, messages: [{ id: 1, text: "124" }] },
-//             {
-//                 name: "Masha",
-//                 id: 9,
-//                 status: "online",
-//                 messages: [{ id: 1, text: "124" }],
-//             },
-//             { name: "Anton", id: 10, messages: [{ id: 1, text: "124" }] },
-//             { name: "Sergey", id: 11, messages: [{ id: 1, text: "124" }] },
-//             {
-//                 name: "Pavel",
-//                 id: 12,
-//                 status: "online",
-//                 messages: [{ id: 1, text: "124" }],
-//             },
-//         ];
-//         return {
-//             students,
-//         };
-//     },
-// };
 export default {
     data() {
         return {

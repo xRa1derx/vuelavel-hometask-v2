@@ -89,7 +89,6 @@ export default {};
     display: block;
     max-width: 100%;
     position: relative;
-    z-index: 2;
     transform: scale(1.1);
     top: 50px;
 }

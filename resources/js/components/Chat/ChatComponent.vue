@@ -46,6 +46,7 @@
             v-if="$route.params.id || $route.meta.title === 'Dashboard'"
             @newMessage="newMessage"
             @addFiles="addFiles"
+            @addImages="addImages"
             @newMessageStatus="newMessageStatus"
             :quote="quote"
             @cancelReply="quote = {}"
@@ -243,6 +244,16 @@ export default {
             scrollDown();
         };
 
+        const addImages = (images) => {
+            const currentImage = messages.value.filter(
+                (message) => message.uuid === images.uuid
+            );
+            currentImage[0].images = currentImage[0].images.concat(
+                images.images
+            );
+            scrollDown();
+        };
+
         const addAdditionalFiles = (message) => {
             textareaComponent.value.attachFiles(message);
             quote.value = {};
@@ -384,6 +395,7 @@ export default {
             moreMessagesLoader,
             findNewMessages,
             stopFindingMoreMessages,
+            addImages,
         };
     },
 };

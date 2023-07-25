@@ -17,12 +17,12 @@
         <div class="attach-image-preview">
             <div
                 class="image-preview"
-                v-for="(image, index) in previewImages"
-                :key="image"
+                v-for="image in previewImages"
+                :key="image.id"
             >
-                <img :src="image" alt="" />
+                <img :src="image.image" alt="" />
                 <font-awesome-icon
-                    @click="removeImage(index)"
+                    @click="removeImage(image.id)"
                     icon="circle-xmark"
                     size="2xl"
                     style="color: #e1e4ea"
@@ -146,7 +146,13 @@ import { v4 as uuidv4 } from "uuid";
 import { useStore } from "vuex";
 import gsap from "gsap/all";
 export default {
-    emits: ["newMessage", "newMessageStatus", "cancelReply", "addFiles"],
+    emits: [
+        "newMessage",
+        "newMessageStatus",
+        "cancelReply",
+        "addFiles",
+        "addImages",
+    ],
     props: ["quote"],
     setup(props, { emit, expose }) {
         const fileInputKey = ref(0);
@@ -179,16 +185,17 @@ export default {
         };
         const onChangeImageUpload = (e) => {
             selectedImage.value = [];
+            previewImages.value = [];
             let fileList = e.target.files;
             for (let i = 0; i < fileList.length; i++) {
                 let image = fileList[i];
                 if (!image.type.match("image.*")) {
                     return;
                 }
-                selectedImage.value.push(image);
+                selectedImage.value.push({ image, id: i });
                 let reader = new FileReader();
                 reader.onload = function (e) {
-                    previewImages.value.push(e.target.result);
+                    previewImages.value.push({ image: e.target.result, id: i });
                 };
                 reader.readAsDataURL(image);
             }
@@ -211,11 +218,15 @@ export default {
             clearFileInputKey();
             store.dispatch("getActionWithMessage", "");
         };
-        const removeImage = (index) => {
+        const removeImage = (id) => {
+            console.log(id);
             const fileListArray = Array.from(selectedImage.value);
-            fileListArray.splice(index, 1);
-            selectedImage.value = fileListArray;
-            previewImages.value.splice(index, 1);
+            selectedImage.value = selectedImage.value.filter(
+                (image) => image.id != id
+            );
+            previewImages.value = previewImages.value.filter(
+                (image) => image.id != id
+            );
         };
         const clearFileInputKey = () => {
             fileInputKey.value++;
@@ -288,21 +299,17 @@ export default {
                     const uuid = uuidv4();
                     const replyMessage = props.quote.message || "";
                     const message = text.value;
-                    // const attachedFiles = [];
-                    // const attachedImages = [];
                     const formData = new FormData();
                     if (selectedFile.value) {
                         for (let i = 0; i < selectedFile.value.length; i++) {
                             let file = selectedFile.value[i];
                             formData.append(`files[${i}]`, file);
-                            // attachedFiles.push(file);
                         }
                     }
                     if (selectedImage.value.length) {
                         for (let i = 0; i < selectedImage.value.length; i++) {
-                            let image = selectedImage.value[i];
+                            let image = selectedImage.value[i].image;
                             formData.append(`images[${i}]`, image);
-                            // attachedImages.push(image);
                         }
                     }
                     formData.append("uuid", uuid);
@@ -331,6 +338,9 @@ export default {
                                 emit("addFiles", res.data);
                                 fileProgress.value = 0;
                             }
+                            if (res.data.images.length) {
+                                emit("addImages", res.data);
+                            }
                             emit("newMessageStatus", "accept");
                         })
                         .catch((err) => emit("newMessageStatus", "denied"));
@@ -347,10 +357,13 @@ export default {
                             admin: store.state.auth.isAdmin ? 1 : 0,
                         },
                         files: [],
+                        images: [],
                     };
                     emit("newMessage", data);
                     text.value = "";
                     removeFiles();
+                    selectedImage.value = [];
+                    previewImages.value = [];
                     chatTextarea.value.style.height = "24px";
                 } else {
                     let caret = event.target.selectionStart;
@@ -484,7 +497,8 @@ export default {
 .attach-image-preview {
     display: flex;
     position: absolute;
-    width: 50%;
+    width: 100%;
+    max-width: 598px;
     height: fit-content;
     bottom: 45px;
     align-items: flex-end;
@@ -530,8 +544,7 @@ export default {
 }
 
 @media (max-width: 500px) {
-    .textarea,
-    .attach-image-preview {
+    .textarea {
         width: 100%;
     }
 }
